@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
+    <title>账号绑定</title>
+    <link th:href="@{/public/css/bootstrap.css}" rel="stylesheet"/>
+    <link th:href="@{/css/login.css}" rel="stylesheet"/>
+</head>
+<body class="text-center">
+
+<div class="login-top mb-3">
+    <img class="mb-3" th:src="@{/images/logo.png}" alt="Aulang"/>
+    <h5 class="h5 font-weight-normal"></h5>
+    <span style="color: red">绑定成功</span>
+</div>
+
+<form class="form-login">
+    <span>绑定<span th:text="${name}"></span>账号成功</span>
+</form>
+
+<div class="login-footer">
+    <p class="mt-5 mb-3 text-muted">
+        <span>&copy;2018 Aulang</span>
+    </p>
+    <p class="mt-5 mb-3 text-muted small">
+        <span class="pr-2">
+            <a class="text-secondary" target="_blank"
+               th:href="${beiAn.miit.url}" th:text="${beiAn.miit.no}">
+            </a>
+        </span>
+        <span>
+            <img th:src="@{/images/beian.png}"/>
+            <a class="text-secondary" target="_blank"
+               th:href="${beiAn.mps.url}" th:text="${beiAn.mps.no}">
+            </a>
+        </span>
+    </p>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
+    <title>账号授权</title>
+    <link th:href="@{/public/css/bootstrap.css}" rel="stylesheet"/>
+    <link th:href="@{/css/login.css}" rel="stylesheet"/>
+</head>
+<body class="text-center">
+
+<div class="login-top">
+    <img class="mb-3" th:src="${logoUrl}" th:alt-title="${clientName}" width="100px" height="100px"/>
+    <h5 class="h5 mb-3 font-weight-normal">账号授权</h5>
+</div>
+
+<form method="post" th:action="@{/approval}" class="form-login">
+    <input type="hidden" name="authorize_id" th:value="${authorizeId}"/>
+
+    <div class="form-group">
+        <span>授权<span th:text="${clientName}"></span>获取您的</span>
+    </div>
+
+    <div class="form-group">
+        <div class="form-check" th:each="scope : ${scopes}">
+            <input type="checkbox" name="scopes" th:value="${scope}" th:id="${scope}" checked="checked"
+                   class="form-check-input"/>
+            <label class="form-check-label" th:for="${scope}" th:text="${scopeNames.get(scope)}"></label>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <button type="submit" name="authorized" value="false" class="btn btn-secondary mr-3">拒绝</button>
+        <button type="submit" name="authorized" value="true" class="btn btn-primary">授权</button>
+    </div>
+</form>
+
+<div class="login-footer">
+    <p class="mt-5 mb-3 text-muted">
+        <span>&copy;2018 Aulang</span>
+    </p>
+    <p class="mt-5 mb-3 text-muted small">
+        <span class="pr-2">
+            <a class="text-secondary" target="_blank"
+               th:href="${beiAn.miit.url}" th:text="${beiAn.miit.no}">
+            </a>
+        </span>
+        <span>
+            <img th:src="@{/images/beian.png}"/>
+            <a class="text-secondary" target="_blank"
+               th:href="${beiAn.mps.url}" th:text="${beiAn.mps.no}">
+            </a>
+        </span>
+    </p>
+</div>
+
+</body>
+</html>

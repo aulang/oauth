@@ -1,0 +1,57 @@
+plugins {
+    id 'org.springframework.boot' version '2.2.6.RELEASE'
+    id 'io.spring.dependency-management' version '1.0.9.RELEASE'
+    id 'java'
+}
+
+group = 'net.aulang.oauth'
+version = '1.0.0'
+sourceCompatibility = '11'
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    maven {
+        url 'https://maven.aliyun.com/repository/public'
+    }
+
+    maven {
+        credentials {
+            username 'mUG1Lz'
+            password 'Xw5RtNA0MC'
+        }
+        url 'https://repo.rdc.aliyun.com/repository/51853-release-C1fBb4/'
+    }
+    maven {
+        credentials {
+            username 'mUG1Lz'
+            password 'Xw5RtNA0MC'
+        }
+        url 'https://repo.rdc.aliyun.com/repository/51853-snapshot-s3ikOa/'
+    }
+}
+
+dependencies {
+    implementation(
+            'org.springframework.boot:spring-boot-starter-web',
+            'org.springframework.boot:spring-boot-starter-thymeleaf',
+            'org.springframework.boot:spring-boot-starter-data-mongodb',
+
+            'org.apache.httpcomponents:httpclient:4.5.12',
+            'com.sun.mail:javax.mail:1.6.2',
+            'cn.hutool:hutool-all:5.3.2'
+    )
+    compileOnly('org.projectlombok:lombok')
+    annotationProcessor('org.projectlombok:lombok')
+    testImplementation('org.springframework.boot:spring-boot-starter-test') {
+        exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+    }
+}
+
+test {
+    useJUnitPlatform()
+}

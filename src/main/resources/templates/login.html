@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
+    <title>登录</title>
+    <link th:href="@{/public/css/bootstrap.css}" rel="stylesheet"/>
+    <link th:href="@{/css/login.css}" rel="stylesheet"/>
+</head>
+<body class="text-center">
+<input type="hidden" id="authorize_id" th:value="${authorizeId}"/>
+
+<div class="login-top">
+    <img class="mb-3" th:src="@{/images/logo.png}" alt="Aulang"/>
+    <h4 class="h4 mb-3 font-weight-normal">请登录</h4>
+    <span th:text="${error}" id="errorMsg" style="color: red"></span>
+</div>
+
+<form method="post" th:action="@{/login}" id="loginForm" class="form-login">
+    <input type="hidden" name="authorize_id" th:value="${authorizeId}"/>
+
+    <label for="username" class="sr-only">账号</label>
+    <input type="text" id="username" name="username" class="form-control username"
+           placeholder="用户名" autofocus="autofocus" required="required" autocomplete="off"/>
+
+    <label for="password" class="sr-only">密码</label>
+    <input type="password" id="password" name="password" class="form-control"
+           th:classappend="${captcha}?'captcha-pwd':'password'"
+           placeholder="密  码" required="required"/>
+
+    <div th:if="${captcha}" class="form-captcha">
+        <input type="text" id="captcha" name="captcha" class="form-control captcha"
+               placeholder="验证码" required="required" autocomplete="off"/>
+        <img th:src="@{'/api/captcha/' + ${authorizeId}}" id="captchaImg"
+             title="点击刷新" alt="验证码"/>
+    </div>
+
+    <div class="checkbox mt-3 mb-3">
+        <label>
+            <input type="checkbox" id="rememberMe"/> 记住账号
+        </label>
+    </div>
+
+    <button type="button" class="btn btn-lg btn-primary btn-block" id="loginSubmit">登 录</button>
+</form>
+
+<form method="post" th:action="@{/login/captcha}" id="mobileLoginForm" class="form-login" style="display: none">
+    <input type="hidden" name="authorize_id" th:value="${authorizeId}"/>
+
+    <label for="mobile" class="sr-only">手机号</label>
+    <input type="text" id="mobile" name="mobile" class="form-control username"
+           placeholder="手机号" autofocus="autofocus" required="required" autocomplete="off"/>
+
+    <div class="input-group mb-3">
+        <input type="text" id="mobileCaptcha" name="captcha" class="form-control captcha"
+               placeholder="验证码" required="required" autocomplete="off"/>
+        <div class="input-group-append">
+            <button type="button" th:href="@{/api/captcha}" id="sendCaptcha"
+                    class="btn btn-outline-primary mobileCaptcha">发送验证码</button>
+        </div>
+    </div>
+
+    <button type="button" th:href="@{'/api/captcha/' + ${authorizeId} + '/'}" id="mobileLoginSubmit"
+            class="btn btn-lg btn-primary btn-block">登 录</button>
+</form>
+
+<div class="login-footer">
+    <div class="third-login">
+        <a id="loginModeSwitch">
+            <img th:src="@{/images/phone.png}" title="账号/短信登录"/>
+        </a>
+
+        <a th:each="server : ${servers}"
+           th:href="@{'/third_login/' + ${authorizeId} + '/' + ${server.id}}">
+            <img th:src="${server.logoUrl}" th:title="${server.name}"/>
+        </a>
+    </div>
+
+    <p class="mt-5 mb-3 text-muted">
+        <span>&copy;2018 Aulang</span>
+    </p>
+    <p class="mt-5 mb-3 text-muted small">
+        <span class="pr-2">
+            <a class="text-secondary" target="_blank"
+               th:href="${beiAn.miit.url}" th:text="${beiAn.miit.no}">
+            </a>
+        </span>
+        <span>
+            <img th:src="@{/images/beian.png}"/>
+            <a class="text-secondary" target="_blank"
+               th:href="${beiAn.mps.url}" th:text="${beiAn.mps.no}">
+            </a>
+        </span>
+    </p>
+</div>
+
+<script type="text/javascript" th:src="@{/public/js/jquery.js}"></script>
+<script type="text/javascript" th:src="@{/js/cookie.js}"></script>
+<script type="text/javascript" th:src="@{/js/login.js}"></script>
+</body>
+</html>

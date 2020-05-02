@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
+    <title>密码修改</title>
+    <link th:href="@{/public/css/bootstrap.css}" rel="stylesheet"/>
+    <link th:href="@{/css/login.css}" rel="stylesheet"/>
+</head>
+<body class="text-center">
+
+<div class="login-top">
+    <img class="mb-3" th:src="@{/images/logo.png}" alt="Aulang"/>
+    <h5 class="h5 mb-3 font-weight-normal">修改密码</h5>
+    <span th:text="${error}" id="errorMsg" style="color: red"></span>
+</div>
+
+<form method="post" th:action="@{/change_passwd}" id="passwordForm" class="form-login">
+    <input type="hidden" name="authorize_id" th:value="${authorizeId}"/>
+
+    <label for="password" class="sr-only">新密码</label>
+    <input type="password" id="password" name="password" class="form-control username"
+           placeholder="新密码" autofocus="autofocus" required="required"/>
+
+    <label for="confirmedPassword" class="sr-only">确认密码</label>
+    <input type="password" id="confirmedPassword" name="confirmed_password" class="form-control password"
+           placeholder="确认密码" required="required"/>
+
+    <button type="button" id="passwordFormSubmit" class="btn btn-lg btn-primary btn-block mt-3">确认修改</button>
+</form>
+
+<div class="login-footer">
+    <p class="mt-5 mb-3 text-muted">
+        <span>&copy;2018 Aulang</span>
+    </p>
+    <p class="mt-5 mb-3 text-muted small">
+        <span class="pr-2">
+            <a class="text-secondary" target="_blank"
+               th:href="${beiAn.miit.url}" th:text="${beiAn.miit.no}">
+            </a>
+        </span>
+        <span>
+            <img th:src="@{/images/beian.png}"/>
+            <a class="text-secondary" target="_blank"
+               th:href="${beiAn.mps.url}" th:text="${beiAn.mps.no}">
+            </a>
+        </span>
+    </p>
+</div>
+
+<script type="text/javascript" th:src="@{/public/js/jquery.js}"></script>
+<script type="text/javascript" th:src="@{/js/chpwd.js}"></script>
+</body>
+</html>
