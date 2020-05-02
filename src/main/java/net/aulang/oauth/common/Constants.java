@@ -26,8 +26,9 @@ public interface Constants {
     String HEADER = "header";
     String BEARER = "Bearer";
 
+    int NEED_CAPTCHA_TIMES = 2;
     int MAX_PASSWORD_ERROR_TIMES = 6;
-    
+
     String BIND_STATE_AUTHORIZE_ID = "bind_third_account";
 
 

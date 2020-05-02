@@ -15,10 +15,10 @@ spring:
       uri: mongodb://127.0.0.1:27017/oauth
 
 captcha:
-  count: 4
-  width: 200
-  height: 80
-  style: shear
+  len: 2
+  width: 100
+  height: 42
+  style: Math
 
 email:
   host: smtp.aliyun.com

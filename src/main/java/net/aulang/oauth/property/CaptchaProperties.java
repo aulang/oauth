@@ -11,7 +11,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @Data
 @ConfigurationProperties("captcha")
 public class CaptchaProperties {
-    private int count;
+    private int len;
     private int width;
     private int height;
     private String style;

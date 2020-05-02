@@ -1,9 +1,10 @@
 package net.aulang.oauth.factory;
 
-import cn.hutool.captcha.CircleCaptcha;
-import cn.hutool.captcha.ICaptcha;
-import cn.hutool.captcha.LineCaptcha;
-import cn.hutool.captcha.ShearCaptcha;
+import com.wf.captcha.ArithmeticCaptcha;
+import com.wf.captcha.ChineseCaptcha;
+import com.wf.captcha.SpecCaptcha;
+import com.wf.captcha.base.Captcha;
+import net.aulang.oauth.captcha.MathCaptcha;
 import net.aulang.oauth.property.CaptchaProperties;
 
 /**
@@ -18,16 +19,14 @@ public class CaptchaFactory {
         this.properties = properties;
     }
 
-    public ICaptcha create() {
+    public Captcha create() {
         switch (properties.getStyle().toLowerCase()) {
-            case "circle":
-                return new CircleCaptcha(properties.getWidth(), properties.getHeight(), properties.getCount());
-            case "line":
-                return new LineCaptcha(properties.getWidth(), properties.getHeight(), properties.getCount(), 150);
-            case "shear":
-                return new ShearCaptcha(properties.getWidth(), properties.getHeight(), properties.getCount());
+            case "Spec":
+                return new SpecCaptcha(properties.getWidth(), properties.getHeight(), properties.getLen());
+            case "Chinese":
+                return new ChineseCaptcha(properties.getWidth(), properties.getHeight(), properties.getLen());
             default:
-                return new ShearCaptcha(properties.getWidth(), properties.getHeight(), properties.getCount());
+                return new MathCaptcha(properties.getWidth(), properties.getHeight(), properties.getLen());
         }
     }
 }

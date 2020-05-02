@@ -1,14 +1,14 @@
 package net.aulang.oauth.restcontroller;
 
-import cn.hutool.captcha.ICaptcha;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
+import com.wf.captcha.base.Captcha;
 import lombok.extern.slf4j.Slf4j;
 import net.aulang.oauth.entity.AuthRequest;
 import net.aulang.oauth.factory.CaptchaFactory;
-import net.aulang.oauth.model.CaptchaSendResult;
 import net.aulang.oauth.manage.AccountBiz;
 import net.aulang.oauth.manage.AuthRequestBiz;
+import net.aulang.oauth.model.CaptchaSendResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -40,13 +40,13 @@ public class CaptchaController {
     public ResponseEntity<StreamingResponseBody> captcha(@PathVariable String authorizeId) {
         AuthRequest request = requestBiz.findOne(authorizeId);
         if (request != null) {
-            ICaptcha captcha = factory.create();
+            Captcha captcha = factory.create();
 
-            String code = captcha.getCode();
+            String code = captcha.text();
             request.setCaptcha(code);
             requestBiz.save(request);
 
-            return ResponseEntity.ok(outputStream -> captcha.write(outputStream));
+            return ResponseEntity.ok(captcha::out);
         } else {
             return ResponseEntity.badRequest().build();
         }

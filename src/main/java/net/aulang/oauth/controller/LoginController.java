@@ -1,10 +1,10 @@
 package net.aulang.oauth.controller;
 
+import cn.hutool.core.util.RandomUtil;
 import net.aulang.oauth.common.Constants;
 import net.aulang.oauth.entity.AuthRequest;
 import net.aulang.oauth.entity.Client;
 import net.aulang.oauth.exception.PasswordExpiredException;
-import net.aulang.oauth.factory.CaptchaFactory;
 import net.aulang.oauth.manage.AccountBiz;
 import net.aulang.oauth.manage.AuthRequestBiz;
 import net.aulang.oauth.manage.ClientBiz;
@@ -36,8 +36,6 @@ public class LoginController {
     private AuthRequestBiz requestBiz;
     @Autowired
     private ReturnPageBiz returnPageBiz;
-    @Autowired
-    private CaptchaFactory captchaFactory;
 
     @GetMapping("/login/{authorizeId}")
     public String login(@PathVariable String authorizeId, HttpServletResponse response, Model model) {
@@ -110,9 +108,11 @@ public class LoginController {
 
 
         int triedTimes = request.getTriedTimes() + 1;
-        if (request.getTriedTimes() > 2) {
-            captcha = captchaFactory.create().getCode();
-            request.setCaptcha(captcha);
+        if (request.getTriedTimes() > Constants.NEED_CAPTCHA_TIMES) {
+            /**
+             * 需要验证码了，随机塞个数字就行
+             */
+            request.setCaptcha(RandomUtil.randomString(4));
         }
 
         request.setTriedTimes(triedTimes);
