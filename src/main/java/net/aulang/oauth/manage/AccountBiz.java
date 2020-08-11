@@ -97,7 +97,7 @@ public class AccountBiz {
         return null;
     }
 
-    public String login(String loginName, String password)
+    public String login(String loginName, String passwordSHA256)
             throws PasswordExpiredException, AccountLockedException {
         Account account = findByLoginName(loginName);
 
@@ -112,7 +112,7 @@ public class AccountBiz {
             throw new AccountLockedException("账号被锁定，请稍后再试");
         }
 
-        if (!PasswordUtil.digest(password).equals(account.getPassword())) {
+        if (!passwordSHA256.equals(account.getPassword())) {
             int passwordErrorTimes = account.getPasswordErrorTimes();
             account.setPasswordErrorTimes(++passwordErrorTimes);
 

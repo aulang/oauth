@@ -17,6 +17,7 @@ import net.aulang.oauth.manage.AuthRequestBiz;
 import net.aulang.oauth.manage.ClientBiz;
 import net.aulang.oauth.manage.ReturnPageBiz;
 import net.aulang.oauth.model.AccessToken;
+import net.aulang.oauth.util.PasswordUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -208,7 +209,8 @@ public class OAuthController {
                 }
 
                 try {
-                    String accountId = accountBiz.login(username, password);
+                    String passwordSHA256 = PasswordUtil.digest(password);
+                    String accountId = accountBiz.login(username, passwordSHA256);
                     if (accountId != null) {
                         Set<String> scopes = client.getAutoApprovedScopes();
                         AccountToken accountToken = tokenBiz.create(clientId, scopes, grantType, accountId);

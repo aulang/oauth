@@ -75,7 +75,7 @@ public class LoginController {
             return Constants.errorPage(model, "无效的client_id");
         }
 
-        if (request.getTriedTimes() > 2) {
+        if (request.getTriedTimes() > Constants.NEED_CAPTCHA_TIMES) {
             if (request.getCaptcha() != null && !request.getCaptcha().equals(captcha)) {
                 model.addAttribute("error", "验证码错误");
                 return returnPageBiz.loginPage(request, client, model);

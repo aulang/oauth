@@ -20,7 +20,9 @@ $(function () {
                 $('#errorMsg').html('请输入账号');
                 return;
             }
-            if (!$.trim(password.val())) {
+
+            var passwordVal = password.val();
+            if (!$.trim(passwordVal)) {
                 $('#errorMsg').html('请输入密码');
                 return;
             }
@@ -31,6 +33,11 @@ $(function () {
             }
 
             rememberMe();
+
+            /**
+             * 密码进行SHA256
+             */
+            password.val(sha256(passwordVal));
 
             $('#loginForm').submit();
         });
