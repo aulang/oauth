@@ -80,7 +80,7 @@ public class IndexController {
             account.setMobile("xxxxxxxxxxxxxxxxx");
             account.setEmail("aulang@qq.com");
 
-            account.setPassword(PasswordUtil.digest("xxxxxxxxxxxxxxxxx"));
+            account.setPassword(PasswordUtil.digestAndBcrypt("xxxxxxxxxxxxxxxxx"));
 
             account = accountBiz.save(account);
 

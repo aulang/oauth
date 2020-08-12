@@ -1,4 +1,5 @@
 ### 1. 登录请求方式
+<font color="red">密码（password）均为SHA256摘要，禁止明文传输</font>
 #### 1. 认证码模式
 1. 路径: /authorize?client_id=xxxxxx&response_type=code&redirect_url=xxxxxx&scope=xxxxxx&state=xxxxxx
 2. 方式：get

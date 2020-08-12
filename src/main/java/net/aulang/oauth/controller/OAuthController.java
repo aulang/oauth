@@ -17,7 +17,6 @@ import net.aulang.oauth.manage.AuthRequestBiz;
 import net.aulang.oauth.manage.ClientBiz;
 import net.aulang.oauth.manage.ReturnPageBiz;
 import net.aulang.oauth.model.AccessToken;
-import net.aulang.oauth.util.PasswordUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -173,7 +172,7 @@ public class OAuthController {
      * @param clientSecret 客户端凭证，授权码模式和凭证模式必选项
      * @param redirectUrl  重定向URI，授权码模式可选项
      * @param username     用户名，密码模式必选项
-     * @param password     用户密码，密码模式必选项
+     * @param password     用户密码SHA256摘要，密码模式必选项
      * @param refreshToken 刷新access_token
      */
     @ResponseBody
@@ -209,8 +208,7 @@ public class OAuthController {
                 }
 
                 try {
-                    String passwordSHA256 = PasswordUtil.digest(password);
-                    String accountId = accountBiz.login(username, passwordSHA256);
+                    String accountId = accountBiz.login(username, password);
                     if (accountId != null) {
                         Set<String> scopes = client.getAutoApprovedScopes();
                         AccountToken accountToken = tokenBiz.create(clientId, scopes, grantType, accountId);

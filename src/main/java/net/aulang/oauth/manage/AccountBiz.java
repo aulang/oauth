@@ -97,7 +97,7 @@ public class AccountBiz {
         return null;
     }
 
-    public String login(String loginName, String passwordSHA256)
+    public String login(String loginName, String password)
             throws PasswordExpiredException, AccountLockedException {
         Account account = findByLoginName(loginName);
 
@@ -112,7 +112,7 @@ public class AccountBiz {
             throw new AccountLockedException("账号被锁定，请稍后再试");
         }
 
-        if (!passwordSHA256.equals(account.getPassword())) {
+        if (!PasswordUtil.bcryptCheck(password, account.getPassword())) {
             int passwordErrorTimes = account.getPasswordErrorTimes();
             account.setPasswordErrorTimes(++passwordErrorTimes);
 
@@ -153,7 +153,7 @@ public class AccountBiz {
         Optional<Account> optional = dao.findById(id);
         if (optional.isPresent()) {
             Account account = optional.get();
-            account.setPassword(PasswordUtil.digest(password));
+            account.setPassword(PasswordUtil.bcrypt(password));
             account.setMustChangePassword(mustChangePassword);
             dao.save(account);
             return id;
@@ -164,7 +164,7 @@ public class AccountBiz {
     public Account register(Account account) {
         String password = account.getPassword();
         if (password != null) {
-            account.setPassword(PasswordUtil.digest(password));
+            account.setPassword(PasswordUtil.bcrypt(password));
         }
         return dao.save(account);
     }
