@@ -26,5 +26,5 @@ email:
   ssl-enable: true
   auth: true
   user: aulang@aliyun.com
-  pass: xxxxxxxxxxxxxxxxx
+  pass: ${EMAIL_PASSWORD}
   from: aulang@aliyun.com
