@@ -20,6 +20,7 @@ steps:
   commands:
   - gradle build
   - docker build -t aulang/oauth .
+  - docker rmi $(docker images | grep "none" | awk '{print $3}')
 
 - name: stop
   commands:
