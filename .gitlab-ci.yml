@@ -5,14 +5,16 @@ stages:
 
 build_image:
   stage: build
-  only: master
+  only:
+    - master
   script:
     - gradle build
     - docker build -t aulang/oauth .
 
 stop_service:
   stage: stop
-  only: master
+  only:
+    - master
   script:
     - docker stop oauth
     - docker rm oauth
@@ -20,7 +22,8 @@ stop_service:
 
 deploy_service:
   stage: stop
-  only: master
+  only:
+    - master
   script:
     - rm -rf /var/log/oauth/*
     - docker run -d -v /var/log/oauth:/var/log/oauth --name=oauth --net=host --restart=always aulang/oauth
