@@ -21,7 +21,7 @@ stop_service:
     - docker rmi $(docker images | grep "none" | awk '{print $3}')
 
 deploy_service:
-  stage: stop
+  stage: deploy
   only:
     - master
   script:
