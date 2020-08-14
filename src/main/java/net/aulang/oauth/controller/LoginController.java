@@ -150,9 +150,9 @@ public class LoginController {
     }
 
     @GetMapping("/logout")
-    public void logout(@RequestParam(name = "redirect_url", required = false) String redirectUrl,
+    public void logout(@RequestParam(name = "redirect_uri", required = false) String redirectUri,
                        HttpServletResponse response) throws IOException {
         response.addCookie(Constants.removeSsoCookie());
-        response.sendRedirect(redirectUrl != null ? redirectUrl : "/");
+        response.sendRedirect(redirectUri != null ? redirectUri : "/");
     }
 }

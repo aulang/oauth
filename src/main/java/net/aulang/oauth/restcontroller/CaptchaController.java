@@ -81,9 +81,9 @@ public class CaptchaController {
             request = new AuthRequest();
             request.setClientId(clientId);
             /**
-             * 移动端验证码登录没有redirectUrl默认填充captcha
+             * 移动端验证码登录没有redirectUri默认填充captcha
              */
-            request.setRedirectUrl("captcha");
+            request.setRedirectUri("captcha");
         } else {
             return ResponseEntity.badRequest().body("参数不合法");
         }

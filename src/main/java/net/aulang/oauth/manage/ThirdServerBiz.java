@@ -86,7 +86,7 @@ public class ThirdServerBiz {
         Map<String, String> params = server.getAuthorizeParams();
         String url = buildGetUrl(server.getAuthorizeUrl(), params);
 
-        StringBuilder authorizeUrl = new StringBuilder("redirect:");
+        StringBuilder authorizeUrl = new StringBuilder(Constants.REDIRECT);
         authorizeUrl.append(url);
 
         String state = stateBiz.create(authorizeId, server.getId(), accountId).getId();

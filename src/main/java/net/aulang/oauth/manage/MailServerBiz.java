@@ -43,6 +43,7 @@ public class MailServerBiz {
                     "aulang@aliyun.com",
                     aes.encryptHex("123456"),
                     "aulang@aliyun.com");
+            return repository.save(server);
         }
 
         /**
@@ -50,6 +51,6 @@ public class MailServerBiz {
          */
         server.setPass(aes.decryptStr(server.getPass()));
 
-        return repository.save(server);
+        return server;
     }
 }

@@ -23,7 +23,7 @@ public class AuthCode implements Serializable {
 
     private String clientId;
     private Set<String> scopes;
-    private String redirectUrl;
+    private String redirectUri;
     private String accountId;
 
     /**

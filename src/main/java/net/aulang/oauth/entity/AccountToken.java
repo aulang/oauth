@@ -22,8 +22,8 @@ import java.util.Set;
 @CompoundIndexes({
         @CompoundIndex(
                 unique = true,
-                name = "idx_accountId_clientId_redirectUrl",
-                def = "{'accountId':1, 'clientId':1, 'redirectUrl':1}"
+                name = "idx_accountId_clientId_redirectUri",
+                def = "{'accountId':1, 'clientId':1, 'redirectUri':1}"
         )
 })
 public class AccountToken implements Serializable {
@@ -55,7 +55,7 @@ public class AccountToken implements Serializable {
 
     private String clientId;
     private Set<String> scopes;
-    private String redirectUrl;
+    private String redirectUri;
     private String accountId;
 
     private LocalDateTime createdDateTime = LocalDateTime.now();

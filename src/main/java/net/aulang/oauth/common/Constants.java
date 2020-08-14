@@ -29,6 +29,7 @@ public interface Constants {
     int NEED_CAPTCHA_TIMES = 2;
     int MAX_PASSWORD_ERROR_TIMES = 6;
 
+    String REDIRECT = "redirect:";
     String BIND_STATE_AUTHORIZE_ID = "bind_third_account";
     byte[] DEFAULT_KEY = "QGDCilNe3S3Nn8OFqRAhKoS8DRo21jVk".getBytes();
 

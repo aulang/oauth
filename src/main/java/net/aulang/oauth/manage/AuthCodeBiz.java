@@ -44,9 +44,9 @@ public class AuthCodeBiz {
         return authCode;
     }
 
-    public AuthCode create(String clientId, Set<String> scopes, String redirectUrl, String accountId) {
+    public AuthCode create(String clientId, Set<String> scopes, String redirectUri, String accountId) {
         AuthCode code = new AuthCode();
-        code.setRedirectUrl(redirectUrl);
+        code.setRedirectUri(redirectUri);
         code.setAccountId(accountId);
         code.setClientId(clientId);
         code.setScopes(scopes);

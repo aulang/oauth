@@ -110,12 +110,12 @@ public class ReturnPageBiz {
     /**
      * 授权单点登录Token
      */
-    public String grantSsoToken(String redirectUrl, String state, AccountToken accountToken) {
+    public String grantSsoToken(String redirectUri, String state, AccountToken accountToken) {
         /**
          * access_token=ACCESS_TOKEN&expires_in=EXPIRES_IN&state=STATE
          */
-        StringBuilder url = new StringBuilder("redirect:");
-        url.append(redirectUrl);
+        StringBuilder url = new StringBuilder(Constants.REDIRECT);
+        url.append(redirectUri);
 
 
         if (url.lastIndexOf(Constants.QUESTION) == -1) {
@@ -146,10 +146,10 @@ public class ReturnPageBiz {
     }
 
     public String rejectToken(AuthRequest request) {
-        String redirectUrl = request.getRedirectUrl();
+        String redirectUri = request.getRedirectUri();
 
-        StringBuilder url = new StringBuilder("redirect:");
-        url.append(redirectUrl);
+        StringBuilder url = new StringBuilder(Constants.REDIRECT);
+        url.append(redirectUri);
 
         if (url.lastIndexOf(Constants.QUESTION) == -1) {
             url.append(Constants.QUESTION);

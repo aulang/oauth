@@ -1,27 +1,27 @@
 ### 1. 登录请求方式
-<font color="red">密码（password）均为SHA256摘要，禁止明文传输</font>
+`密码（password）均为SHA256摘要，禁止明文传输`
 #### 1. 认证码模式
-1. 路径: /authorize?client_id=xxxxxx&response_type=code&redirect_url=xxxxxx&scope=xxxxxx&state=xxxxxx
+1. 路径: /authorize?client_id=xxxxxx&response_type=code&redirect_uri=xxxxxx&scope=xxxxxx&state=xxxxxx
 2. 方式：get
 3. 参数说明
     ```json
     {
         "client_id": "xxxxxx",      // 客户端ID
         "response_type": "code",    // 固定值，认证码模式为code
-        "redirect_url": "xxxxxx",   // 认证成功重定向url，后台匹配验证，只设一个可以不传，支持正则配置
+        "redirect_uri": "xxxxxx",   // 认证成功重定向uri，后台匹配验证，只设一个可以不传，支持正则配置
         "scope": "xxxxxx",          // 授权范围，文档约定
         "state": "xxxxxx"           // 原样返回
     }
     ```
 #### 2. 简化模式
-1. 路径: /authorize?client_id=xxxxxx&response_type=token&redirect_url=xxxxxx&scope=xxxxxx&state=xxxxxx
+1. 路径: /authorize?client_id=xxxxxx&response_type=token&redirect_uri=xxxxxx&scope=xxxxxx&state=xxxxxx
 2. 方式：get
 3. 参数说明
     ```json
     {
         "client_id": "xxxxxx",      // 客户端ID
         "response_type": "token",   // 固定值，认证码模式为code
-        "redirect_url": "xxxxxx",   // 认证成功重定向url，后台匹配验证，只设一个可以不传，支持正则配置
+        "redirect_uri": "xxxxxx",   // 认证成功重定向uri，后台匹配验证，只设一个可以不传，支持正则配置
         "scope": "xxxxxx",          // 授权范围，文档约定
         "state": "xxxxxx"           // 原样返回
     }
@@ -226,11 +226,11 @@
         ```
 
 ### 5. 单点登出
-1. 路径: /logout?redirect_url=xxxxxx
+1. 路径: /logout?redirect_uri=xxxxxx
 2. 方式：get
 3. 参数：
     ```json
     {
-        "redirect_url": "xxxxxx"    //单点登出后重定向页面，不传为默认为'/'
+        "redirect_uri": "xxxxxx"    //单点登出后重定向页面，不传为默认为'/'
     }
     ```

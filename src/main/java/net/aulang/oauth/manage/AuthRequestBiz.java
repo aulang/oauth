@@ -35,7 +35,7 @@ public class AuthRequestBiz {
     public AuthRequest create(String accountId,
                               String clientId,
                               String authorizationGrant,
-                              String redirectUrl,
+                              String redirectUri,
                               Set<String> scopes,
                               String state) {
 
@@ -46,7 +46,7 @@ public class AuthRequestBiz {
 
         request.setClientId(clientId);
         request.setAuthorizationGrant(authorizationGrant);
-        request.setRedirectUrl(redirectUrl);
+        request.setRedirectUri(redirectUri);
         request.setScopes(scopes);
         request.setState(state);
 
@@ -55,7 +55,7 @@ public class AuthRequestBiz {
 
     public AuthRequest createAndSave(String clientId,
                                      String authorizationGrant,
-                                     String redirectUrl,
+                                     String redirectUri,
                                      Set<String> scopes,
                                      String state) {
 
@@ -63,7 +63,7 @@ public class AuthRequestBiz {
 
         request.setClientId(clientId);
         request.setAuthorizationGrant(authorizationGrant);
-        request.setRedirectUrl(redirectUrl);
+        request.setRedirectUri(redirectUri);
         request.setScopes(scopes);
         request.setState(state);
 
@@ -84,16 +84,16 @@ public class AuthRequestBiz {
     }
 
     public String redirect(AuthRequest request, HttpServletResponse response, Model model) {
-        StringBuilder redirectUrl = new StringBuilder("redirect:");
-        redirectUrl.append(request.getRedirectUrl());
+        StringBuilder redirectUri = new StringBuilder(Constants.REDIRECT);
+        redirectUri.append(request.getRedirectUri());
 
         /**
          * 有?不用再添加?直接添加&
          */
-        if (redirectUrl.lastIndexOf(Constants.QUESTION) == -1) {
-            redirectUrl.append(Constants.QUESTION);
+        if (redirectUri.lastIndexOf(Constants.QUESTION) == -1) {
+            redirectUri.append(Constants.QUESTION);
         } else {
-            redirectUrl.append(Constants.AND);
+            redirectUri.append(Constants.AND);
         }
 
         /**
@@ -102,7 +102,7 @@ public class AuthRequestBiz {
          */
         String state = request.getState();
         if (StrUtil.isNotBlank(state)) {
-            redirectUrl
+            redirectUri
                     .append(OAuthConstants.STATE)
                     .append(Constants.EQUAL)
                     .append(state)
@@ -118,11 +118,11 @@ public class AuthRequestBiz {
                 String accessToken = tokenBiz.create(
                         request.getClientId(),
                         request.getScopes(),
-                        request.getRedirectUrl(),
+                        request.getRedirectUri(),
                         request.getAccountId()
                 ).getAccessToken();
                 long expires_in = client.getAccessTokenValiditySeconds();
-                redirectUrl
+                redirectUri
                         .append(OAuthConstants.ACCESS_TOKEN).append(Constants.EQUAL).append(accessToken)
                         .append(Constants.AND)
                         .append(OAuthConstants.EXPIRES_IN).append(Constants.EQUAL).append(expires_in);
@@ -131,7 +131,7 @@ public class AuthRequestBiz {
                     response.addCookie(Constants.setSsoCookie(accessToken));
                 }
 
-                return redirectUrl.toString();
+                return redirectUri.toString();
             }
             case OAuthConstants.AuthorizationGrant.AUTHORIZATION_CODE: {
                 /**
@@ -140,18 +140,18 @@ public class AuthRequestBiz {
                 String code = codeBiz.create(
                         request.getClientId(),
                         request.getScopes(),
-                        request.getRedirectUrl(),
+                        request.getRedirectUri(),
                         request.getAccountId()
                 ).getId();
 
-                redirectUrl.append(OAuthConstants.CODE).append(Constants.EQUAL).append(code);
+                redirectUri.append(OAuthConstants.CODE).append(Constants.EQUAL).append(code);
 
-                return redirectUrl.toString();
+                return redirectUri.toString();
             }
             default: {
                 log.error("错误的授权方式，登录认证ID：{}，授权方式：{}", request.getId(), request.getAuthorizationGrant());
-                redirectUrl = new StringBuilder(Constants.errorPage(model, "错误的授权方式"));
-                return redirectUrl.toString();
+                redirectUri = new StringBuilder(Constants.errorPage(model, "错误的授权方式"));
+                return redirectUri.toString();
             }
         }
     }

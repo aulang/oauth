@@ -65,7 +65,7 @@ public class OAuthController {
     @GetMapping("/authorize")
     public String authorize(@RequestParam(name = "client_id") String clientId,
                             @RequestParam(name = "response_type") String responseType,
-                            @RequestParam(name = "redirect_url", required = false) String redirectUrl,
+                            @RequestParam(name = "redirect_uri", required = false) String redirectUri,
                             @RequestParam(name = "scope", required = false) String scope,
                             @RequestParam(name = "state", required = false) String state,
                             @CookieValue(name = Constants.SSO_COOKIE_NAME, required = false) String ssoCookie,
@@ -87,21 +87,21 @@ public class OAuthController {
             return Constants.errorPage(model, "未授权的response_type");
         }
 
-        String registeredUrl = redirectUrl;
-        Set<String> registeredUrls = client.getRegisteredRedirectUrl();
-        if (redirectUrl != null) {
+        String registeredUri = redirectUri;
+        Set<String> registeredUrls = client.getRegisteredRedirectUris();
+        if (redirectUri != null) {
             boolean result = registeredUrls.parallelStream().anyMatch(url -> {
                 Pattern pattern = Pattern.compile(url, Pattern.CASE_INSENSITIVE);
-                return pattern.matcher(redirectUrl).matches();
+                return pattern.matcher(redirectUri).matches();
             });
             if (!result) {
-                return Constants.errorPage(model, "未注册的redirectUrl");
+                return Constants.errorPage(model, "未注册的redirect_uri");
             }
         } else {
             if (registeredUrls.size() == 1) {
-                registeredUrl = registeredUrls.iterator().next();
+                registeredUri = registeredUrls.iterator().next();
             } else {
-                return Constants.errorPage(model, "缺失redirectUrl");
+                return Constants.errorPage(model, "缺失redirect_uri");
             }
         }
 
@@ -123,14 +123,14 @@ public class OAuthController {
             String accessToken = Base64.decodeStr(ssoCookie);
             AccountToken accountToken = tokenBiz.findByAccessToken(accessToken);
             if (accountToken != null) {
-                return returnPageBiz.grantSsoToken(redirectUrl, state, accountToken);
+                return returnPageBiz.grantSsoToken(redirectUri, state, accountToken);
             }
         }
 
         /**
          * 保存登录认证请求信息，重定向登录页面
          */
-        AuthRequest request = requestBiz.createAndSave(clientId, authorizationGrant, registeredUrl, scopes, state);
+        AuthRequest request = requestBiz.createAndSave(clientId, authorizationGrant, registeredUri, scopes, state);
         return returnPageBiz.loginPage(request, client, model);
     }
 
@@ -170,7 +170,7 @@ public class OAuthController {
      *                     凭证模式为"client_credentials"
      * @param code         授权码模式获得的授权码，授权码模式必选项
      * @param clientSecret 客户端凭证，授权码模式和凭证模式必选项
-     * @param redirectUrl  重定向URI，授权码模式可选项
+     * @param redirectUri  重定向URI，授权码模式可选项
      * @param username     用户名，密码模式必选项
      * @param password     用户密码SHA256摘要，密码模式必选项
      * @param refreshToken 刷新access_token
@@ -182,7 +182,7 @@ public class OAuthController {
 
                                         @RequestParam(name = "code", required = false) String code,
                                         @RequestParam(name = "client_secret", required = false) String clientSecret,
-                                        @RequestParam(name = "redirect_url", required = false) String redirectUrl,
+                                        @RequestParam(name = "redirect_uri", required = false) String redirectUri,
 
                                         @RequestParam(name = "username", required = false) String username,
                                         @RequestParam(name = "password", required = false) String password,
@@ -248,8 +248,8 @@ public class OAuthController {
                     return ResponseEntity.badRequest().body(Constants.error("无效code"));
                 }
 
-                if (!authCode.getRedirectUrl().equalsIgnoreCase(redirectUrl)) {
-                    return ResponseEntity.badRequest().body(Constants.error("redirect_url不匹配"));
+                if (!authCode.getRedirectUri().equalsIgnoreCase(redirectUri)) {
+                    return ResponseEntity.badRequest().body(Constants.error("redirect_uri不匹配"));
                 }
 
                 AccountToken accountToken = tokenBiz.createByCode(authCode);

@@ -29,15 +29,15 @@ public class AccountTokenBiz {
         return dao.findByAccessToken(accessToken);
     }
 
-    public AccountToken findByAccountIdAndClientIdAndRedirectUrl(String accountId, String clientId, String redirectUrl) {
-        return dao.findByAccountIdAndClientIdAndRedirectUrl(accountId, clientId, redirectUrl);
+    public AccountToken findByAccountIdAndClientIdAndRedirectUri(String accountId, String clientId, String redirectUri) {
+        return dao.findByAccountIdAndClientIdAndRedirectUri(accountId, clientId, redirectUri);
     }
 
     public AccountToken save(AccountToken token) {
-        AccountToken accountToken = findByAccountIdAndClientIdAndRedirectUrl(
+        AccountToken accountToken = findByAccountIdAndClientIdAndRedirectUri(
                 token.getAccountId(),
                 token.getClientId(),
-                token.getRedirectUrl()
+                token.getRedirectUri()
         );
 
         if (accountToken != null) {
@@ -82,11 +82,11 @@ public class AccountTokenBiz {
     public AccountToken create(
             String clientId,
             Set<String> scopes,
-            String redirectUrl,
+            String redirectUri,
             String accountId) {
         String accessToken = IdUtil.fastSimpleUUID();
         String refreshToken = IdUtil.fastSimpleUUID();
-        return create(accessToken, refreshToken, clientId, scopes, redirectUrl, accountId);
+        return create(accessToken, refreshToken, clientId, scopes, redirectUri, accountId);
     }
 
     public AccountToken create(
@@ -94,13 +94,13 @@ public class AccountTokenBiz {
             String refreshToken,
             String clientId,
             Set<String> scopes,
-            String redirectUrl,
+            String redirectUri,
             String accountId) {
         AccountToken accountToken = new AccountToken();
 
         accountToken.setScopes(scopes);
         accountToken.setClientId(clientId);
-        accountToken.setRedirectUrl(redirectUrl);
+        accountToken.setRedirectUri(redirectUri);
         accountToken.setAccountId(accountId);
         accountToken.setAccessToken(accessToken);
         accountToken.setRefreshToken(refreshToken);
@@ -128,7 +128,7 @@ public class AccountTokenBiz {
                 refreshToken,
                 code.getClientId(),
                 code.getScopes(),
-                code.getRedirectUrl(),
+                code.getRedirectUri(),
                 code.getAccountId()
         );
     }

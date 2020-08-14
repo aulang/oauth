@@ -1,9 +1,11 @@
 package net.aulang.oauth.controller;
 
+import cn.hutool.crypto.symmetric.AES;
 import net.aulang.oauth.entity.Account;
 import net.aulang.oauth.entity.BeiAn;
 import net.aulang.oauth.entity.BeiAnEntry;
 import net.aulang.oauth.entity.Client;
+import net.aulang.oauth.entity.MailServer;
 import net.aulang.oauth.entity.ThirdServer;
 import net.aulang.oauth.manage.AccountBiz;
 import net.aulang.oauth.manage.BeiAnBiz;
@@ -19,6 +21,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import static net.aulang.oauth.common.Constants.DEFAULT_KEY;
 
 /**
  * @author Aulang
@@ -62,13 +66,16 @@ public class IndexController {
             client.getAuthorizationGrants().add("password");
             client.getAuthorizationGrants().add("authorization_code");
 
-            client.getRegisteredRedirectUrl().add("https://aulang.cn\\S*");
+            client.getRegisteredRedirectUris().add("https://aulang.cn\\S*");
 
             client = clientBiz.save(client);
 
             result.put("client", client);
 
-            mailServerBiz.get();
+            MailServer server = mailServerBiz.get();
+            server.setPass(new AES(DEFAULT_KEY).encryptHex("xxxxxxxxxx"));
+            mailServerBiz.save(server);
+
             BeiAn beiAn = beiAnBiz.get();
 
             beiAn.setMiit(BeiAnEntry.of("鄂ICP备18028762号", "http://beian.miit.gov.cn"));
@@ -81,10 +88,10 @@ public class IndexController {
             Account account = new Account();
 
             account.setUsername("admin");
-            account.setMobile("xxxxxxxxxxxxxxxxx");
+            account.setMobile("17620157736");
             account.setEmail("aulang@qq.com");
 
-            account.setPassword(PasswordUtil.digestAndBcrypt("xxxxxxxxxxxxxxxxx"));
+            account.setPassword(PasswordUtil.digestAndBcrypt("xxxxxxxxxx"));
 
             account = accountBiz.save(account);
 
@@ -108,7 +115,7 @@ public class IndexController {
             server.setAccessTokenType("text");
             server.getAccessTokenParams().put("grant_type", "authorization_code");
             server.getAccessTokenParams().put("client_id", "101869860");
-            server.getAccessTokenParams().put("client_secret", "xxxxxxxxxxxxxxxxx");
+            server.getAccessTokenParams().put("client_secret", "xxxxxxxxxx");
             server.getAccessTokenParams().put("redirect_uri", "https://aulang.cn/oauth/third_login");
 
             server.setProfileUrl("https://graph.qq.com/oauth2.0/me");

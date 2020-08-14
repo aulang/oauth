@@ -16,6 +16,6 @@ public interface AccountTokenRepository extends MongoRepository<AccountToken, St
 
     AccountToken findByAccessToken(String accessToken);
 
-    AccountToken findByAccountIdAndClientIdAndRedirectUrl(String accountId, String clientId, String redirectUrl);
+    AccountToken findByAccountIdAndClientIdAndRedirectUri(String accountId, String clientId, String redirectUri);
 
 }

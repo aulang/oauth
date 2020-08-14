@@ -58,7 +58,7 @@ public class TokenController {
         AccountToken accountToken = tokenBiz.create(
                 request.getClientId(),
                 client.getAutoApprovedScopes(),
-                request.getRedirectUrl(),
+                request.getRedirectUri(),
                 request.getAccountId()
         );
 

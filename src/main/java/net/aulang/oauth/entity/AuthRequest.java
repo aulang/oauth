@@ -29,7 +29,7 @@ public class AuthRequest implements Serializable {
 
     private String clientId;
     private String authorizationGrant;
-    private String redirectUrl;
+    private String redirectUri;
     private Set<String> scopes;
     private String state;
 
