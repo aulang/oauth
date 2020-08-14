@@ -1,10 +1,10 @@
 package net.aulang.oauth.config;
 
 import cn.hutool.extra.mail.MailAccount;
-import net.aulang.oauth.property.EmailProperties;
+import net.aulang.oauth.entity.MailServer;
+import net.aulang.oauth.manage.MailServerBiz;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -14,16 +14,17 @@ import org.springframework.context.annotation.Configuration;
  * @date 2019/12/5 17:53
  */
 @Configuration
-@EnableConfigurationProperties(EmailProperties.class)
 public class EmailConfiguration {
     @Autowired
-    private EmailProperties properties;
+    private MailServerBiz mailServerBiz;
 
     @Bean
     public MailAccount mailAccount() {
+        MailServer server = mailServerBiz.get();
+
         MailAccount account = new MailAccount();
 
-        BeanUtils.copyProperties(properties, account);
+        BeanUtils.copyProperties(server, account);
 
         return account;
     }

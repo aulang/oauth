@@ -19,12 +19,3 @@ captcha:
   width: 100
   height: 42
   style: Math
-
-email:
-  host: smtp.aliyun.com
-  port: 465
-  ssl-enable: true
-  auth: true
-  user: aulang@aliyun.com
-  pass: ${EMAIL_PASSWORD}
-  from: aulang@aliyun.com
