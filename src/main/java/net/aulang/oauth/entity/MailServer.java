@@ -1,16 +1,18 @@
-package net.aulang.oauth.property;
+package net.aulang.oauth.entity;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
-import org.springframework.boot.context.properties.ConfigurationProperties;
+import lombok.NoArgsConstructor;
 
 /**
  * @author Aulang
  * @email aulang@aq.com
- * @date 2019/12/5 17:51
+ * @date 2020-08-14 13:27
  */
 @Data
-@ConfigurationProperties("email")
-public class EmailProperties {
+@NoArgsConstructor
+@AllArgsConstructor(staticName = "of")
+public class MailServer {
     private String host;
     private Integer port;
     private Boolean sslEnable;

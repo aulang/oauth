@@ -8,6 +8,7 @@ import net.aulang.oauth.entity.ThirdServer;
 import net.aulang.oauth.manage.AccountBiz;
 import net.aulang.oauth.manage.BeiAnBiz;
 import net.aulang.oauth.manage.ClientBiz;
+import net.aulang.oauth.manage.MailServerBiz;
 import net.aulang.oauth.manage.ThirdServerBiz;
 import net.aulang.oauth.util.PasswordUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +35,8 @@ public class IndexController {
     private AccountBiz accountBiz;
     @Autowired
     private ThirdServerBiz serverBiz;
+    @Autowired
+    private MailServerBiz mailServerBiz;
 
     @GetMapping({"/", "/index",})
     public String index() {
@@ -65,6 +68,7 @@ public class IndexController {
 
             result.put("client", client);
 
+            mailServerBiz.get();
             BeiAn beiAn = beiAnBiz.get();
 
             beiAn.setMiit(BeiAnEntry.of("鄂ICP备18028762号", "http://beian.miit.gov.cn"));

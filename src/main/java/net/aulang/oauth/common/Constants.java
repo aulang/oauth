@@ -30,6 +30,7 @@ public interface Constants {
     int MAX_PASSWORD_ERROR_TIMES = 6;
 
     String BIND_STATE_AUTHORIZE_ID = "bind_third_account";
+    byte[] DEFAULT_KEY = "QGDCilNe3S3Nn8OFqRAhKoS8DRo21jVk".getBytes();
 
 
     static Map<String, String> error(String msg) {
