@@ -19,13 +19,7 @@ public class BeiAnBiz {
     private BeiAn beiAn = null;
 
     public BeiAn save(BeiAn entity) {
-        entity = dao.save(entity);
-
-        get().setId(entity.getId());
-        get().setMiit(entity.getMiit());
-        get().setMps(entity.getMps());
-
-        return entity;
+        return (beiAn = dao.save(entity));
     }
 
     public BeiAn get() {

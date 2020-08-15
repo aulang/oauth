@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
+
 /**
  * @author Aulang
  * @email aulang@aq.com
@@ -12,7 +14,8 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor(staticName = "of")
-public class BeiAnEntry {
+public class BeiAnEntry implements Serializable {
+    private static final long serialVersionUID = 1L;
     /**
      * 备案号
      */

@@ -20,9 +20,14 @@ public class MailServerBiz {
     private MailServerRepository repository;
 
     private MailServer server = null;
+    private AES aes = SecureUtil.aes(DEFAULT_KEY);
 
-    public MailServer save(MailServer server) {
-        return repository.save(server);
+    public MailServer save(MailServer entity) {
+        server = repository.save(entity);
+
+        server.setPass(aes.decryptStr(server.getPass()));
+
+        return server;
     }
 
     public MailServer get() {
@@ -32,22 +37,20 @@ public class MailServerBiz {
 
         server = repository.findFirstBy();
 
-        AES aes = SecureUtil.aes(DEFAULT_KEY);
-
         if (server == null) {
-            server = MailServer.of(
-                    "smtp.aliyun.com",
-                    465,
-                    true,
-                    true,
-                    "aulang@aliyun.com",
-                    aes.encryptHex("123456"),
-                    "aulang@aliyun.com");
+            server = new MailServer();
+            server.setHost("smtp.aliyun.com");
+            server.setPort(465);
+            server.setSslEnable(true);
+            server.setAuth(true);
+            server.setUser("aulang@aliyun.com");
+            server.setPass(aes.encryptHex("123456"));
+            server.setFrom("aulang@aliyun.com");
             return repository.save(server);
         }
 
         /**
-         * 解密密码
+         * 解密密码，会有解密失败异常
          */
         server.setPass(aes.decryptStr(server.getPass()));
 

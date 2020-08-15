@@ -1,8 +1,10 @@
 package net.aulang.oauth.entity;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+
+import java.io.Serializable;
 
 /**
  * @author Aulang
@@ -10,9 +12,11 @@ import lombok.NoArgsConstructor;
  * @date 2020-08-14 13:27
  */
 @Data
-@NoArgsConstructor
-@AllArgsConstructor(staticName = "of")
-public class MailServer {
+@Document
+public class MailServer implements Serializable {
+    private static final long serialVersionUID = 1L;
+    @Id
+    private String id;
     private String host;
     private Integer port;
     private Boolean sslEnable;
