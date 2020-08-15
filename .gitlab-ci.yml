@@ -18,6 +18,14 @@ stop_service:
   script:
     - docker stop oauth
     - docker rm oauth
+
+
+delete_none_image:
+  stage: deploy
+  only:
+    - master
+  allow_failure: true
+  script:
     - docker rmi $(docker images | grep "none" | awk '{print $3}')
 
 deploy_service:
