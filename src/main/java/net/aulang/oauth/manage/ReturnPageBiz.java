@@ -158,6 +158,14 @@ public class ReturnPageBiz {
         }
 
         url.append("error=reject");
+
+        if (request.getState() != null) {
+            url.append(Constants.AND)
+                    .append(OAuthConstants.STATE)
+                    .append(Constants.EQUAL)
+                    .append(request.getState());
+        }
+
         return url.toString();
     }
 }
