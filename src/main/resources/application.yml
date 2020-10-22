@@ -6,8 +6,9 @@ server:
       cookie:
         http-only: true
   tomcat:
-    remote-ip-header: X-Real-IP
-    protocol-header: X-Forwarded-Proto
+    remoteip:
+      remote-ip-header: X-Real-IP
+      protocol-header: X-Forwarded-Proto
 
 spring:
   data:
