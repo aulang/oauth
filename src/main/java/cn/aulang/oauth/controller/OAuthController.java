@@ -118,7 +118,7 @@ public class OAuthController {
 
         if (ssoCookie != null) {
             /**
-             * 单点登录
+             * 单点登录，FixMe 不同登录模式单点实现不一样
              */
             String accessToken = Base64.decodeStr(ssoCookie);
             AccountToken accountToken = tokenBiz.findByAccessToken(accessToken);
@@ -212,7 +212,9 @@ public class OAuthController {
                     if (accountId != null) {
                         Set<String> scopes = client.getAutoApprovedScopes();
                         AccountToken accountToken = tokenBiz.create(clientId, scopes, grantType, accountId);
-
+                        /**
+                         * 单点登录，FixMe 不同登录模式单点实现不一样
+                         */
                         response.addCookie(Constants.setSsoCookie(accountToken.getAccessToken()));
 
                         return ResponseEntity.ok(
@@ -254,7 +256,10 @@ public class OAuthController {
 
                 AccountToken accountToken = tokenBiz.createByCode(authCode);
 
-                response.addCookie(Constants.setSsoCookie(accountToken.getAccessToken()));
+                /**
+                 * 单点登录，FixMe 不同登录模式单点实现不一样
+                 */
+                // response.addCookie(Constants.setSsoCookie(accountToken.getAccessToken()));
 
                 return ResponseEntity.ok(
                         AccessToken.create(
@@ -274,7 +279,10 @@ public class OAuthController {
 
                 AccountToken accountToken = tokenBiz.refreshAccessToken(refreshToken);
                 if (accountToken != null) {
-                    response.addCookie(Constants.setSsoCookie(accountToken.getAccessToken()));
+                    /**
+                     * 单点登录，FixMe 不同登录模式单点实现不一样
+                     */
+                    // response.addCookie(Constants.setSsoCookie(accountToken.getAccessToken()));
 
                     return ResponseEntity.ok(
                             AccessToken.create(
@@ -305,7 +313,10 @@ public class OAuthController {
 
                 AccountToken accountToken = tokenBiz.create(clientId, client.getAutoApprovedScopes(), grantType, accountId);
 
-                response.addCookie(Constants.setSsoCookie(accountToken.getAccessToken()));
+                /**
+                 * 单点登录，FixMe 不同登录模式单点实现不一样
+                 */
+                // response.addCookie(Constants.setSsoCookie(accountToken.getAccessToken()));
 
                 return ResponseEntity.ok(
                         AccessToken.create(

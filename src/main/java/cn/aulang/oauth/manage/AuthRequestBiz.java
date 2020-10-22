@@ -128,7 +128,10 @@ public class AuthRequestBiz {
                         .append(OAuthConstants.EXPIRES_IN).append(Constants.EQUAL).append(expires_in);
 
                 if (response != null && !response.isCommitted()) {
-                    response.addCookie(Constants.setSsoCookie(accessToken));
+                    /**
+                     * 单点登录，FixMe 不同登录模式单点实现不一样
+                     */
+                    // response.addCookie(Constants.setSsoCookie(accessToken));
                 }
 
                 return redirectUri.toString();

@@ -121,6 +121,16 @@ $(function () {
         $('#loginForm').toggle();
         $('#mobileLoginForm').toggle();
     });
+
+    $(document).keyup(function (event) {
+        if (event.keyCode == 13) {
+            if ($('#loginForm').is(":visible")) {
+                $("#loginSubmit").trigger("click");
+            } else {
+                $("#mobileLoginSubmit").trigger("click");
+            }
+        }
+    });
 });
 
 function rememberMe() {
