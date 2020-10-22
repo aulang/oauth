@@ -1,7 +1,7 @@
 $(function () {
     var authorizeId = $('#authorize_id').val();
 
-    if (cookieEnabled()) {
+    if (!cookieEnabled()) {
         $('#errorMsg').html('您的浏览器禁用了cookie，您无法使用单点登录！');
     }
 
