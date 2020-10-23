@@ -32,7 +32,7 @@ public class AuthRequestBiz {
     @Autowired
     private AuthRequestReRepository dao;
 
-    public AuthRequest create(String accountId,
+    public AuthRequest createAndSave(String accountId,
                               String clientId,
                               String authorizationGrant,
                               String redirectUri,
@@ -60,6 +60,9 @@ public class AuthRequestBiz {
                                      String state) {
 
         AuthRequest request = new AuthRequest();
+
+        request.setAccountId(null);
+        request.setAuthenticated(false);
 
         request.setClientId(clientId);
         request.setAuthorizationGrant(authorizationGrant);
@@ -129,9 +132,9 @@ public class AuthRequestBiz {
 
                 if (response != null && !response.isCommitted()) {
                     /**
-                     * 单点登录，FixMe 不同登录模式单点实现不一样
+                     * 单点登录，简化模式才能单点登录
                      */
-                    // response.addCookie(Constants.setSsoCookie(accessToken));
+                    response.addCookie(Constants.setSsoCookie(accessToken));
                 }
 
                 return redirectUri.toString();

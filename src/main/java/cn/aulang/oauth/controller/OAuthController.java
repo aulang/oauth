@@ -1,7 +1,5 @@
 package cn.aulang.oauth.controller;
 
-import cn.hutool.core.codec.Base64;
-import cn.hutool.core.util.StrUtil;
 import cn.aulang.oauth.common.Constants;
 import cn.aulang.oauth.common.OAuthConstants;
 import cn.aulang.oauth.entity.AccountToken;
@@ -17,6 +15,8 @@ import cn.aulang.oauth.manage.AuthRequestBiz;
 import cn.aulang.oauth.manage.ClientBiz;
 import cn.aulang.oauth.manage.ReturnPageBiz;
 import cn.aulang.oauth.model.AccessToken;
+import cn.hutool.core.codec.Base64;
+import cn.hutool.core.util.StrUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -69,6 +69,7 @@ public class OAuthController {
                             @RequestParam(name = "scope", required = false) String scope,
                             @RequestParam(name = "state", required = false) String state,
                             @CookieValue(name = Constants.SSO_COOKIE_NAME, required = false) String ssoCookie,
+                            HttpServletResponse response,
                             Model model) {
         Client client = clientBiz.findOne(clientId);
         if (client == null) {
@@ -117,13 +118,21 @@ public class OAuthController {
         }
 
         if (ssoCookie != null) {
-            /**
-             * 单点登录，FixMe 不同登录模式单点实现不一样
-             */
             String accessToken = Base64.decodeStr(ssoCookie);
             AccountToken accountToken = tokenBiz.findByAccessToken(accessToken);
             if (accountToken != null) {
-                return returnPageBiz.grantSsoToken(redirectUri, state, accountToken);
+                if (accountToken.getScopes().containsAll(scopes)) {
+                    return returnPageBiz.grantSsoToken(redirectUri, state, accountToken);
+                } else {
+                    AuthRequest request = requestBiz.createAndSave(
+                            accountToken.getAccountId(),
+                            clientId,
+                            authorizationGrant,
+                            registeredUri,
+                            scopes,
+                            state);
+                    return returnPageBiz.approvalPage(request, response, model);
+                }
             }
         }
 
@@ -187,8 +196,7 @@ public class OAuthController {
                                         @RequestParam(name = "username", required = false) String username,
                                         @RequestParam(name = "password", required = false) String password,
 
-                                        @RequestParam(name = "refresh_token", required = false) String refreshToken,
-                                        HttpServletResponse response) {
+                                        @RequestParam(name = "refresh_token", required = false) String refreshToken) {
         Client client = clientBiz.findOne(clientId);
         if (client == null) {
             return ResponseEntity.badRequest().body(Constants.error("无效的客户端"));
@@ -212,10 +220,6 @@ public class OAuthController {
                     if (accountId != null) {
                         Set<String> scopes = client.getAutoApprovedScopes();
                         AccountToken accountToken = tokenBiz.create(clientId, scopes, grantType, accountId);
-                        /**
-                         * 单点登录，FixMe 不同登录模式单点实现不一样
-                         */
-                        response.addCookie(Constants.setSsoCookie(accountToken.getAccessToken()));
 
                         return ResponseEntity.ok(
                                 AccessToken.create(
@@ -256,11 +260,6 @@ public class OAuthController {
 
                 AccountToken accountToken = tokenBiz.createByCode(authCode);
 
-                /**
-                 * 单点登录，FixMe 不同登录模式单点实现不一样
-                 */
-                // response.addCookie(Constants.setSsoCookie(accountToken.getAccessToken()));
-
                 return ResponseEntity.ok(
                         AccessToken.create(
                                 accountToken.getAccessToken(),
@@ -279,11 +278,6 @@ public class OAuthController {
 
                 AccountToken accountToken = tokenBiz.refreshAccessToken(refreshToken);
                 if (accountToken != null) {
-                    /**
-                     * 单点登录，FixMe 不同登录模式单点实现不一样
-                     */
-                    // response.addCookie(Constants.setSsoCookie(accountToken.getAccessToken()));
-
                     return ResponseEntity.ok(
                             AccessToken.create(
                                     accountToken.getAccessToken(),
@@ -312,11 +306,6 @@ public class OAuthController {
                 }
 
                 AccountToken accountToken = tokenBiz.create(clientId, client.getAutoApprovedScopes(), grantType, accountId);
-
-                /**
-                 * 单点登录，FixMe 不同登录模式单点实现不一样
-                 */
-                // response.addCookie(Constants.setSsoCookie(accountToken.getAccessToken()));
 
                 return ResponseEntity.ok(
                         AccessToken.create(
