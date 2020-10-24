@@ -15,7 +15,6 @@ import cn.aulang.oauth.manage.AuthRequestBiz;
 import cn.aulang.oauth.manage.ClientBiz;
 import cn.aulang.oauth.manage.ReturnPageBiz;
 import cn.aulang.oauth.model.AccessToken;
-import cn.hutool.core.codec.Base64;
 import cn.hutool.core.util.StrUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -68,7 +67,7 @@ public class OAuthController {
                             @RequestParam(name = "redirect_uri", required = false) String redirectUri,
                             @RequestParam(name = "scope", required = false) String scope,
                             @RequestParam(name = "state", required = false) String state,
-                            @CookieValue(name = Constants.SSO_COOKIE_NAME, required = false) String ssoCookie,
+                            @CookieValue(name = Constants.SSO_COOKIE_NAME, required = false) String accessToken,
                             HttpServletResponse response,
                             Model model) {
         Client client = clientBiz.findOne(clientId);
@@ -117,8 +116,7 @@ public class OAuthController {
             scopes.addAll(client.getAutoApprovedScopes());
         }
 
-        if (ssoCookie != null) {
-            String accessToken = Base64.decodeStr(ssoCookie);
+        if (accessToken != null) {
             AccountToken accountToken = tokenBiz.findByAccessToken(accessToken);
             if (accountToken != null) {
                 if (accountToken.getScopes().containsAll(scopes)) {

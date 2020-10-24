@@ -50,7 +50,7 @@ public class AuthRequestBiz {
         request.setScopes(scopes);
         request.setState(state);
 
-        return request;
+        return dao.save(request);
     }
 
     public AuthRequest createAndSave(String clientId,

@@ -1,6 +1,5 @@
 package cn.aulang.oauth.common;
 
-import cn.hutool.core.codec.Base64;
 import org.springframework.ui.Model;
 
 import javax.servlet.http.Cookie;
@@ -46,8 +45,7 @@ public interface Constants {
     }
 
     static Cookie setSsoCookie(String value) {
-        String base64 = Base64.encode(value);
-        Cookie cookie = new Cookie(SSO_COOKIE_NAME, base64);
+        Cookie cookie = new Cookie(SSO_COOKIE_NAME, value);
         cookie.setHttpOnly(true);
         cookie.setMaxAge(-1);
         cookie.setPath("/");
