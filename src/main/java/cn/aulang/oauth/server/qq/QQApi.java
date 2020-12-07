@@ -1,18 +1,17 @@
 package cn.aulang.oauth.server.qq;
 
+import cn.aulang.oauth.entity.ThirdServer;
+import cn.aulang.oauth.server.core.AccessToken;
+import cn.aulang.oauth.server.impl.AbstractApi;
+import lombok.extern.slf4j.Slf4j;
+
+import java.util.Map;
+
 /**
  * @author Aulang
  * @email aulang@qq.com
  * @date 2019-12-7 17:53
  */
-
-import cn.aulang.oauth.server.core.AccessToken;
-import cn.aulang.oauth.server.impl.AbstractApi;
-import lombok.extern.slf4j.Slf4j;
-import cn.aulang.oauth.entity.ThirdServer;
-
-import java.util.Map;
-
 @Slf4j
 public class QQApi extends AbstractApi<QQProfile> {
     public static final String GET_USER_INFO = "https://graph.qq.com/user/get_user_info?access_token=%s&oauth_consumer_key=%s&openid=%s";

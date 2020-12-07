@@ -1,15 +1,15 @@
 package cn.aulang.oauth.server.impl;
 
-import cn.aulang.oauth.factory.HttpConnectionFactory;
-import cn.hutool.core.util.StrUtil;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import cn.aulang.oauth.common.Constants;
 import cn.aulang.oauth.common.OAuthConstants;
 import cn.aulang.oauth.entity.ThirdServer;
+import cn.aulang.oauth.factory.HttpConnectionFactory;
 import cn.aulang.oauth.server.core.AccessToken;
 import cn.aulang.oauth.server.core.Api;
 import cn.aulang.oauth.server.core.ProfileExtractor;
+import cn.hutool.core.util.StrUtil;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -62,7 +62,7 @@ public abstract class AbstractApi<T extends AbstractProfile> implements Api<T> {
     }
 
     protected Map<String, String> parseAccessToken(String accessToken) {
-        Map<String, String> map = new HashMap<>();
+        Map<String, String> map = new HashMap<>(3);
         String[] params = accessToken.split(Constants.AND);
         for (String param : params) {
             String[] kv = param.split(Constants.EQUAL);
@@ -78,8 +78,8 @@ public abstract class AbstractApi<T extends AbstractProfile> implements Api<T> {
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
         MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
-        params.forEach((k, v) -> map.add(k, v));
-        return new HttpEntity(map, headers);
+        params.forEach(map::add);
+        return new HttpEntity<>(map, headers);
     }
 
     protected String getHttpResponse(String url,
@@ -91,7 +91,7 @@ public abstract class AbstractApi<T extends AbstractProfile> implements Api<T> {
             case Constants.HEADER: {
                 HttpHeaders headers = new HttpHeaders();
                 headers.set(HttpHeaders.AUTHORIZATION, authorization + StrUtil.SPACE + accessToken);
-                HttpEntity entity = new HttpEntity(headers);
+                HttpEntity<HttpHeaders> entity = new HttpEntity<>(headers);
                 return restTemplate.exchange(url, HttpMethod.GET, entity, String.class).getBody();
             }
             case Constants.POST: {
@@ -121,6 +121,10 @@ public abstract class AbstractApi<T extends AbstractProfile> implements Api<T> {
         } else {
             String url = buildGetUrl(accessTokenUrl, accessTokenParams);
             response = restTemplate.getForEntity(url, String.class).getBody();
+        }
+
+        if (StrUtil.isBlank(response)) {
+            throw new IOException("获取AccessToken响应为空！");
         }
 
         Map<String, String> responseMap;

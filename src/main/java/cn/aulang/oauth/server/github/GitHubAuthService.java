@@ -1,4 +1,4 @@
-package cn.aulang.oauth.server.qq;
+package cn.aulang.oauth.server.github;
 
 import cn.aulang.oauth.entity.ThirdServer;
 import cn.aulang.oauth.manage.ThirdAccountBiz;
@@ -12,21 +12,21 @@ import org.springframework.stereotype.Service;
  * @date 2019-12-7 17:54
  */
 @Service
-public class QQAuthService extends AbstractAuthService {
-    public static final String QQ = "QQ";
+public class GitHubAuthService extends AbstractAuthService {
+    public static final String GITHUB = "GitHub";
 
-    private final QQApi api = new QQApi();
+    private final GitHubApi api = new GitHubApi();
     @Autowired
     private ThirdAccountBiz thirdAccountBiz;
 
     @Override
-    public QQApi getApi() {
+    public GitHubApi getApi() {
         return api;
     }
 
     @Override
     public boolean supports(ThirdServer server) {
-        return QQ.equals(server.getName());
+        return GITHUB.equals(server.getName());
     }
 
     @Override

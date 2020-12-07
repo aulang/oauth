@@ -12,4 +12,8 @@ public interface Profile {
     String getUsername();
 
     String getServerName();
+
+    String getOriginInfo();
+
+    void setOriginInfo(String originInfo);
 }

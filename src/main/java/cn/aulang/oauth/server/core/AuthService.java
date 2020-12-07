@@ -1,9 +1,9 @@
 package cn.aulang.oauth.server.core;
 
-import cn.aulang.oauth.exception.AuthException;
 import cn.aulang.oauth.entity.Account;
 import cn.aulang.oauth.entity.ThirdAccount;
 import cn.aulang.oauth.entity.ThirdServer;
+import cn.aulang.oauth.exception.AuthException;
 
 /**
  * @author Aulang
@@ -12,7 +12,7 @@ import cn.aulang.oauth.entity.ThirdServer;
  * 第三方认证服务
  */
 public interface AuthService {
-    Api getApi();
+    <T extends Profile> Api<T> getApi();
 
     Account authenticate(ThirdServer server, String code) throws AuthException;
 
