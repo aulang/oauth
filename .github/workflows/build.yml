@@ -17,7 +17,7 @@ jobs:
       - name: Build jar
         uses: eskatos/gradle-command-action@v1
         with:
-          gradle-version: 6.6
+          gradle-version: 6.7.1
           arguments: build
       - name: Build and push image
         uses: docker/build-push-action@v1
