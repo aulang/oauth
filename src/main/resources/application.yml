@@ -5,10 +5,6 @@ server:
     session:
       cookie:
         http-only: true
-  tomcat:
-    remoteip:
-      remote-ip-header: X-Real-IP
-      protocol-header: X-Forwarded-Proto
 
 spring:
   data:

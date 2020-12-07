@@ -48,6 +48,10 @@ public class ThirdAccount implements Serializable {
      */
     @Indexed
     private String accountId;
+    /**
+     * 原始用户信息
+     */
+    private String profile;
 
     private LocalDateTime createdDateTime = LocalDateTime.now();
 }

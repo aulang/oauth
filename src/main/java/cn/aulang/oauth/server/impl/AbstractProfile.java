@@ -9,6 +9,7 @@ import cn.aulang.oauth.server.core.Profile;
  */
 public abstract class AbstractProfile implements Profile {
     protected String serverName;
+    protected String originInfo;
 
     @Override
     public String getServerName() {
@@ -17,5 +18,15 @@ public abstract class AbstractProfile implements Profile {
 
     public void setServerName(String serverName) {
         this.serverName = serverName;
+    }
+
+    @Override
+    public String getOriginInfo() {
+        return originInfo;
+    }
+
+    @Override
+    public void setOriginInfo(String originInfo) {
+        this.originInfo = originInfo;
     }
 }

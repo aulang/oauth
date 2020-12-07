@@ -1,9 +1,9 @@
 package cn.aulang.oauth.server.impl;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import cn.aulang.oauth.server.core.Profile;
 import cn.aulang.oauth.server.core.ProfileExtractor;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * @author Aulang
@@ -15,6 +15,10 @@ public class DefaultProfileExtractor implements ProfileExtractor {
 
     @Override
     public <T extends Profile> T extract(String responseBody, Class<T> type) throws Exception {
-        return MAPPER.readValue(responseBody, type);
+        T t = MAPPER.readValue(responseBody, type);
+
+        t.setOriginInfo(responseBody);
+
+        return t;
     }
 }
