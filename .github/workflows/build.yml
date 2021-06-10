@@ -15,10 +15,9 @@ jobs:
         with:
           java-version: 11
       - name: Build jar
-        uses: eskatos/gradle-command-action@v1
+        uses: comchangs/action-maven@master
         with:
-          gradle-version: 6.7.1
-          arguments: build
+          arguments: package
       - name: Build and push image
         uses: docker/build-push-action@v1
         with:

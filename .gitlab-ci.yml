@@ -8,7 +8,7 @@ build_image:
   only:
     - master
   script:
-    - gradle build
+    - maven package
     - docker build -t aulang/oauth .
 
 stop_service:
@@ -18,7 +18,6 @@ stop_service:
   script:
     - docker stop oauth
     - docker rm oauth
-
 
 delete_none_image:
   stage: deploy
