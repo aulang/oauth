@@ -20,6 +20,7 @@ import javax.net.ssl.SSLSocketFactory;
 import java.security.cert.X509Certificate;
 
 /**
+ * @author Aulang
  * HTTP连接工厂，忽略HTTPS证书
  */
 public class HttpConnectionFactory {

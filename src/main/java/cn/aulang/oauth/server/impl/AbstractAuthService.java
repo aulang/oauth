@@ -1,13 +1,14 @@
 package cn.aulang.oauth.server.impl;
 
-import cn.aulang.oauth.exception.AuthException;
+import cn.aulang.oauth.common.OAuthError;
 import cn.aulang.oauth.entity.Account;
 import cn.aulang.oauth.entity.ThirdAccount;
 import cn.aulang.oauth.entity.ThirdServer;
+import cn.aulang.oauth.exception.AuthException;
+import cn.aulang.oauth.manage.ThirdAccountBiz;
 import cn.aulang.oauth.server.core.AccessToken;
 import cn.aulang.oauth.server.core.AuthService;
 import cn.aulang.oauth.server.core.Profile;
-import cn.aulang.oauth.manage.ThirdAccountBiz;
 
 /**
  * @author Aulang
@@ -34,7 +35,7 @@ public abstract class AbstractAuthService implements AuthService {
                 return getThirdAccountBiz().register(profile);
             }
         } catch (Exception e) {
-            throw new AuthException(server.getName() + "认证失败", e);
+            throw OAuthError.AUTH_ERROR.exception(server.getName() + "认证失败", e);
         }
     }
 
@@ -46,7 +47,7 @@ public abstract class AbstractAuthService implements AuthService {
             getApi().getDetail(server, accessToken, profile);
             return getThirdAccountBiz().bind(accountId, profile);
         } catch (Exception e) {
-            throw new AuthException(server.getName() + "绑定失败", e);
+            throw OAuthError.AUTH_ERROR.exception(server.getName() + "绑定失败", e);
         }
     }
 

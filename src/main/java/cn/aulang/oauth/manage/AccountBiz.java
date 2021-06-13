@@ -1,14 +1,14 @@
 package cn.aulang.oauth.manage;
 
+import cn.aulang.oauth.common.Constants;
+import cn.aulang.oauth.common.OAuthError;
+import cn.aulang.oauth.entity.Account;
 import cn.aulang.oauth.exception.PasswordExpiredException;
+import cn.aulang.oauth.model.CaptchaSendResult;
+import cn.aulang.oauth.model.Profile;
 import cn.aulang.oauth.repository.AccountRepository;
 import cn.aulang.oauth.service.EmailService;
 import cn.aulang.oauth.service.SMSService;
-import cn.hutool.core.util.StrUtil;
-import cn.aulang.oauth.common.Constants;
-import cn.aulang.oauth.entity.Account;
-import cn.aulang.oauth.model.CaptchaSendResult;
-import cn.aulang.oauth.model.Profile;
 import cn.aulang.oauth.util.PasswordUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -140,10 +140,7 @@ public class AccountBiz {
 
         if (account.isMustChangePassword()) {
             String reason = account.getMustChangePasswordReason();
-            if (StrUtil.isBlank(reason)) {
-                reason = "请修改密码";
-            }
-            throw new PasswordExpiredException(reason, account.getId());
+            throw ((PasswordExpiredException) OAuthError.PASSWORD_EXPIRED.exception(reason)).accountId(account.getId());
         }
 
         return account.getId();
