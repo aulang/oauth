@@ -21,9 +21,9 @@ public class AuthStateBiz {
         return dao.save(entity);
     }
 
-    public AuthState create(String authorizeId, String serverId, String accountId) {
+    public AuthState create(String authId, String serverId, String accountId) {
         AuthState state = new AuthState();
-        state.setAuthorizeId(authorizeId);
+        state.setAuthId(authId);
         state.setThirdServerId(serverId);
         state.setAccountId(accountId);
         return save(state);
@@ -31,10 +31,6 @@ public class AuthStateBiz {
 
     public AuthState findByState(String state) {
         Optional<AuthState> optional = dao.findById(state);
-        if (optional.isPresent()) {
-            return optional.get();
-        } else {
-            return null;
-        }
+        return optional.orElse(null);
     }
 }

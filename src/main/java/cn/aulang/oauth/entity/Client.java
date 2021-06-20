@@ -35,6 +35,7 @@ public class Client implements Serializable {
     private Set<String> autoApprovedScopes = new HashSet<>();
     private Set<String> authorizationGrants = new HashSet<>();
     private Set<String> registeredRedirectUris = new HashSet<>();
+
     private int accessTokenValiditySeconds = 2592000;
     private int refreshTokenValiditySeconds = 7776000;
     private int approvalValiditySeconds = 2592000;

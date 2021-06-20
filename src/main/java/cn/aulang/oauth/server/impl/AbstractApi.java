@@ -1,7 +1,6 @@
 package cn.aulang.oauth.server.impl;
 
 import cn.aulang.oauth.common.Constants;
-import cn.aulang.oauth.common.OAuthConstants;
 import cn.aulang.oauth.entity.ThirdServer;
 import cn.aulang.oauth.factory.HttpConnectionFactory;
 import cn.aulang.oauth.server.core.AccessToken;
@@ -112,7 +111,7 @@ public abstract class AbstractApi<T extends AbstractProfile> implements Api<T> {
     public AccessToken getAccessToken(ThirdServer server, String code) throws IOException {
         String accessTokenUrl = server.getAccessTokenUrl();
         Map<String, String> accessTokenParams = server.getAccessTokenParams();
-        accessTokenParams.put(OAuthConstants.CODE, code);
+        accessTokenParams.put(Constants.CODE, code);
 
         String response;
         if (HttpMethod.POST.matches(server.getAccessTokenMethod().toUpperCase())) {
@@ -150,7 +149,7 @@ public abstract class AbstractApi<T extends AbstractProfile> implements Api<T> {
         String profileUrl = server.getProfileUrl();
         String profileMethod = server.getProfileMethod();
         Map<String, String> profileParams = server.getProfileParams();
-        profileParams.put(OAuthConstants.ACCESS_TOKEN, accessToken.getAccessToken());
+        profileParams.put(Constants.ACCESS_TOKEN, accessToken.getAccessToken());
 
         String responseBody = getHttpResponse(
                 profileUrl,

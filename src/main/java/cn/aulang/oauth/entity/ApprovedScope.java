@@ -9,6 +9,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -38,16 +39,15 @@ public class ApprovedScope implements Serializable {
     /**
      * 已授权的
      */
-    private Set<String> approved;
-    /**
-     * 拒绝授权的
-     */
-    private Set<String> denied;
+    private Set<String> approved = new HashSet<>();
 
     /**
      * 失效时间
      */
-    @Indexed(expireAfterSeconds = 0)
+    @Indexed(name = "ttl", expireAfterSeconds = 0)
     private LocalDateTime expiresAt;
+
+    private int expiresIn;
+
     private LocalDateTime lastUpdatedAt;
 }

@@ -29,10 +29,6 @@ public class ClientBiz {
 
     public Client findOne(String id) {
         Optional<Client> optional = dao.findById(id);
-        if (optional.isPresent()) {
-            return optional.get();
-        } else {
-            return null;
-        }
+        return optional.orElse(null);
     }
 }

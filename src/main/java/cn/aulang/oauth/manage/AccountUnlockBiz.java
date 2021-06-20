@@ -3,7 +3,7 @@ package cn.aulang.oauth.manage;
 import cn.aulang.oauth.repository.AccountRepository;
 import lombok.extern.slf4j.Slf4j;
 import cn.aulang.oauth.entity.Account;
-import cn.aulang.oauth.model.UnlockAccountDelayed;
+import cn.aulang.oauth.model.bo.UnlockAccountDelayed;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;

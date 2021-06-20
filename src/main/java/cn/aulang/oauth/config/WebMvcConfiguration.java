@@ -1,6 +1,10 @@
 package cn.aulang.oauth.config;
 
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.mvc.WebContentInterceptor;
@@ -17,5 +21,21 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
         WebContentInterceptor contentInterceptor = new WebContentInterceptor();
         contentInterceptor.setCacheSeconds(0);
         registry.addInterceptor(contentInterceptor).addPathPatterns("/**");
+    }
+
+    private CorsConfiguration corsConfig() {
+        CorsConfiguration corsConfiguration = new CorsConfiguration();
+        corsConfiguration.setMaxAge(3600L);
+        corsConfiguration.addAllowedOrigin("*");
+        corsConfiguration.addAllowedHeader("*");
+        corsConfiguration.addAllowedMethod("*");
+        return corsConfiguration;
+    }
+
+    @Bean
+    public CorsFilter corsFilter() {
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", corsConfig());
+        return new CorsFilter(source);
     }
 }

@@ -1,11 +1,11 @@
 package cn.aulang.oauth.manage;
 
+import cn.aulang.oauth.common.OAuthError;
+import cn.aulang.oauth.entity.AccountToken;
+import cn.aulang.oauth.entity.Client;
 import cn.aulang.oauth.repository.AccountTokenRepository;
 import cn.hutool.core.util.IdUtil;
 import lombok.extern.slf4j.Slf4j;
-import cn.aulang.oauth.entity.AccountToken;
-import cn.aulang.oauth.entity.AuthCode;
-import cn.aulang.oauth.entity.Client;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -26,7 +26,18 @@ public class AccountTokenBiz {
     private AccountTokenRepository dao;
 
     public AccountToken findByAccessToken(String accessToken) {
-        return dao.findByAccessToken(accessToken);
+        AccountToken accountToken = dao.findByAccessToken(accessToken);
+        if (accountToken == null) {
+            throw OAuthError.TOKEN_NOT_FOUND.exception();
+        }
+
+        LocalDateTime now = LocalDateTime.now();
+
+        LocalDateTime accessTokenExpiration = accountToken.getAccessTokenExpiresAt();
+        if (accessTokenExpiration != null && accessTokenExpiration.isBefore(now)) {
+            throw OAuthError.TOKEN_EXPIRED.exception();
+        }
+        return accountToken;
     }
 
     public AccountToken findByAccountIdAndClientIdAndRedirectUri(String accountId, String clientId, String redirectUri) {
@@ -34,12 +45,14 @@ public class AccountTokenBiz {
     }
 
     public AccountToken save(AccountToken token) {
+        // 同一个client，同一个账号，同一个端只能有一个token
         AccountToken accountToken = findByAccountIdAndClientIdAndRedirectUri(
                 token.getAccountId(),
                 token.getClientId(),
                 token.getRedirectUri()
         );
 
+        // 申请新的，之前的就失效
         if (accountToken != null) {
             token.setId(accountToken.getId());
         }
@@ -48,33 +61,27 @@ public class AccountTokenBiz {
     }
 
     public AccountToken refreshAccessToken(String refreshToken) {
-        try {
-            return refreshAccessToken(refreshToken, IdUtil.fastSimpleUUID());
-        } catch (Exception e) {
-            log.error("刷新令牌失败", e);
-            return null;
-        }
+        return refreshAccessToken(refreshToken, IdUtil.fastSimpleUUID());
     }
 
     public AccountToken refreshAccessToken(String refreshToken, String newAccessToken) {
         AccountToken accountToken = dao.findByRefreshToken(refreshToken);
 
         if (accountToken == null) {
-            return null;
+            throw OAuthError.TOKEN_EXPIRED.exception();
         }
 
         LocalDateTime now = LocalDateTime.now();
 
         LocalDateTime refreshTokenExpiration = accountToken.getRefreshTokenExpiresAt();
         if (refreshTokenExpiration != null && refreshTokenExpiration.isBefore(now)) {
-            throw new RuntimeException("令牌已过期");
+            throw OAuthError.TOKEN_EXPIRED.exception();
         }
 
         accountToken.setAccessToken(newAccessToken);
 
-        Client client = clientBiz.findOne(accountToken.getClientId());
-        accountToken.setAccessTokenExpiresAt(now.plusSeconds(client.getAccessTokenValiditySeconds()));
-        accountToken.setRefreshTokenExpiresAt(now.plusSeconds(client.getRefreshTokenValiditySeconds()));
+        accountToken.setAccessTokenExpiresAt(now.plusSeconds(accountToken.getExpiresIn()));
+        accountToken.setRefreshTokenExpiresAt(now.plusSeconds(accountToken.getExpiresIn()));
 
         return save(accountToken);
     }
@@ -105,31 +112,19 @@ public class AccountTokenBiz {
         accountToken.setAccessToken(accessToken);
         accountToken.setRefreshToken(refreshToken);
 
-
         Client client = clientBiz.findOne(clientId);
         if (client == null) {
-            throw new RuntimeException("客户端不存在");
+            throw OAuthError.CLIENT_NOT_FOUND.exception();
         }
 
         LocalDateTime now = LocalDateTime.now();
 
         accountToken.setAccessTokenExpiresAt(now.plusSeconds(client.getAccessTokenValiditySeconds()));
 
+        accountToken.setExpiresIn(client.getAccessTokenValiditySeconds());
+
         accountToken.setRefreshTokenExpiresAt(now.plusSeconds(client.getRefreshTokenValiditySeconds()));
 
         return save(accountToken);
-    }
-
-    public AccountToken createByCode(AuthCode code) {
-        String accessToken = IdUtil.fastSimpleUUID();
-        String refreshToken = IdUtil.fastSimpleUUID();
-        return create(
-                accessToken,
-                refreshToken,
-                code.getClientId(),
-                code.getScopes(),
-                code.getRedirectUri(),
-                code.getAccountId()
-        );
     }
 }

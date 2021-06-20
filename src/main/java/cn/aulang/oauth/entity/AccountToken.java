@@ -39,8 +39,12 @@ public class AccountToken implements Serializable {
     /**
      * access_token失效时间
      */
-    @Indexed(expireAfterSeconds = 0)
     private LocalDateTime accessTokenExpiresAt;
+
+    /**
+     * access_token失效秒数
+     */
+    private int expiresIn;
 
     /**
      * refresh_token
@@ -50,7 +54,7 @@ public class AccountToken implements Serializable {
     /**
      * refresh_token失效时间
      */
-    @Indexed(expireAfterSeconds = 0)
+    @Indexed(name = "ttl_refresh_token", expireAfterSeconds = 0)
     private LocalDateTime refreshTokenExpiresAt;
 
     private String clientId;

@@ -1,10 +1,9 @@
 package cn.aulang.oauth.manage;
 
-import cn.aulang.oauth.repository.ThirdServerRepository;
 import cn.aulang.oauth.common.Constants;
-import cn.aulang.oauth.common.OAuthConstants;
 import cn.aulang.oauth.entity.ThirdServer;
-import cn.aulang.oauth.model.Server;
+import cn.aulang.oauth.model.bo.Server;
+import cn.aulang.oauth.repository.ThirdServerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -60,11 +59,7 @@ public class ThirdServerBiz {
 
     public ThirdServer findOne(String id) {
         Optional<ThirdServer> optional = dao.findById(id);
-        if (optional.isPresent()) {
-            return optional.get();
-        } else {
-            return null;
-        }
+        return optional.orElse(null);
     }
 
     public ThirdServer findByName(String name) {
@@ -73,25 +68,25 @@ public class ThirdServerBiz {
 
     private String buildGetUrl(String url, Map<String, String> params) {
         StringBuilder builder = new StringBuilder(url).append(Constants.QUESTION);
-        params.entrySet().forEach(
-                e -> builder.append(e.getKey())
+        params.forEach(
+                (k, v) -> builder.append(k)
                         .append(Constants.EQUAL)
-                        .append(e.getValue())
+                        .append(v)
                         .append(Constants.AND)
         );
         return builder.toString();
     }
 
-    public String buildAuthorizeUrl(String authorizeId, ThirdServer server, String accountId) {
+    public String buildAuthorizeUrl(String authId, ThirdServer server, String accountId) {
         Map<String, String> params = server.getAuthorizeParams();
         String url = buildGetUrl(server.getAuthorizeUrl(), params);
 
         StringBuilder authorizeUrl = new StringBuilder(Constants.REDIRECT);
         authorizeUrl.append(url);
 
-        String state = stateBiz.create(authorizeId, server.getId(), accountId).getId();
+        String state = stateBiz.create(authId, server.getId(), accountId).getId();
 
-        authorizeUrl.append(OAuthConstants.STATE).append(Constants.EQUAL).append(state);
+        authorizeUrl.append(Constants.STATE).append(Constants.EQUAL).append(state);
         return authorizeUrl.toString();
     }
 }

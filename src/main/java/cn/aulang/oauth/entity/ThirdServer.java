@@ -1,8 +1,7 @@
 package cn.aulang.oauth.entity;
 
-import lombok.Data;
 import cn.aulang.oauth.common.Constants;
-import cn.aulang.oauth.common.OAuthConstants;
+import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -53,15 +52,15 @@ public class ThirdServer implements Serializable {
     /**
      * 返回access_token数据access_token的key
      */
-    private String accessTokenKey = OAuthConstants.ACCESS_TOKEN;
+    private String accessTokenKey = Constants.ACCESS_TOKEN;
     /**
      * 返回access_token数据refresh_token的key
      */
-    private String refreshTokenKey = OAuthConstants.REFRESH_TOKEN;
+    private String refreshTokenKey = Constants.REFRESH_TOKEN;
     /**
      * 返回access_token数据expires_in的key
      */
-    private String expiresInKey = OAuthConstants.EXPIRES_IN;
+    private String expiresInKey = Constants.EXPIRES_IN;
 
     /**
      * 获取第三方用户信息的http请求方式：post、get、header

@@ -22,21 +22,22 @@ public class AuthRequest implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * authorizeId
+     * authId
      */
     @Id
     private String id;
 
     private String clientId;
-    private String authorizationGrant;
+    private String responseType;
     private String redirectUri;
+    private String codeChallenge;
     private Set<String> scopes;
     private String state;
 
     /**
      * 密码错误尝试次数
      */
-    private int triedTimes = 0;
+    private Integer triedTimes = 0;
     private String captcha;
     private String mobile;
 
@@ -48,6 +49,6 @@ public class AuthRequest implements Serializable {
     /**
      * 登录认证请求有效时间8小时
      */
-    @Indexed(expireAfterSeconds = 28800)
+    @Indexed(name = "ttl", expireAfterSeconds = 28800)
     private LocalDateTime createdDateTime = LocalDateTime.now();
 }

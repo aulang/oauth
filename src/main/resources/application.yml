@@ -1,18 +1,18 @@
 server:
   port: 8080
-  servlet:
-    context-path: /oauth
-    session:
-      cookie:
-        http-only: true
 
 spring:
   data:
     mongodb:
-      uri: mongodb://127.0.0.1:27017/oauth
+      uri: mongodb://aulang.cn:27017/oauth
+      auto-index-creation: ${AUTO_CREATE_INDEX:false}
 
 captcha:
   len: 2
   width: 100
   height: 42
   style: Math
+
+login:
+  needCaptchaTimes: ${CAPTCHA_COUNT:2}
+  lockAccountTimes: ${LOCK_COUNT:6}

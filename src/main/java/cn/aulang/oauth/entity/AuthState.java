@@ -23,7 +23,7 @@ public class AuthState implements Serializable {
     /**
      * 认证请求ID
      */
-    private String authorizeId;
+    private String authId;
     /**
      * 第三方登录服务ID
      */
@@ -37,6 +37,6 @@ public class AuthState implements Serializable {
     /**
      * state有效期10分钟
      */
-    @Indexed(expireAfterSeconds = 600)
+    @Indexed(name = "ttl", expireAfterSeconds = 600)
     private LocalDateTime createdDateTime = LocalDateTime.now();
 }

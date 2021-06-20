@@ -1,12 +1,12 @@
 package cn.aulang.oauth.manage;
 
-import cn.aulang.oauth.repository.AuthCodeRepository;
 import cn.aulang.oauth.entity.AuthCode;
+import cn.aulang.oauth.entity.AuthRequest;
+import cn.aulang.oauth.repository.AuthCodeRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
 import java.util.Optional;
-import java.util.Set;
 
 /**
  * @author Aulang
@@ -15,8 +15,10 @@ import java.util.Set;
  */
 @Service
 public class AuthCodeBiz {
-    @Resource
+    @Autowired
     private AuthCodeRepository dao;
+    @Autowired
+    private ApprovedScopeBiz approvedScopeBiz;
 
     public AuthCode save(AuthCode entity) {
         return dao.save(entity);
@@ -28,28 +30,19 @@ public class AuthCodeBiz {
 
     public AuthCode findOne(String id) {
         Optional<AuthCode> optional = dao.findById(id);
-        if (optional.isPresent()) {
-            return optional.get();
-        } else {
-            return null;
-        }
+        return optional.orElse(null);
     }
 
-    public AuthCode consumeCode(String code) {
-        AuthCode authCode = findOne(code);
-        if (authCode == null) {
-            return null;
-        }
-        delete(authCode.getId());
-        return authCode;
+    public void consumeCode(String code) {
+        delete(code);
     }
 
-    public AuthCode create(String clientId, Set<String> scopes, String redirectUri, String accountId) {
+    public AuthCode create(AuthRequest authRequest) {
+        // 判断是否需要用户授权
+        approvedScopeBiz.hasApproved(authRequest);
+        // 创建Code
         AuthCode code = new AuthCode();
-        code.setRedirectUri(redirectUri);
-        code.setAccountId(accountId);
-        code.setClientId(clientId);
-        code.setScopes(scopes);
+        code.setAuthId(authRequest.getId());
         return save(code);
     }
 }

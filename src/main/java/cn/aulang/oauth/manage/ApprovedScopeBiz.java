@@ -1,15 +1,17 @@
 package cn.aulang.oauth.manage;
 
-import cn.aulang.oauth.repository.ApprovedScopeRepository;
-import lombok.extern.slf4j.Slf4j;
+import cn.aulang.oauth.common.OAuthError;
 import cn.aulang.oauth.entity.ApprovedScope;
+import cn.aulang.oauth.entity.AuthRequest;
 import cn.aulang.oauth.entity.Client;
+import cn.aulang.oauth.repository.ApprovedScopeRepository;
+import cn.hutool.core.collection.CollectionUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author Aulang
@@ -19,6 +21,8 @@ import java.util.HashSet;
 @Slf4j
 @Service
 public class ApprovedScopeBiz {
+    @Autowired
+    private ClientBiz clientBiz;
     @Autowired
     private ApprovedScopeRepository dao;
 
@@ -30,17 +34,68 @@ public class ApprovedScopeBiz {
         return dao.save(entity);
     }
 
-    public ApprovedScope save(Client client, String accountId, String[] scopes) {
+    public ApprovedScope create(Client client, String accountId, Set<String> scopes) {
         ApprovedScope approvedScope = new ApprovedScope();
 
         approvedScope.setClientId(client.getId());
         approvedScope.setAccountId(accountId);
 
-        approvedScope.setApproved(new HashSet<>(Arrays.asList(scopes)));
+        approvedScope.setApproved(scopes);
 
         LocalDateTime now = LocalDateTime.now();
         approvedScope.setExpiresAt(now.plusSeconds(client.getApprovalValiditySeconds()));
 
+        approvedScope.setLastUpdatedAt(now);
+
         return save(approvedScope);
+    }
+
+    public void hasApproved(AuthRequest authRequest) {
+        Client client = clientBiz.findOne(authRequest.getClientId());
+        if (client == null) {
+            throw OAuthError.CLIENT_NOT_FOUND.exception();
+        }
+
+        Set<String> requestScopes = authRequest.getScopes();
+        if (CollectionUtil.isEmpty(requestScopes)) {
+            return;
+        }
+
+        // 没有申请额外权限，自动授权
+        if (client.getAutoApprovedScopes() != null
+                && client.getAutoApprovedScopes().containsAll(requestScopes)) {
+            return;
+        }
+        // 用户已经授权过，无需再授权
+        ApprovedScope approvedScope = findByAccountIdAndClientId(
+                authRequest.getAccountId(),
+                client.getId()
+        );
+        if (approvedScope != null
+                && approvedScope.getApproved() != null
+                && approvedScope.getApproved().containsAll(requestScopes)) {
+            return;
+        }
+
+        throw OAuthError.NEED_APPROVAL.exception();
+    }
+
+    public void approved(AuthRequest authRequest) {
+        ApprovedScope approved = findByAccountIdAndClientId(authRequest.getAccountId(), authRequest.getClientId());
+        if (approved != null) {
+            approved.setApproved(authRequest.getScopes());
+
+            LocalDateTime now = LocalDateTime.now();
+            approved.setExpiresAt(now.plusSeconds(approved.getExpiresIn()));
+            approved.setLastUpdatedAt(now);
+
+            save(approved);
+        } else {
+            Client client = clientBiz.findOne(authRequest.getClientId());
+            if (client == null) {
+                throw OAuthError.CLIENT_NOT_FOUND.exception();
+            }
+            create(client, authRequest.getAccountId(), authRequest.getScopes());
+        }
     }
 }

@@ -20,7 +20,7 @@ public class MailServerBiz {
     private MailServerRepository repository;
 
     private MailServer server = null;
-    private AES aes = SecureUtil.aes(DEFAULT_KEY);
+    private final AES aes = SecureUtil.aes(DEFAULT_KEY);
 
     public MailServer save(MailServer entity) {
         server = repository.save(entity);
@@ -49,9 +49,7 @@ public class MailServerBiz {
             return repository.save(server);
         }
 
-        /**
-         * 解密密码，会有解密失败异常
-         */
+        // 解密密码，会有解密失败异常
         server.setPass(aes.decryptStr(server.getPass()));
 
         return server;

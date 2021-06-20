@@ -1,19 +1,23 @@
 package cn.aulang.oauth.manage;
 
-import cn.aulang.oauth.common.Constants;
 import cn.aulang.oauth.common.OAuthError;
 import cn.aulang.oauth.entity.Account;
+import cn.aulang.oauth.exception.AccountLockedException;
+import cn.aulang.oauth.exception.AuthException;
 import cn.aulang.oauth.exception.PasswordExpiredException;
-import cn.aulang.oauth.model.CaptchaSendResult;
-import cn.aulang.oauth.model.Profile;
+import cn.aulang.oauth.model.bo.CaptchaSendResult;
+import cn.aulang.oauth.model.bo.Profile;
+import cn.aulang.oauth.property.LoginProperties;
 import cn.aulang.oauth.repository.AccountRepository;
 import cn.aulang.oauth.service.EmailService;
 import cn.aulang.oauth.service.SMSService;
 import cn.aulang.oauth.util.PasswordUtil;
+import cn.hutool.core.util.DesensitizedUtil;
+import cn.hutool.core.util.StrUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.stereotype.Service;
 
-import javax.security.auth.login.AccountLockedException;
 import java.util.Optional;
 
 /**
@@ -22,6 +26,7 @@ import java.util.Optional;
  * @date 2019/12/5 10:16
  */
 @Service
+@EnableConfigurationProperties(LoginProperties.class)
 public class AccountBiz {
     @Autowired
     private AccountRepository dao;
@@ -32,6 +37,8 @@ public class AccountBiz {
     private EmailService emailService;
     @Autowired
     private AccountUnlockBiz unlockBiz;
+    @Autowired
+    private LoginProperties loginProperties;
 
     public Account getOne() {
         return dao.findFirstByStatus(Account.ENABLED);
@@ -57,59 +64,60 @@ public class AccountBiz {
         return dao.findByUsernameOrMobileOrEmail(loginName, loginName, loginName);
     }
 
-    public CaptchaSendResult sendCaptcha(String loginName, String captcha) throws RuntimeException {
+    public CaptchaSendResult sendCaptcha(String loginName, String captcha) {
         Account account = findByLoginName(loginName);
-        if (account != null) {
-            String content = "您申请的验证码是：" + captcha;
-
-            String mobile = account.getMobile();
-            String email = account.getEmail();
-
-            int result;
-            String target;
-            if (mobile != null && email == null) {
-                /**
-                 * 发送短信验证码
-                 */
-                /**
-                 * 隐私处理
-                 */
-                target = mobile.replaceAll("(\\d{3})\\d{4}(\\d{4})", "$1****$2");
-                result = smsService.send(mobile, content);
-            } else if (email != null) {
-                /**
-                 * 发送邮件验证码
-                 */
-                /**
-                 * 隐私处理
-                 */
-                target = email.replaceAll("(\\w?)(\\w+)(\\w)(@\\w+\\.[a-z]+(\\.[a-z]+)?)", "$1****$3$4");
-                result = emailService.send(email, content);
-            } else {
-                return null;
-            }
-
-            if (result < 0) {
-                throw new RuntimeException("发送验证码失败");
-            }
-            return new CaptchaSendResult(null, account.getId(), target);
+        if (account == null) {
+            throw OAuthError.ACCOUNT_NOT_FOUND.exception();
         }
-        return null;
+
+        String content = StrUtil.format("您申请的验证码是：{}", captcha);
+
+        String mobile = account.getMobile();
+        String email = account.getEmail();
+
+        int result;
+        String target;
+        if (mobile != null && email == null) {
+            /**
+             * 发送短信验证码
+             */
+            /**
+             * 隐私处理
+             */
+            target = DesensitizedUtil.mobilePhone(mobile);
+            result = smsService.send(mobile, content);
+        } else if (email != null) {
+            /**
+             * 发送邮件验证码
+             */
+            /**
+             * 隐私处理
+             */
+            target = DesensitizedUtil.email(email);
+            result = emailService.send(email, content);
+        } else {
+            throw OAuthError.SEND_CAPTCHA_FAILED.exception("账号没有绑定手机和邮箱");
+        }
+
+        if (result < 0) {
+            throw OAuthError.SEND_CAPTCHA_FAILED.exception();
+        }
+
+        return CaptchaSendResult.of(account.getId(), target, captcha, content);
     }
 
-    public String login(String loginName, String password)
-            throws PasswordExpiredException, AccountLockedException {
+    public Account login(String loginName, String password) throws AuthException {
         Account account = findByLoginName(loginName);
 
         if (account == null) {
-            return null;
+            throw OAuthError.AUTH_ERROR.exception();
         }
 
         /**
          * 判断账号是否被禁用
          */
         if (Account.DISABLED == account.getStatus()) {
-            throw new AccountLockedException("账号被锁定，请稍后再试");
+            throw ((AccountLockedException) OAuthError.ACCOUNT_LOCKED.exception()).accountId(account.getId());
         }
 
         if (!PasswordUtil.bcryptCheck(password, account.getPassword())) {
@@ -119,7 +127,7 @@ public class AccountBiz {
             /**
              * 密码连续错误一定次锁定账号，5分钟后自动解锁
              */
-            if (passwordErrorTimes > Constants.MAX_PASSWORD_ERROR_TIMES) {
+            if (passwordErrorTimes > loginProperties.getLockAccountTimes()) {
                 /**
                  * 禁用账号
                  */
@@ -131,10 +139,10 @@ public class AccountBiz {
                  */
                 unlockBiz.delayUnlock(account.getId());
 
-                throw new AccountLockedException("账号被锁定，请稍后再试");
+                throw ((AccountLockedException) OAuthError.ACCOUNT_LOCKED.exception()).accountId(account.getId());
             } else {
                 dao.save(account);
-                return null;
+                throw OAuthError.AUTH_ERROR.exception();
             }
         }
 
@@ -143,19 +151,18 @@ public class AccountBiz {
             throw ((PasswordExpiredException) OAuthError.PASSWORD_EXPIRED.exception(reason)).accountId(account.getId());
         }
 
-        return account.getId();
+        return account;
     }
 
-    public String changePassword(String id, String password, boolean mustChangePassword) {
+    public Account changePassword(String id, String password, boolean mustChangePassword) {
         Optional<Account> optional = dao.findById(id);
         if (optional.isPresent()) {
             Account account = optional.get();
             account.setPassword(PasswordUtil.bcrypt(password));
             account.setMustChangePassword(mustChangePassword);
-            dao.save(account);
-            return id;
+            return dao.save(account);
         }
-        return null;
+        throw OAuthError.ACCOUNT_NOT_FOUND.exception();
     }
 
     public Account register(Account account) {
@@ -166,12 +173,20 @@ public class AccountBiz {
         return dao.save(account);
     }
 
-    public Profile getUser(String id) {
+    public Profile getProfile(String id) {
         Optional<Account> optional = dao.findById(id);
         if (optional.isEmpty()) {
-            return null;
+            throw OAuthError.ACCOUNT_NOT_FOUND.exception();
         }
+
         Account account = optional.get();
-        return new Profile(account.getId(), account.getNickname());
+
+        return new Profile(
+                account.getId(),
+                account.getNickname(),
+                account.getUsername(),
+                account.getMobile(),
+                account.getEmail()
+        );
     }
 }

@@ -7,7 +7,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.Set;
 
 /**
  * @author Aulang
@@ -21,14 +20,11 @@ public class AuthCode implements Serializable {
     @Id
     private String id;
 
-    private String clientId;
-    private Set<String> scopes;
-    private String redirectUri;
-    private String accountId;
+    private String authId;
 
     /**
      * 授权码（authorization code）有效期10分钟
      */
-    @Indexed(expireAfterSeconds = 600)
+    @Indexed(name = "ttl", expireAfterSeconds = 600)
     private LocalDateTime createdDateTime = LocalDateTime.now();
 }
