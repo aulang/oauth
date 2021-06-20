@@ -81,8 +81,7 @@ public class ThirdServerBiz {
         Map<String, String> params = server.getAuthorizeParams();
         String url = buildGetUrl(server.getAuthorizeUrl(), params);
 
-        StringBuilder authorizeUrl = new StringBuilder(Constants.REDIRECT);
-        authorizeUrl.append(url);
+        StringBuilder authorizeUrl = new StringBuilder(url);
 
         String state = stateBiz.create(authId, server.getId(), accountId).getId();
 

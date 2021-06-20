@@ -8,7 +8,6 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
-import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -28,22 +27,16 @@ public class AuthServiceProvider implements ApplicationContextAware {
 
     public Collection<AuthService> getServices() {
         if (services == null) {
-            Map<String, AuthService> serviceMap
-                    = applicationContext.getBeansOfType(AuthService.class);
-            services = serviceMap.values();
+            services = applicationContext.getBeansOfType(AuthService.class).values();
         }
         return services;
     }
 
     public AuthService get(ThirdServer server) {
-        Optional<AuthService> optional =
-                getServices()
-                        .parallelStream()
-                        .filter(e -> e.supports(server))
-                        .findFirst();
-        if (optional.isPresent()) {
-            return optional.get();
-        }
-        return null;
+        Optional<AuthService> optional = getServices()
+                .parallelStream()
+                .filter(e -> e.supports(server))
+                .findFirst();
+        return optional.orElse(null);
     }
 }

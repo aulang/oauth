@@ -10,6 +10,8 @@ public interface Constants {
     String STATE = "state";
     String MOBILE = "mobile";
 
+    String AUTHORIZATION = "Authorization";
+
     String EXPIRES_IN = "expires_in";
     String ACCESS_TOKEN = "access_token";
     String REFRESH_TOKEN = "refresh_token";
@@ -26,7 +28,7 @@ public interface Constants {
     String HEADER = "header";
     String BEARER = "Bearer";
 
-    String REDIRECT = "redirect:";
-    String BIND_STATE_AUTHORIZE_ID = "bind_third_account";
+    String BIND_AUTH_ID = "third_account_bind";
+
     byte[] DEFAULT_KEY = "QGDCilNe3S3Nn8OFqRAhKoS8DRo21jVk".getBytes();
 }

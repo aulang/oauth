@@ -1,10 +1,10 @@
 package cn.aulang.oauth.factory;
 
+import cn.aulang.oauth.captcha.MathCaptcha;
 import cn.aulang.oauth.property.CaptchaProperties;
 import com.wf.captcha.ChineseCaptcha;
 import com.wf.captcha.SpecCaptcha;
 import com.wf.captcha.base.Captcha;
-import cn.aulang.oauth.captcha.MathCaptcha;
 
 /**
  * @author Aulang
@@ -25,7 +25,7 @@ public class CaptchaFactory {
             case "Chinese":
                 return new ChineseCaptcha(properties.getWidth(), properties.getHeight(), properties.getLen());
             default:
-                return new MathCaptcha(properties.getWidth(), properties.getHeight(), properties.getLen());
+                return new MathCaptcha(properties.getWidth(), properties.getHeight());
         }
     }
 }

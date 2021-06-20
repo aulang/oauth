@@ -28,9 +28,8 @@ public class ProfileController {
     private AccountTokenBiz accountTokenBiz;
 
     @GetMapping("")
-    public Response<Profile> profile(@RequestHeader("Authorization") String authorization) {
-        String accessToken = authorization.substring(Constants.BEARER.length()).trim();
-        AccountToken accountToken = accountTokenBiz.findByAccessToken(accessToken);
+    public Response<Profile> profile(@RequestHeader(Constants.AUTHORIZATION) String authorization) {
+        AccountToken accountToken = accountTokenBiz.findByAuthorization(authorization);
         Profile profile = accountBiz.getProfile(accountToken.getAccountId());
         return ResponseFactory.success(profile);
     }

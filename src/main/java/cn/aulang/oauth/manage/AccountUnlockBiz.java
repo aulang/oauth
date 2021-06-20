@@ -1,9 +1,9 @@
 package cn.aulang.oauth.manage;
 
-import cn.aulang.oauth.repository.AccountRepository;
-import lombok.extern.slf4j.Slf4j;
 import cn.aulang.oauth.entity.Account;
 import cn.aulang.oauth.model.bo.UnlockAccountDelayed;
+import cn.aulang.oauth.repository.AccountRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -30,8 +30,8 @@ public class AccountUnlockBiz implements DisposableBean {
     @Autowired
     private MongoTemplate mongoTemplate;
 
-    private DelayQueue<UnlockAccountDelayed> queue = new DelayQueue<>();
-    private ExecutorService executorService = Executors.newSingleThreadExecutor();
+    private final DelayQueue<UnlockAccountDelayed> queue = new DelayQueue<>();
+    private final ExecutorService executorService = Executors.newSingleThreadExecutor();
 
     public void delayUnlock(String accountId) {
         queue.put(new UnlockAccountDelayed(accountId));
@@ -70,6 +70,6 @@ public class AccountUnlockBiz implements DisposableBean {
 
     @Override
     public void destroy() {
-        executorService.shutdown();
+        executorService.shutdownNow();
     }
 }
