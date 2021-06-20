@@ -128,6 +128,7 @@ public class ThirdLoginController {
             @Valid @RequestBody ThirdLoginRequest request,
             @RequestHeader(Constants.AUTHORIZATION) String authorization) {
         AuthState authState = getAuthState(request.getState());
+        // FIXME authorization怎么获取问题
         AccountToken accountToken = accountTokenBiz.findByAuthorization(authorization);
 
         if (StrUtil.isBlank(authState.getAccountId())
