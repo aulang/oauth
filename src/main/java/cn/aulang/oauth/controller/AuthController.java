@@ -11,8 +11,8 @@ import cn.aulang.oauth.manage.ClientBiz;
 import cn.aulang.oauth.model.enums.AuthorizationGrant;
 import cn.aulang.oauth.model.request.AuthorizeRequest;
 import cn.aulang.oauth.model.response.AuthRequestVO;
+import cn.hutool.core.util.StrUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -73,7 +73,7 @@ public class AuthController {
         // 有scope时，scope不能超出客户端的范围
         String scope = request.getScope();
         Set<String> scopes = new HashSet<>();
-        if (StringUtils.hasText(scope)) {
+        if (StrUtil.isNotBlank(scope)) {
             List<String> requestScopes = Arrays.asList(scope.split(Constants.COMMA));
             if (!client.getScopes().keySet().containsAll(requestScopes)) {
                 throw OAuthError.SCOPE_ERROR.exception();

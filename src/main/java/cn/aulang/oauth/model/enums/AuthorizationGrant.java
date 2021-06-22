@@ -9,7 +9,8 @@ package cn.aulang.oauth.model.enums;
 public enum AuthorizationGrant {
     CODE("code", "authorization_code"),
     REFRESH_TOKEN("refresh_token", "refresh_token"),
-    CLIENT_CREDENTIALS("client_credentials", "client_credentials");
+    CLIENT_CREDENTIALS("client_credentials", "client_credentials"),
+    CAPTCHA("captcha", "captcha");
 
     private final String responseType;
     private final String grantType;

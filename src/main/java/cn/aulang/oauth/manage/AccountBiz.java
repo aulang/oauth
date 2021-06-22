@@ -40,10 +40,6 @@ public class AccountBiz {
     @Autowired
     private LoginProperties loginProperties;
 
-    public Account getOne() {
-        return dao.findFirstByStatus(Account.ENABLED);
-    }
-
     public Account save(Account entity) {
         return dao.save(entity);
     }
@@ -154,13 +150,13 @@ public class AccountBiz {
         return account;
     }
 
-    public Account changePassword(String id, String password, boolean mustChangePassword) {
+    public void changePassword(String id, String password, boolean mustChangePassword) {
         Optional<Account> optional = dao.findById(id);
         if (optional.isPresent()) {
             Account account = optional.get();
             account.setPassword(PasswordUtil.bcrypt(password));
             account.setMustChangePassword(mustChangePassword);
-            return dao.save(account);
+            dao.save(account);
         }
         throw OAuthError.ACCOUNT_NOT_FOUND.exception();
     }

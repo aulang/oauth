@@ -12,16 +12,19 @@ import cn.aulang.oauth.exception.PasswordExpiredException;
 import cn.aulang.oauth.manage.AccountBiz;
 import cn.aulang.oauth.manage.AuthCodeBiz;
 import cn.aulang.oauth.manage.AuthRequestBiz;
+import cn.aulang.oauth.model.request.CaptchaLoginRequest;
 import cn.aulang.oauth.model.request.LoginRequest;
 import cn.aulang.oauth.model.request.SsoRequest;
 import cn.aulang.oauth.model.response.AuthCodeVO;
 import cn.aulang.oauth.model.response.AuthRequestVO;
 import cn.aulang.oauth.property.LoginProperties;
 import cn.hutool.core.util.RandomUtil;
+import cn.hutool.core.util.StrUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
@@ -33,6 +36,7 @@ import javax.validation.Valid;
  * @date 2021-06-19 11:23
  */
 @RestController
+@RequestMapping("/api/login")
 @EnableConfigurationProperties(LoginProperties.class)
 public class LoginController {
     @Autowired
@@ -44,15 +48,12 @@ public class LoginController {
     @Autowired
     private LoginProperties loginProperties;
 
-    @PostMapping("/api/login")
+    @PostMapping("")
     public Response<?> login(@Valid @RequestBody LoginRequest request) {
         String authId = request.getAuthId();
 
         // 登录请求是否存在
-        AuthRequest authRequest = authRequestBiz.findOne(authId);
-        if (authRequest == null) {
-            throw OAuthError.AUTH_REQUEST_NOT_FOUND.exception();
-        }
+        AuthRequest authRequest = authRequestBiz.getAuthRequest(authId);
 
         // 秘密错误次数需要验证码
         if (authRequest.getTriedTimes() > loginProperties.getNeedCaptchaTimes()
@@ -106,8 +107,8 @@ public class LoginController {
         );
     }
 
-    @PostMapping("/api/sso")
-    public Response<?> sso(@Valid @RequestBody SsoRequest request) {
+    @PostMapping("/sso")
+    public Response<AuthCodeVO> sso(@Valid @RequestBody SsoRequest request) {
         String authId = request.getAuthId();
         // 判断是否登录过
         authRequestBiz.checkAuthenticated(authId);
@@ -122,6 +123,30 @@ public class LoginController {
                         code.getId(),
                         request.getState(),
                         request.getRedirectUri()
+                )
+        );
+    }
+
+    @PostMapping("/captcha")
+    public Response<AuthCodeVO> captcha(@Valid @RequestBody CaptchaLoginRequest request) {
+        String authId = request.getAuthId();
+        AuthRequest authRequest = authRequestBiz.getAuthRequest(authId);
+
+        if (!StrUtil.equals(request.getMobile(), authRequest.getMobile())
+                || !StrUtil.equals(request.getCaptcha(), authRequest.getCaptcha())) {
+            throw OAuthError.CAPTCHA_ERROR.exception();
+        }
+
+        // 创建authorisation code
+        AuthCode code = authCodeBiz.create(authRequest);
+
+        // 返回code
+        return ResponseFactory.success(
+                AuthCodeVO.of(
+                        authId,
+                        code.getId(),
+                        authRequest.getState(),
+                        authRequest.getRedirectUri()
                 )
         );
     }

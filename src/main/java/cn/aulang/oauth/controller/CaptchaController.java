@@ -64,7 +64,7 @@ public class CaptchaController {
 
         AuthRequest authRequest;
         if (isNotBlank(authId)) {
-            // Web，先创建认证请求，再发生验证码
+            // Web，先要有认证请求，再发生验证码
             // 登录请求是否存在
             authRequest = authRequestBiz.findOne(authId);
             if (authRequest == null) {

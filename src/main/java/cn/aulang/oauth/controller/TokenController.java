@@ -52,7 +52,11 @@ public class TokenController {
             // refresh_token
             @RequestParam(name = "refresh_token", required = false) String refreshToken,
             // client_credentials
-            @RequestParam(name = "client_secret", required = false) String clientSecret) {
+            @RequestParam(name = "client_secret", required = false) String clientSecret,
+            // captcha
+            @RequestParam(name = "auth_id", required = false) String authId,
+            @RequestParam(name = "mobile", required = false) String mobile,
+            @RequestParam(name = "client_secret", required = false) String captcha) {
         Client client = clientBiz.findOne(clientId);
         if (client == null) {
             return ResponseEntity.badRequest().body("client_id错误");
@@ -72,6 +76,10 @@ public class TokenController {
 
         if (AuthorizationGrant.CLIENT_CREDENTIALS.getGrantType().equalsIgnoreCase(grantType)) {
             return clientCredentials(client, clientSecret);
+        }
+
+        if (AuthorizationGrant.CAPTCHA.getGrantType().equalsIgnoreCase(grantType)) {
+            return captcha(authId, mobile, captcha);
         }
 
         return ResponseEntity.badRequest().body("grant_type错误");
@@ -129,6 +137,39 @@ public class TokenController {
 
             // Code被消费
             authCodeBiz.consumeCode(code);
+
+            return ResponseEntity.ok(AccessToken.build(accountToken));
+        } catch (Exception e) {
+            log.error("创建Token失败", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    private ResponseEntity<?> captcha(String authId,
+                                      String mobile,
+                                      String captcha) {
+        if (StrUtil.hasBlank(authId, mobile, captcha)) {
+            return ResponseEntity.badRequest().body("参数缺失");
+        }
+
+        AuthRequest authRequest = authRequestBiz.findOne(authId);
+        if (authRequest == null) {
+            return ResponseEntity.badRequest().body("认证请求已过期");
+        }
+
+        if (!StrUtil.equals(mobile, authRequest.getMobile())
+                || !StrUtil.equals(captcha, authRequest.getCaptcha())) {
+            return ResponseEntity.badRequest().body("验证码错误");
+        }
+
+        try {
+            AccountToken accountToken = accountTokenBiz.create(
+                    authRequest.getId(),
+                    authRequest.getClientId(),
+                    authRequest.getScopes(),
+                    authRequest.getRedirectUri(),
+                    authRequest.getAccountId()
+            );
 
             return ResponseEntity.ok(AccessToken.build(accountToken));
         } catch (Exception e) {

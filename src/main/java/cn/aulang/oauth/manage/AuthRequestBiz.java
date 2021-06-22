@@ -90,4 +90,8 @@ public class AuthRequestBiz {
 
         return authRequest;
     }
+
+    public AuthRequest getAuthRequest(String id) {
+        return dao.findById(id).orElseThrow(OAuthError.AUTH_REQUEST_NOT_FOUND::exception);
+    }
 }
