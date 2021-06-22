@@ -1,5 +1,6 @@
 package cn.aulang.oauth.manage;
 
+import cn.aulang.framework.exception.BaseException;
 import cn.aulang.framework.exception.CommonError;
 import cn.aulang.oauth.common.OAuthError;
 import cn.aulang.oauth.entity.AuthRequest;
@@ -9,7 +10,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -73,11 +73,10 @@ public class AuthRequestBiz {
     }
 
     public AuthRequest findOne(String id) {
-        Optional<AuthRequest> optional = dao.findById(id);
-        return optional.orElse(null);
+        return dao.findById(id).orElse(null);
     }
 
-    public AuthRequest checkAuthenticated(String id) {
+    public AuthRequest checkAuthenticated(String id) throws BaseException {
         AuthRequest authRequest = findOne(id);
 
         if (authRequest == null) {
@@ -91,7 +90,7 @@ public class AuthRequestBiz {
         return authRequest;
     }
 
-    public AuthRequest getAuthRequest(String id) {
+    public AuthRequest getAuthRequest(String id) throws BaseException {
         return dao.findById(id).orElseThrow(OAuthError.AUTH_REQUEST_NOT_FOUND::exception);
     }
 }

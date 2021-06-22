@@ -12,6 +12,4 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ClientRepository extends MongoRepository<Client, String> {
 
-    Client findFirstByEnabled(boolean enabled);
-
 }

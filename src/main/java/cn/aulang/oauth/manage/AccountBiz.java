@@ -1,5 +1,6 @@
 package cn.aulang.oauth.manage;
 
+import cn.aulang.framework.exception.BaseException;
 import cn.aulang.oauth.common.OAuthError;
 import cn.aulang.oauth.entity.Account;
 import cn.aulang.oauth.exception.AccountLockedException;
@@ -60,7 +61,7 @@ public class AccountBiz {
         return dao.findByUsernameOrMobileOrEmail(loginName, loginName, loginName);
     }
 
-    public CaptchaSendResult sendCaptcha(String loginName, String captcha) {
+    public CaptchaSendResult sendCaptcha(String loginName, String captcha) throws BaseException {
         Account account = findByLoginName(loginName);
         if (account == null) {
             throw OAuthError.ACCOUNT_NOT_FOUND.exception();
@@ -150,7 +151,7 @@ public class AccountBiz {
         return account;
     }
 
-    public void changePassword(String id, String password, boolean mustChangePassword) {
+    public void changePassword(String id, String password, boolean mustChangePassword) throws BaseException {
         Optional<Account> optional = dao.findById(id);
         if (optional.isPresent()) {
             Account account = optional.get();
@@ -169,7 +170,7 @@ public class AccountBiz {
         return dao.save(account);
     }
 
-    public Profile getProfile(String id) {
+    public Profile getProfile(String id) throws BaseException {
         Optional<Account> optional = dao.findById(id);
         if (optional.isEmpty()) {
             throw OAuthError.ACCOUNT_NOT_FOUND.exception();

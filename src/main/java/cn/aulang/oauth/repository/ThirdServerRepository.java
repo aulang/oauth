@@ -18,5 +18,4 @@ public interface ThirdServerRepository extends MongoRepository<ThirdServer, Stri
 
     ThirdServer findByNameAndEnabledIsTrue(String name);
 
-    ThirdServer findFirstByEnabled(boolean enabled);
 }

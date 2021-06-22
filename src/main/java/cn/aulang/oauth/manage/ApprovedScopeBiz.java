@@ -1,5 +1,6 @@
 package cn.aulang.oauth.manage;
 
+import cn.aulang.framework.exception.BaseException;
 import cn.aulang.oauth.common.OAuthError;
 import cn.aulang.oauth.entity.ApprovedScope;
 import cn.aulang.oauth.entity.AuthRequest;
@@ -50,7 +51,7 @@ public class ApprovedScopeBiz {
         return save(approvedScope);
     }
 
-    public void hasApproved(AuthRequest authRequest) {
+    public void hasApproved(AuthRequest authRequest) throws BaseException {
         Client client = clientBiz.findOne(authRequest.getClientId());
         if (client == null) {
             throw OAuthError.CLIENT_NOT_FOUND.exception();
@@ -80,7 +81,7 @@ public class ApprovedScopeBiz {
         throw OAuthError.NEED_APPROVAL.exception();
     }
 
-    public void approved(AuthRequest authRequest) {
+    public void approved(AuthRequest authRequest) throws BaseException {
         ApprovedScope approved = findByAccountIdAndClientId(authRequest.getAccountId(), authRequest.getClientId());
         if (approved != null) {
             approved.setApproved(authRequest.getScopes());

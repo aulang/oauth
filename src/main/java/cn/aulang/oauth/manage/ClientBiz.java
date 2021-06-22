@@ -1,12 +1,11 @@
 package cn.aulang.oauth.manage;
 
+import cn.aulang.oauth.entity.Client;
 import cn.aulang.oauth.repository.ClientRepository;
 import lombok.extern.slf4j.Slf4j;
-import cn.aulang.oauth.entity.Client;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.Optional;
 
 /**
  * @author Aulang
@@ -23,12 +22,7 @@ public class ClientBiz {
         return dao.save(entity);
     }
 
-    public Client getOne() {
-        return dao.findFirstByEnabled(true);
-    }
-
     public Client findOne(String id) {
-        Optional<Client> optional = dao.findById(id);
-        return optional.orElse(null);
+        return dao.findById(id).orElse(null);
     }
 }

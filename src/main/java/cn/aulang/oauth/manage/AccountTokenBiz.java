@@ -1,5 +1,6 @@
 package cn.aulang.oauth.manage;
 
+import cn.aulang.framework.exception.BaseException;
 import cn.aulang.oauth.common.Constants;
 import cn.aulang.oauth.common.OAuthError;
 import cn.aulang.oauth.entity.AccountToken;
@@ -27,7 +28,7 @@ public class AccountTokenBiz {
     @Autowired
     private AccountTokenRepository dao;
 
-    public AccountToken findByAuthorization(String authorization) {
+    public AccountToken findByAuthorization(String authorization) throws BaseException {
         String accessToken = StrUtil.removePrefix(authorization, Constants.BEARER).trim();
         return findByAccessToken(accessToken);
     }
@@ -42,7 +43,7 @@ public class AccountTokenBiz {
         return accountToken;
     }
 
-    public AccountToken findByAccessToken(String accessToken) {
+    public AccountToken findByAccessToken(String accessToken) throws BaseException {
         AccountToken accountToken = dao.findByAccessToken(accessToken);
         if (accountToken == null) {
             throw OAuthError.TOKEN_NOT_FOUND.exception();
@@ -57,21 +58,18 @@ public class AccountTokenBiz {
         LocalDateTime now = LocalDateTime.now();
 
         LocalDateTime accessTokenExpiration = accountToken.getAccessTokenExpiresAt();
-        if (accessTokenExpiration != null && accessTokenExpiration.isBefore(now)) {
-            return true;
-        }
-        return false;
+        return accessTokenExpiration != null && accessTokenExpiration.isBefore(now);
     }
 
     public AccountToken save(AccountToken token) {
         return dao.save(token);
     }
 
-    public AccountToken refreshAccessToken(String refreshToken) {
+    public AccountToken refreshAccessToken(String refreshToken) throws BaseException {
         return refreshAccessToken(refreshToken, IdUtil.fastSimpleUUID());
     }
 
-    public AccountToken refreshAccessToken(String refreshToken, String newAccessToken) {
+    public AccountToken refreshAccessToken(String refreshToken, String newAccessToken) throws BaseException {
         AccountToken accountToken = dao.findByRefreshToken(refreshToken);
 
         if (accountToken == null) {
@@ -98,7 +96,7 @@ public class AccountTokenBiz {
             String clientId,
             Set<String> scopes,
             String redirectUri,
-            String accountId) {
+            String accountId) throws BaseException {
         String accessToken = IdUtil.fastSimpleUUID();
         String refreshToken = IdUtil.fastSimpleUUID();
         return create(accessToken, refreshToken, authId, clientId, scopes, redirectUri, accountId);
@@ -111,7 +109,7 @@ public class AccountTokenBiz {
             String clientId,
             Set<String> scopes,
             String redirectUri,
-            String accountId) {
+            String accountId) throws BaseException {
         AccountToken accountToken = new AccountToken();
 
         accountToken.setAuthId(authId);

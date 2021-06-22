@@ -1,5 +1,6 @@
 package cn.aulang.oauth.auth;
 
+import cn.aulang.oauth.common.OAuthError;
 import cn.aulang.oauth.entity.ThirdServer;
 import cn.aulang.oauth.server.core.AuthService;
 import org.springframework.beans.BeansException;
@@ -37,6 +38,6 @@ public class AuthServiceProvider implements ApplicationContextAware {
                 .parallelStream()
                 .filter(e -> e.supports(server))
                 .findFirst();
-        return optional.orElse(null);
+        return optional.orElseThrow(OAuthError.THIRD_SERVER_NOT_FOUND::exception);
     }
 }

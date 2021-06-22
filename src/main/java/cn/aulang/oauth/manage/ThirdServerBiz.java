@@ -1,6 +1,8 @@
 package cn.aulang.oauth.manage;
 
+import cn.aulang.framework.exception.BaseException;
 import cn.aulang.oauth.common.Constants;
+import cn.aulang.oauth.common.OAuthError;
 import cn.aulang.oauth.entity.ThirdServer;
 import cn.aulang.oauth.model.bo.Server;
 import cn.aulang.oauth.repository.ThirdServerRepository;
@@ -10,7 +12,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
@@ -53,13 +54,8 @@ public class ThirdServerBiz {
         return dao.save(entity);
     }
 
-    public ThirdServer getOne() {
-        return dao.findFirstByEnabled(true);
-    }
-
     public ThirdServer findOne(String id) {
-        Optional<ThirdServer> optional = dao.findById(id);
-        return optional.orElse(null);
+        return dao.findById(id).orElse(null);
     }
 
     public ThirdServer findByName(String name) {
@@ -87,5 +83,9 @@ public class ThirdServerBiz {
 
         authorizeUrl.append(Constants.STATE).append(Constants.EQUAL).append(state);
         return authorizeUrl.toString();
+    }
+
+    public ThirdServer getThirdServer(String id) throws BaseException {
+        return dao.findById(id).orElseThrow(OAuthError.THIRD_SERVER_NOT_FOUND::exception);
     }
 }

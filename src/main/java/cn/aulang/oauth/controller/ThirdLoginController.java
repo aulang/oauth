@@ -67,20 +67,20 @@ public class ThirdLoginController {
 
     @GetMapping("/login/{authId}/{serverId}")
     public Response<ThirdAuthVO> redirectUrl(@PathVariable String authId, @PathVariable String serverId) {
-        ThirdServer thirdServer = getThirdServer(serverId);
+        ThirdServer thirdServer = thirdServerBiz.getThirdServer(serverId);
         String redirectUrl = thirdServerBiz.buildAuthorizeUrl(authId, thirdServer, null);
         return ResponseFactory.success(ThirdAuthVO.of(redirectUrl));
     }
 
     @PostMapping("/login")
     public Response<AuthCodeVO> login(@Valid @RequestBody ThirdLoginRequest request) {
-        AuthState authState = getAuthState(request.getState());
+        AuthState authState = authStateBiz.getAuthState(request.getState());
 
-        ThirdServer thirdServer = getThirdServer(authState.getThirdServerId());
+        ThirdServer thirdServer = thirdServerBiz.getThirdServer(authState.getThirdServerId());
 
-        AuthRequest authRequest = getAuthRequest(authState.getAuthId());
+        AuthRequest authRequest = authRequestBiz.getAuthRequest(authState.getAuthId());
 
-        AuthService authService = getAuthService(thirdServer);
+        AuthService authService = provider.get(thirdServer);
 
         Account account = authService.authenticate(thirdServer, request.getCode());
         authRequest.setAuthenticated(true);
@@ -123,8 +123,8 @@ public class ThirdLoginController {
 
     @PostMapping("/bind")
     public Response<?> bind(@Valid @RequestBody ThirdBindRequest request) {
-        AuthRequest authRequest = getAuthRequest(request.getAuthId());
-        AuthState authState = getAuthState(request.getState());
+        AuthRequest authRequest = authRequestBiz.getAuthRequest(request.getAuthId());
+        AuthState authState = authStateBiz.getAuthState(request.getState());
 
         if (StrUtil.hasBlank(authRequest.getAccountId(), authState.getAccountId())
                 || !authRequest.getAccountId().equals(authState.getAccountId())) {
@@ -132,44 +132,12 @@ public class ThirdLoginController {
             throw CommonError.BAD_REQUEST.exception();
         }
 
-        ThirdServer thirdServer = getThirdServer(authState.getThirdServerId());
+        ThirdServer thirdServer = thirdServerBiz.getThirdServer(authState.getThirdServerId());
 
-        AuthService authService = getAuthService(thirdServer);
+        AuthService authService = provider.get(thirdServer);
 
         authService.bind(thirdServer, request.getCode(), authState.getAccountId());
 
         return ResponseFactory.success();
-    }
-
-    private ThirdServer getThirdServer(String id) {
-        ThirdServer thirdServer = thirdServerBiz.findOne(id);
-        if (thirdServer == null) {
-            throw OAuthError.THIRD_SERVER_NOT_FOUND.exception();
-        }
-        return thirdServer;
-    }
-
-    private AuthService getAuthService(ThirdServer thirdServer) {
-        AuthService authService = provider.get(thirdServer);
-        if (authService == null) {
-            throw OAuthError.THIRD_SERVER_NOT_FOUND.exception();
-        }
-        return authService;
-    }
-
-    private AuthState getAuthState(String state) {
-        AuthState authState = authStateBiz.findByState(state);
-        if (authState == null) {
-            throw OAuthError.AUTH_REQUEST_NOT_FOUND.exception();
-        }
-        return authState;
-    }
-
-    private AuthRequest getAuthRequest(String authId) {
-        AuthRequest authRequest = authRequestBiz.findOne(authId);
-        if (authRequest == null) {
-            throw OAuthError.AUTH_REQUEST_NOT_FOUND.exception();
-        }
-        return authRequest;
     }
 }
