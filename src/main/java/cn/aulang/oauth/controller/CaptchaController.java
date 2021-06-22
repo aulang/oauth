@@ -66,11 +66,7 @@ public class CaptchaController {
         if (isNotBlank(authId)) {
             // Web，先要有认证请求，再发生验证码
             // 登录请求是否存在
-            authRequest = authRequestBiz.findOne(authId);
-            if (authRequest == null) {
-                throw OAuthError.AUTH_REQUEST_NOT_FOUND.exception();
-            }
-
+            authRequest = authRequestBiz.getAuthRequest(authId);
         } else {
             // APP，直接使用客户端发送验证码
             // 客户端是否存在

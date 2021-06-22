@@ -19,8 +19,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
-
 /**
  * @author Aulang
  * @email aulang@aq.com
@@ -152,14 +150,10 @@ public class AccountBiz {
     }
 
     public void changePassword(String id, String password, boolean mustChangePassword) throws BaseException {
-        Optional<Account> optional = dao.findById(id);
-        if (optional.isPresent()) {
-            Account account = optional.get();
-            account.setPassword(PasswordUtil.bcrypt(password));
-            account.setMustChangePassword(mustChangePassword);
-            dao.save(account);
-        }
-        throw OAuthError.ACCOUNT_NOT_FOUND.exception();
+        Account account = dao.findById(id).orElseThrow(OAuthError.ACCOUNT_NOT_FOUND::exception);
+        account.setPassword(PasswordUtil.bcrypt(password));
+        account.setMustChangePassword(mustChangePassword);
+        dao.save(account);
     }
 
     public Account register(Account account) {
@@ -171,12 +165,7 @@ public class AccountBiz {
     }
 
     public Profile getProfile(String id) throws BaseException {
-        Optional<Account> optional = dao.findById(id);
-        if (optional.isEmpty()) {
-            throw OAuthError.ACCOUNT_NOT_FOUND.exception();
-        }
-
-        Account account = optional.get();
+        Account account = dao.findById(id).orElseThrow(OAuthError.ACCOUNT_NOT_FOUND::exception);
 
         return new Profile(
                 account.getId(),

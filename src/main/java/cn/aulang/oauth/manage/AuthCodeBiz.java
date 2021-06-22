@@ -6,8 +6,6 @@ import cn.aulang.oauth.repository.AuthCodeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
-
 /**
  * @author Aulang
  * @email aulang@aq.com
@@ -29,8 +27,7 @@ public class AuthCodeBiz {
     }
 
     public AuthCode findOne(String id) {
-        Optional<AuthCode> optional = dao.findById(id);
-        return optional.orElse(null);
+        return dao.findById(id).orElse(null);
     }
 
     public void consumeCode(String code) {

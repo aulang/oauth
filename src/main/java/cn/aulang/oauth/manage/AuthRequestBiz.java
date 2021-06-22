@@ -23,29 +23,6 @@ public class AuthRequestBiz {
     @Autowired
     private AuthRequestReRepository dao;
 
-    public AuthRequest createAndSave(String accountId,
-                                     String clientId,
-                                     String responseType,
-                                     String redirectUri,
-                                     String codeChallenge,
-                                     Set<String> scopes,
-                                     String state) {
-
-        AuthRequest request = new AuthRequest();
-
-        request.setAccountId(accountId);
-        request.setAuthenticated(true);
-
-        request.setClientId(clientId);
-        request.setResponseType(responseType);
-        request.setRedirectUri(redirectUri);
-        request.setCodeChallenge(codeChallenge);
-        request.setScopes(scopes);
-        request.setState(state);
-
-        return dao.save(request);
-    }
-
     public AuthRequest createAndSave(String clientId,
                                      String responseType,
                                      String redirectUri,
@@ -77,11 +54,7 @@ public class AuthRequestBiz {
     }
 
     public AuthRequest checkAuthenticated(String id) throws BaseException {
-        AuthRequest authRequest = findOne(id);
-
-        if (authRequest == null) {
-            throw OAuthError.AUTH_REQUEST_NOT_FOUND.exception();
-        }
+        AuthRequest authRequest = getAuthRequest(id);
 
         if (!authRequest.isAuthenticated() && StrUtil.isBlank(authRequest.getAccountId())) {
             throw CommonError.BAD_REQUEST.exception();
