@@ -24,6 +24,7 @@ import cn.aulang.oauth.model.response.AuthCodeVO;
 import cn.aulang.oauth.model.response.ThirdAuthVO;
 import cn.aulang.oauth.model.response.ThirdServersVO;
 import cn.aulang.oauth.server.core.AuthService;
+import cn.hutool.core.util.StrUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -35,8 +36,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 import java.util.List;
-
-import static cn.hutool.core.util.StrUtil.isBlank;
 
 /**
  * 第三方登录控制器
@@ -127,9 +126,8 @@ public class ThirdLoginController {
         AuthRequest authRequest = getAuthRequest(request.getAuthId());
         AuthState authState = getAuthState(request.getState());
 
-        if (isBlank(authRequest.getAccountId())
-                || isBlank(authState.getAccountId())
-                || authRequest.getAccountId().equals(authState.getAccountId())) {
+        if (StrUtil.hasBlank(authRequest.getAccountId(), authState.getAccountId())
+                || !authRequest.getAccountId().equals(authState.getAccountId())) {
             // 登录账号和绑定账号不一致
             throw CommonError.BAD_REQUEST.exception();
         }

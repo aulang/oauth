@@ -2,8 +2,6 @@ package cn.aulang.oauth.entity;
 
 import lombok.Data;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.index.CompoundIndex;
-import org.springframework.data.mongodb.core.index.CompoundIndexes;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -19,22 +17,20 @@ import java.util.Set;
  */
 @Data
 @Document
-@CompoundIndexes({
-        @CompoundIndex(
-                unique = true,
-                name = "idx_accountId_clientId_redirectUri",
-                def = "{'accountId':1, 'clientId':1, 'redirectUri':1}"
-        )
-})
 public class AccountToken implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id
     private String id;
     /**
-     * access_token
+     * 认证ID，Web端单点登录用
      */
     @Indexed(unique = true, sparse = true)
+    private String authId;
+    /**
+     * access_token
+     */
+    @Indexed(unique = true)
     private String accessToken;
     /**
      * access_token失效时间
@@ -49,7 +45,7 @@ public class AccountToken implements Serializable {
     /**
      * refresh_token
      */
-    @Indexed(unique = true, sparse = true)
+    @Indexed(unique = true)
     private String refreshToken;
     /**
      * refresh_token失效时间

@@ -13,6 +13,7 @@ import cn.aulang.oauth.manage.AccountBiz;
 import cn.aulang.oauth.manage.AuthCodeBiz;
 import cn.aulang.oauth.manage.AuthRequestBiz;
 import cn.aulang.oauth.model.request.LoginRequest;
+import cn.aulang.oauth.model.request.SsoRequest;
 import cn.aulang.oauth.model.response.AuthCodeVO;
 import cn.aulang.oauth.model.response.AuthRequestVO;
 import cn.aulang.oauth.property.LoginProperties;
@@ -44,7 +45,7 @@ public class LoginController {
     private LoginProperties loginProperties;
 
     @PostMapping("/api/login")
-    public Response<?> captchaAuthorize(@Valid @RequestBody LoginRequest request) {
+    public Response<?> login(@Valid @RequestBody LoginRequest request) {
         String authId = request.getAuthId();
 
         // 登录请求是否存在
@@ -54,10 +55,9 @@ public class LoginController {
         }
 
         // 秘密错误次数需要验证码
-        if (authRequest.getTriedTimes() > loginProperties.getNeedCaptchaTimes()) {
-            if (!authRequest.getCaptcha().equalsIgnoreCase(request.getCaptcha())) {
-                throw OAuthError.CAPTCHA_ERROR.exception();
-            }
+        if (authRequest.getTriedTimes() > loginProperties.getNeedCaptchaTimes()
+                && !authRequest.getCaptcha().equalsIgnoreCase(request.getCaptcha())) {
+            throw OAuthError.CAPTCHA_ERROR.exception();
         }
 
         try {
@@ -102,6 +102,26 @@ public class LoginController {
                         code.getId(),
                         authRequest.getState(),
                         authRequest.getRedirectUri()
+                )
+        );
+    }
+
+    @PostMapping("/api/sso")
+    public Response<?> sso(@Valid @RequestBody SsoRequest request) {
+        String authId = request.getAuthId();
+        // 判断是否登录过
+        authRequestBiz.checkAuthenticated(authId);
+
+        // 创建authorisation code
+        AuthCode code = authCodeBiz.create(authId, true);
+
+        // 返回code
+        return ResponseFactory.success(
+                AuthCodeVO.of(
+                        authId,
+                        code.getId(),
+                        request.getState(),
+                        request.getRedirectUri()
                 )
         );
     }

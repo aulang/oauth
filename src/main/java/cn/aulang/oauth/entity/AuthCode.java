@@ -23,6 +23,11 @@ public class AuthCode implements Serializable {
     private String authId;
 
     /**
+     * 是否已认证通过
+     */
+    private boolean sso = false;
+
+    /**
      * 授权码（authorization code）有效期10分钟
      */
     @Indexed(name = "ttl", expireAfterSeconds = 600)

@@ -3,7 +3,6 @@ package cn.aulang.oauth.entity;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.CompoundIndex;
-import org.springframework.data.mongodb.core.index.CompoundIndexes;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -19,13 +18,11 @@ import java.time.LocalDateTime;
  */
 @Data
 @Document
-@CompoundIndexes({
-        @CompoundIndex(
-                unique = true,
-                name = "idx_thirdType_thirdId",
-                def = "{'thirdType':1, 'thirdId':1}"
-        )
-})
+@CompoundIndex(
+        unique = true,
+        name = "idx_thirdType_thirdId",
+        def = "{'thirdType':1, 'thirdId':1}"
+)
 public class ThirdAccount implements Serializable {
     private static final long serialVersionUID = 1L;
 

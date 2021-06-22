@@ -41,8 +41,14 @@ public class AuthCodeBiz {
         // 判断是否需要用户授权
         approvedScopeBiz.hasApproved(authRequest);
         // 创建Code
+        return create(authRequest.getId(), false);
+    }
+
+    public AuthCode create(String authId, boolean sso) {
+        // 创建Code
         AuthCode code = new AuthCode();
-        code.setAuthId(authRequest.getId());
+        code.setAuthId(authId);
+        code.setSso(sso);
         return save(code);
     }
 }

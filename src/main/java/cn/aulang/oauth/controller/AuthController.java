@@ -63,7 +63,7 @@ public class AuthController {
         }
 
         boolean match = registeredUrls.parallelStream().anyMatch(url -> {
-            Pattern pattern = Pattern.compile(url, Pattern.CASE_INSENSITIVE);
+            var pattern = Pattern.compile(url, Pattern.CASE_INSENSITIVE);
             return pattern.matcher(redirectUri).matches();
         });
         if (!match) {

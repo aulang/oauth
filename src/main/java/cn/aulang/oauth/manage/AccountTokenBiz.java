@@ -32,38 +32,38 @@ public class AccountTokenBiz {
         return findByAccessToken(accessToken);
     }
 
+    public AccountToken findByAuthId(String authId) {
+        AccountToken accountToken = dao.findByAuthId(authId);
+
+        if (isExpire(accountToken)) {
+            return null;
+        }
+
+        return accountToken;
+    }
+
     public AccountToken findByAccessToken(String accessToken) {
         AccountToken accountToken = dao.findByAccessToken(accessToken);
         if (accountToken == null) {
             throw OAuthError.TOKEN_NOT_FOUND.exception();
         }
-
-        LocalDateTime now = LocalDateTime.now();
-
-        LocalDateTime accessTokenExpiration = accountToken.getAccessTokenExpiresAt();
-        if (accessTokenExpiration != null && accessTokenExpiration.isBefore(now)) {
+        if (isExpire(accountToken)) {
             throw OAuthError.TOKEN_EXPIRED.exception();
         }
         return accountToken;
     }
 
-    public AccountToken findByAccountIdAndClientIdAndRedirectUri(String accountId, String clientId, String redirectUri) {
-        return dao.findByAccountIdAndClientIdAndRedirectUri(accountId, clientId, redirectUri);
+    private boolean isExpire(AccountToken accountToken) {
+        LocalDateTime now = LocalDateTime.now();
+
+        LocalDateTime accessTokenExpiration = accountToken.getAccessTokenExpiresAt();
+        if (accessTokenExpiration != null && accessTokenExpiration.isBefore(now)) {
+            return true;
+        }
+        return false;
     }
 
     public AccountToken save(AccountToken token) {
-        // 同一个client，同一个账号，同一个端只能有一个token
-        AccountToken accountToken = findByAccountIdAndClientIdAndRedirectUri(
-                token.getAccountId(),
-                token.getClientId(),
-                token.getRedirectUri()
-        );
-
-        // 申请新的，之前的就失效
-        if (accountToken != null) {
-            token.setId(accountToken.getId());
-        }
-
         return dao.save(token);
     }
 
@@ -94,24 +94,27 @@ public class AccountTokenBiz {
     }
 
     public AccountToken create(
+            String authId,
             String clientId,
             Set<String> scopes,
             String redirectUri,
             String accountId) {
         String accessToken = IdUtil.fastSimpleUUID();
         String refreshToken = IdUtil.fastSimpleUUID();
-        return create(accessToken, refreshToken, clientId, scopes, redirectUri, accountId);
+        return create(accessToken, refreshToken, authId, clientId, scopes, redirectUri, accountId);
     }
 
     public AccountToken create(
             String accessToken,
             String refreshToken,
+            String authId,
             String clientId,
             Set<String> scopes,
             String redirectUri,
             String accountId) {
         AccountToken accountToken = new AccountToken();
 
+        accountToken.setAuthId(authId);
         accountToken.setScopes(scopes);
         accountToken.setClientId(clientId);
         accountToken.setRedirectUri(redirectUri);

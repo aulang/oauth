@@ -23,7 +23,7 @@ public class ThirdServer implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
     private String id;
-    @Indexed(unique = true, sparse = true)
+    @Indexed(unique = true)
     private String name;
     private String logoUrl;
     private boolean enabled = true;

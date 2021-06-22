@@ -90,6 +90,16 @@ public class TokenController {
             return ResponseEntity.badRequest().body("code已过期");
         }
 
+        if (authCode.isSso()) {
+            // 单点登录
+            AccountToken accountToken = accountTokenBiz.findByAuthId(authCode.getAuthId());
+            if (accountToken != null) {
+                // Code被消费
+                authCodeBiz.consumeCode(code);
+                return ResponseEntity.ok(AccessToken.build(accountToken));
+            }
+        }
+
         AuthRequest authRequest = authRequestBiz.findOne(authCode.getAuthId());
         if (authRequest == null) {
             return ResponseEntity.badRequest().body("认证请求已过期");
@@ -110,6 +120,7 @@ public class TokenController {
 
         try {
             AccountToken accountToken = accountTokenBiz.create(
+                    authRequest.getId(),
                     authRequest.getClientId(),
                     authRequest.getScopes(),
                     authRequest.getRedirectUri(),
@@ -146,6 +157,7 @@ public class TokenController {
 
         try {
             AccountToken accountToken = accountTokenBiz.create(
+                    client.getId(),
                     client.getId(),
                     client.getAutoApprovedScopes(),
                     AuthorizationGrant.CLIENT_CREDENTIALS.getGrantType(),

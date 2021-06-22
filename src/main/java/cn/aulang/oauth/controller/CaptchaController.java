@@ -14,8 +14,8 @@ import cn.aulang.oauth.manage.ClientBiz;
 import cn.aulang.oauth.model.bo.CaptchaSendResult;
 import cn.aulang.oauth.model.request.SendCaptchaRequest;
 import cn.aulang.oauth.model.response.SendCaptchaVO;
+import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.RandomUtil;
-import cn.hutool.core.util.StrUtil;
 import com.wf.captcha.base.Captcha;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -29,6 +29,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
 import javax.validation.Valid;
+
+import static cn.hutool.core.text.CharSequenceUtil.isNotBlank;
 
 /**
  * 验证码控制器
@@ -56,12 +58,12 @@ public class CaptchaController {
         String authId = request.getAuthId();
         String clientId = request.getClientId();
 
-        if (StrUtil.isAllBlank(authId, clientId)) {
+        if (CharSequenceUtil.isAllBlank(authId, clientId)) {
             throw CommonError.BAD_REQUEST.exception();
         }
 
         AuthRequest authRequest;
-        if (StrUtil.isNotBlank(authId)) {
+        if (isNotBlank(authId)) {
             // Web，先创建认证请求，再发生验证码
             // 登录请求是否存在
             authRequest = authRequestBiz.findOne(authId);
@@ -115,10 +117,8 @@ public class CaptchaController {
     public Response<?> send(@PathVariable("authId") String authId, @PathVariable("code") String code) {
         AuthRequest request = authRequestBiz.findOne(authId);
 
-        if (request != null) {
-            if (code.equalsIgnoreCase(request.getCaptcha())) {
-                return ResponseFactory.success();
-            }
+        if (request != null && code.equalsIgnoreCase(request.getCaptcha())) {
+            return ResponseFactory.success();
         }
 
         return ResponseFactory.build(OAuthError.CAPTCHA_ERROR.exception());
