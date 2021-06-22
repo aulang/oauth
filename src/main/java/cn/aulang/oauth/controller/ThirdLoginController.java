@@ -18,12 +18,12 @@ import cn.aulang.oauth.manage.AuthRequestBiz;
 import cn.aulang.oauth.manage.AuthStateBiz;
 import cn.aulang.oauth.manage.ThirdServerBiz;
 import cn.aulang.oauth.model.bo.Server;
+import cn.aulang.oauth.model.request.ThirdBindRequest;
 import cn.aulang.oauth.model.request.ThirdLoginRequest;
 import cn.aulang.oauth.model.response.AuthCodeVO;
 import cn.aulang.oauth.model.response.ThirdAuthVO;
 import cn.aulang.oauth.model.response.ThirdServersVO;
 import cn.aulang.oauth.server.core.AuthService;
-import cn.hutool.core.util.StrUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -35,6 +35,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 import java.util.List;
+
+import static cn.hutool.core.util.StrUtil.isBlank;
 
 /**
  * 第三方登录控制器
@@ -77,12 +79,9 @@ public class ThirdLoginController {
 
         ThirdServer thirdServer = getThirdServer(authState.getThirdServerId());
 
-        AuthService authService = getAuthService(thirdServer);
+        AuthRequest authRequest = getAuthRequest(authState.getAuthId());
 
-        AuthRequest authRequest = authRequestBiz.findOne(authState.getAuthId());
-        if (authRequest == null) {
-            throw OAuthError.AUTH_REQUEST_NOT_FOUND.exception();
-        }
+        AuthService authService = getAuthService(thirdServer);
 
         Account account = authService.authenticate(thirdServer, request.getCode());
         authRequest.setAuthenticated(true);
@@ -124,15 +123,14 @@ public class ThirdLoginController {
     }
 
     @PostMapping("/bind")
-    public Response<?> bind(
-            @Valid @RequestBody ThirdLoginRequest request,
-            @RequestHeader(Constants.AUTHORIZATION) String authorization) {
+    public Response<?> bind(@Valid @RequestBody ThirdBindRequest request) {
+        AuthRequest authRequest = getAuthRequest(request.getAuthId());
         AuthState authState = getAuthState(request.getState());
-        // FIXME authorization怎么获取问题
-        AccountToken accountToken = accountTokenBiz.findByAuthorization(authorization);
 
-        if (StrUtil.isBlank(authState.getAccountId())
-                || !accountToken.getAccountId().equals(authState.getAccountId())) {
+        if (isBlank(authRequest.getAccountId())
+                || isBlank(authState.getAccountId())
+                || authRequest.getAccountId().equals(authState.getAccountId())) {
+            // 登录账号和绑定账号不一致
             throw CommonError.BAD_REQUEST.exception();
         }
 
@@ -167,5 +165,13 @@ public class ThirdLoginController {
             throw OAuthError.AUTH_REQUEST_NOT_FOUND.exception();
         }
         return authState;
+    }
+
+    private AuthRequest getAuthRequest(String authId) {
+        AuthRequest authRequest = authRequestBiz.findOne(authId);
+        if (authRequest == null) {
+            throw OAuthError.AUTH_REQUEST_NOT_FOUND.exception();
+        }
+        return authRequest;
     }
 }
