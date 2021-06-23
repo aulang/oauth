@@ -17,7 +17,7 @@ public class AuthRequestVO {
     /**
      * 认证请求ID
      */
-    private String id;
+    private String authId;
     /**
      * 需要验证码
      */
