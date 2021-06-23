@@ -12,9 +12,12 @@ import org.springframework.web.servlet.mvc.WebContentInterceptor;
  */
 @Configuration
 public class WebMvcConfiguration implements WebMvcConfigurer {
+    /**
+     * 禁用缓存
+     */
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        WebContentInterceptor contentInterceptor = new WebContentInterceptor();
+        var contentInterceptor = new WebContentInterceptor();
         contentInterceptor.setCacheSeconds(0);
         registry.addInterceptor(contentInterceptor).addPathPatterns("/**");
     }
