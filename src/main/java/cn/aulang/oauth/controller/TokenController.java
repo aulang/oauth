@@ -1,5 +1,9 @@
 package cn.aulang.oauth.controller;
 
+import cn.aulang.framework.exception.CommonError;
+import cn.aulang.framework.web.Response;
+import cn.aulang.framework.web.response.ResponseFactory;
+import cn.aulang.oauth.common.OAuthError;
 import cn.aulang.oauth.entity.AccountToken;
 import cn.aulang.oauth.entity.AuthCode;
 import cn.aulang.oauth.entity.AuthRequest;
@@ -10,17 +14,18 @@ import cn.aulang.oauth.manage.AuthRequestBiz;
 import cn.aulang.oauth.manage.ClientBiz;
 import cn.aulang.oauth.model.bo.AccessToken;
 import cn.aulang.oauth.model.enums.AuthorizationGrant;
+import cn.aulang.oauth.model.request.TokenRequest;
 import cn.hutool.core.codec.Base64;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.digest.DigestUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.validation.Valid;
 
 /**
  * 令牌控制器
@@ -42,173 +47,131 @@ public class TokenController {
     private AccountTokenBiz accountTokenBiz;
 
     @PostMapping("")
-    public ResponseEntity<?> token(
-            @RequestParam(name = "client_id") String clientId,
-            @RequestParam(name = "grant_type") String grantType,
-            // authorization_code
-            @RequestParam(name = "code", required = false) String code,
-            @RequestParam(name = "redirect_uri", required = false) String redirectUri,
-            @RequestParam(name = "code_verifier", required = false) String codeVerifier,
-            // refresh_token
-            @RequestParam(name = "refresh_token", required = false) String refreshToken,
-            // client_credentials
-            @RequestParam(name = "client_secret", required = false) String clientSecret,
-            // captcha
-            @RequestParam(name = "auth_id", required = false) String authId,
-            @RequestParam(name = "mobile", required = false) String mobile,
-            @RequestParam(name = "client_secret", required = false) String captcha) {
-        Client client = clientBiz.findOne(clientId);
-        if (client == null) {
-            return ResponseEntity.badRequest().body("client_id错误");
-        }
+    public Response<?> token(@Valid @RequestBody TokenRequest request) {
+        Client client = clientBiz.getClient(request.getClientId());
 
-        if (client.getAuthorizationGrants() != null && !client.getAuthorizationGrants().contains(grantType)) {
-            return ResponseEntity.badRequest().body("未授权的grant_type");
+        String grantType = request.getGrantType();
+        if (client.getAuthorizationGrants() != null
+                && !client.getAuthorizationGrants().contains(grantType)) {
+            throw OAuthError.GRANT_TYPE_UNAUTHORIZED.exception();
         }
 
         if (AuthorizationGrant.CODE.getGrantType().equalsIgnoreCase(grantType)) {
-            return code(clientId, code, redirectUri, codeVerifier);
+            return code(request.getClientId(), request.getCode(), request.getRedirectUri(), request.getCodeVerifier());
         }
 
         if (AuthorizationGrant.REFRESH_TOKEN.getGrantType().equalsIgnoreCase(grantType)) {
-            return refresh(refreshToken);
+            return refresh(request.getRefreshToken());
         }
 
         if (AuthorizationGrant.CLIENT_CREDENTIALS.getGrantType().equalsIgnoreCase(grantType)) {
-            return clientCredentials(client, clientSecret);
+            return clientCredentials(client, request.getClientSecret());
         }
 
         if (AuthorizationGrant.CAPTCHA.getGrantType().equalsIgnoreCase(grantType)) {
-            return captcha(authId, mobile, captcha);
+            return captcha(request.getAuthId(), request.getMobile(), request.getCaptcha());
         }
 
-        return ResponseEntity.badRequest().body("grant_type错误");
+        throw OAuthError.GRANT_TYPE_UNAUTHORIZED.exception();
     }
 
-    private ResponseEntity<?> code(String clientId,
-                                   String code,
-                                   String redirectUri,
-                                   String codeVerifier) {
+    private Response<AccessToken> code(String clientId,
+                                       String code,
+                                       String redirectUri,
+                                       String codeVerifier) {
         if (StrUtil.hasBlank(code, redirectUri, codeVerifier)) {
-            return ResponseEntity.badRequest().body("参数缺失");
+            throw CommonError.BAD_REQUEST.exception();
         }
 
         AuthCode authCode = authCodeBiz.findOne(code);
         if (authCode == null) {
-            return ResponseEntity.badRequest().body("code已过期");
+            throw OAuthError.CODE_EXPIRED.exception();
         }
+
+        // Code被消费
+        authCodeBiz.consumeCode(code);
 
         if (authCode.isSso()) {
             // 单点登录
             AccountToken accountToken = accountTokenBiz.findByAuthId(authCode.getAuthId());
             if (accountToken != null) {
-                // Code被消费
-                authCodeBiz.consumeCode(code);
-                return ResponseEntity.ok(AccessToken.build(accountToken));
+                return ResponseFactory.success(AccessToken.build(accountToken));
             }
         }
 
-        AuthRequest authRequest = authRequestBiz.findOne(authCode.getAuthId());
-        if (authRequest == null) {
-            return ResponseEntity.badRequest().body("认证请求已过期");
-        }
+        AuthRequest authRequest = authRequestBiz.getAuthRequest(authCode.getId());
 
         if (!clientId.equalsIgnoreCase(authRequest.getClientId())) {
-            return ResponseEntity.badRequest().body("client_id不匹配");
+            throw OAuthError.CLIENT_ID_MISMATCH.exception();
         }
 
         if (!redirectUri.equalsIgnoreCase(authRequest.getRedirectUri())) {
-            return ResponseEntity.badRequest().body("redirect_uri不匹配");
+            throw OAuthError.REDIRECT_URI_ERROR.exception();
         }
 
         String codeChallenge = Base64.encodeUrlSafe(DigestUtil.sha256(codeVerifier));
         if (!codeChallenge.equals(authRequest.getCodeChallenge())) {
-            return ResponseEntity.badRequest().body("code_verifier错误");
+            throw OAuthError.CODE_VERIFIER_ERROR.exception();
         }
 
-        try {
-            AccountToken accountToken = accountTokenBiz.create(
-                    authRequest.getId(),
-                    authRequest.getClientId(),
-                    authRequest.getScopes(),
-                    authRequest.getRedirectUri(),
-                    authRequest.getAccountId()
-            );
+        AccountToken accountToken = accountTokenBiz.create(
+                authRequest.getId(),
+                authRequest.getClientId(),
+                authRequest.getScopes(),
+                authRequest.getRedirectUri(),
+                authRequest.getAccountId()
+        );
 
-            // Code被消费
-            authCodeBiz.consumeCode(code);
-
-            return ResponseEntity.ok(AccessToken.build(accountToken));
-        } catch (Exception e) {
-            log.error("创建Token失败", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-        }
+        return ResponseFactory.success(AccessToken.build(accountToken));
     }
 
-    private ResponseEntity<?> captcha(String authId,
-                                      String mobile,
-                                      String captcha) {
+    private Response<AccessToken> captcha(String authId,
+                                          String mobile,
+                                          String captcha) {
         if (StrUtil.hasBlank(authId, mobile, captcha)) {
-            return ResponseEntity.badRequest().body("参数缺失");
+            throw CommonError.BAD_REQUEST.exception();
         }
 
-        AuthRequest authRequest = authRequestBiz.findOne(authId);
-        if (authRequest == null) {
-            return ResponseEntity.badRequest().body("认证请求已过期");
-        }
+        AuthRequest authRequest = authRequestBiz.getAuthRequest(authId);
 
         if (!StrUtil.equals(mobile, authRequest.getMobile())
                 || !StrUtil.equals(captcha, authRequest.getCaptcha())) {
-            return ResponseEntity.badRequest().body("验证码错误");
+            throw OAuthError.CAPTCHA_ERROR.exception();
         }
 
-        try {
-            AccountToken accountToken = accountTokenBiz.create(
-                    authRequest.getId(),
-                    authRequest.getClientId(),
-                    authRequest.getScopes(),
-                    authRequest.getRedirectUri(),
-                    authRequest.getAccountId()
-            );
+        AccountToken accountToken = accountTokenBiz.create(
+                authRequest.getId(),
+                authRequest.getClientId(),
+                authRequest.getScopes(),
+                authRequest.getRedirectUri(),
+                authRequest.getAccountId()
+        );
 
-            return ResponseEntity.ok(AccessToken.build(accountToken));
-        } catch (Exception e) {
-            log.error("创建Token失败", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-        }
+        return ResponseFactory.success(AccessToken.build(accountToken));
     }
 
-    private ResponseEntity<?> refresh(String refreshToken) {
-        try {
-            AccountToken accountToken = accountTokenBiz.refreshAccessToken(refreshToken);
-            return ResponseEntity.ok(AccessToken.build(accountToken));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+    private Response<AccessToken> refresh(String refreshToken) {
+        AccountToken accountToken = accountTokenBiz.refreshAccessToken(refreshToken);
+        return ResponseFactory.success(AccessToken.build(accountToken));
     }
 
-    private ResponseEntity<?> clientCredentials(Client client, String clientSecret) {
+    private Response<AccessToken> clientCredentials(Client client, String clientSecret) {
         if (StrUtil.isBlank(clientSecret) || !clientSecret.equals(client.getSecret())) {
-            return ResponseEntity.badRequest().body("client_secret错误");
+            throw OAuthError.CLIENT_CREDENTIALS_ERROR.exception("client_secret错误");
         }
 
         if (StrUtil.isBlank(client.getAccountId())) {
-            return ResponseEntity.badRequest().body("client_id未配置绑定账号");
+            throw OAuthError.CLIENT_CREDENTIALS_ERROR.exception("client_id未配置绑定账号");
         }
 
-        try {
-            AccountToken accountToken = accountTokenBiz.create(
-                    client.getId(),
-                    client.getId(),
-                    client.getAutoApprovedScopes(),
-                    AuthorizationGrant.CLIENT_CREDENTIALS.getGrantType(),
-                    client.getAccountId()
-            );
+        AccountToken accountToken = accountTokenBiz.create(
+                client.getId(),
+                client.getId(),
+                client.getAutoApprovedScopes(),
+                AuthorizationGrant.CLIENT_CREDENTIALS.getGrantType(),
+                client.getAccountId()
+        );
 
-            return ResponseEntity.ok(AccessToken.build(accountToken));
-        } catch (Exception e) {
-            log.error("创建Token失败", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-        }
+        return ResponseFactory.success(AccessToken.build(accountToken));
     }
 }

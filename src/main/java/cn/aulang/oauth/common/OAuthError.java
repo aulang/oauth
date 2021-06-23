@@ -38,12 +38,20 @@ public enum OAuthError implements ErrorDefine {
     ACCOUNT_NOT_FOUND,
     @ErrorDeclare(value = 12, group = 10101000, msg = "发送验证码失败")
     SEND_CAPTCHA_FAILED,
-    @ErrorDeclare(value = 13, group = 10101000, msg = "token已失效")
+    @ErrorDeclare(value = 13, group = 10101000, msg = "code已失效")
+    CODE_EXPIRED,
+    @ErrorDeclare(value = 14, group = 10101000, msg = "token已失效")
     TOKEN_EXPIRED,
-    @ErrorDeclare(value = 14, group = 10101000, msg = "token不存在")
+    @ErrorDeclare(value = 15, group = 10101000, msg = "token不存在")
     TOKEN_NOT_FOUND,
-    @ErrorDeclare(value = 15, group = 10101000, msg = "grant_type未授权")
+    @ErrorDeclare(value = 16, group = 10101000, msg = "grant_type未授权")
     GRANT_TYPE_UNAUTHORIZED,
-    @ErrorDeclare(value = 16, group = 10101000, msg = "登录方式不存在")
-    THIRD_SERVER_NOT_FOUND
+    @ErrorDeclare(value = 17, group = 10101000, msg = "登录方式不存在")
+    THIRD_SERVER_NOT_FOUND,
+    @ErrorDeclare(value = 18, group = 10101000, msg = "client id不匹配")
+    CLIENT_ID_MISMATCH,
+    @ErrorDeclare(value = 19, group = 10101000, msg = "code_verifier错误")
+    CODE_VERIFIER_ERROR,
+    @ErrorDeclare(value = 20, group = 10101000, msg = "client_credentials错误")
+    CLIENT_CREDENTIALS_ERROR
 }

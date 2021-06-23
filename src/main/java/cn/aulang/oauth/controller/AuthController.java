@@ -40,10 +40,7 @@ public class AuthController {
     @PostMapping("/api/authorize")
     public Response<AuthRequestVO> authorize(@Valid @RequestBody AuthorizeRequest request) {
         // 判断客户端是否存在
-        Client client = clientBiz.findOne(request.getClientId());
-        if (client == null) {
-            throw OAuthError.CLIENT_NOT_FOUND.exception();
-        }
+        Client client = clientBiz.getClient(request.getClientId());
 
         if (!AuthorizationGrant.CODE.getResponseType().equalsIgnoreCase(request.getResponseType())) {
             throw OAuthError.RESPONSE_TYPE_ERROR.exception();

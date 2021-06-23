@@ -1,5 +1,7 @@
 package cn.aulang.oauth.manage;
 
+import cn.aulang.framework.exception.BaseException;
+import cn.aulang.oauth.common.OAuthError;
 import cn.aulang.oauth.entity.Client;
 import cn.aulang.oauth.repository.ClientRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -24,5 +26,9 @@ public class ClientBiz {
 
     public Client findOne(String id) {
         return dao.findById(id).orElse(null);
+    }
+
+    public Client getClient(String id) throws BaseException {
+        return dao.findById(id).orElseThrow(OAuthError.CLIENT_NOT_FOUND::exception);
     }
 }

@@ -76,10 +76,7 @@ public class ApprovalController {
     public Response<ApprovedScopeVO> approval(@PathVariable("authId") String authId) {
         AuthRequest authRequest = authRequestBiz.checkAuthenticated(authId);
 
-        Client client = clientBiz.findOne(authRequest.getClientId());
-        if (client == null) {
-            throw OAuthError.CLIENT_NOT_FOUND.exception();
-        }
+        Client client = clientBiz.getClient(authRequest.getClientId());
 
         List<ScopeVO> scopes = new ArrayList<>();
         client.getScopes().forEach((k, v) -> {

@@ -120,10 +120,7 @@ public class AccountTokenBiz {
         accountToken.setAccessToken(accessToken);
         accountToken.setRefreshToken(refreshToken);
 
-        Client client = clientBiz.findOne(clientId);
-        if (client == null) {
-            throw OAuthError.CLIENT_NOT_FOUND.exception();
-        }
+        Client client = clientBiz.getClient(clientId);
 
         LocalDateTime now = LocalDateTime.now();
 

@@ -52,10 +52,7 @@ public class ApprovedScopeBiz {
     }
 
     public void hasApproved(AuthRequest authRequest) throws BaseException {
-        Client client = clientBiz.findOne(authRequest.getClientId());
-        if (client == null) {
-            throw OAuthError.CLIENT_NOT_FOUND.exception();
-        }
+        Client client = clientBiz.getClient(authRequest.getClientId());
 
         Set<String> requestScopes = authRequest.getScopes();
         if (CollectionUtil.isEmpty(requestScopes)) {
@@ -92,10 +89,7 @@ public class ApprovedScopeBiz {
 
             save(approved);
         } else {
-            Client client = clientBiz.findOne(authRequest.getClientId());
-            if (client == null) {
-                throw OAuthError.CLIENT_NOT_FOUND.exception();
-            }
+            Client client = clientBiz.getClient(authRequest.getClientId());
             create(client, authRequest.getAccountId(), authRequest.getScopes());
         }
     }

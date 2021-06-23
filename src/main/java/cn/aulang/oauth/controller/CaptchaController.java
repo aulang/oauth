@@ -6,7 +6,6 @@ import cn.aulang.framework.web.response.ResponseFactory;
 import cn.aulang.oauth.common.Constants;
 import cn.aulang.oauth.common.OAuthError;
 import cn.aulang.oauth.entity.AuthRequest;
-import cn.aulang.oauth.entity.Client;
 import cn.aulang.oauth.factory.CaptchaFactory;
 import cn.aulang.oauth.manage.AccountBiz;
 import cn.aulang.oauth.manage.AuthRequestBiz;
@@ -70,10 +69,7 @@ public class CaptchaController {
         } else {
             // APP，直接使用客户端发送验证码
             // 客户端是否存在
-            Client client = clientBiz.findOne(clientId);
-            if (client == null) {
-                throw OAuthError.CLIENT_NOT_FOUND.exception();
-            }
+            clientBiz.getClient(clientId);
             authRequest = new AuthRequest();
             authRequest.setResponseType(Constants.MOBILE);
             authRequest.setRedirectUri(Constants.MOBILE);
