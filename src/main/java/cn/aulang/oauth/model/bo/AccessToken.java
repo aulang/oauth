@@ -16,7 +16,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor(staticName = "of")
 public class AccessToken {
-    private String token_type = "Bearer";
+    private String token_type;
     private String access_token;
     private Integer expires_in;
     private String refresh_token;
@@ -24,7 +24,7 @@ public class AccessToken {
 
     public static AccessToken build(AccountToken token) {
         return of(
-                "Bearer",
+                Constants.BEARER,
                 token.getAccessToken(),
                 token.getExpiresIn(),
                 token.getRefreshToken(),

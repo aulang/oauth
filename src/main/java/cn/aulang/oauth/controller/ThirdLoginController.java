@@ -26,6 +26,7 @@ import cn.aulang.oauth.model.response.ThirdServersVO;
 import cn.aulang.oauth.server.core.AuthService;
 import cn.hutool.core.util.StrUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -104,7 +105,7 @@ public class ThirdLoginController {
     @GetMapping("/bind/{serverName}")
     public Response<ThirdAuthVO> bind(
             @PathVariable String serverName,
-            @RequestHeader(Constants.AUTHORIZATION) String authorization) {
+            @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization) {
         ThirdServer thirdServer = thirdServerBiz.findByName(serverName);
         if (thirdServer == null) {
             throw OAuthError.THIRD_SERVER_NOT_FOUND.exception();

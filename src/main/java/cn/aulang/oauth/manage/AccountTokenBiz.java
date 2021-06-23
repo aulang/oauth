@@ -36,7 +36,7 @@ public class AccountTokenBiz {
     public AccountToken findByAuthId(String authId) {
         AccountToken accountToken = dao.findByAuthId(authId);
 
-        if (isExpire(accountToken)) {
+        if (isExpires(accountToken)) {
             return null;
         }
 
@@ -48,13 +48,13 @@ public class AccountTokenBiz {
         if (accountToken == null) {
             throw OAuthError.TOKEN_NOT_FOUND.exception();
         }
-        if (isExpire(accountToken)) {
+        if (isExpires(accountToken)) {
             throw OAuthError.TOKEN_EXPIRED.exception();
         }
         return accountToken;
     }
 
-    private boolean isExpire(AccountToken accountToken) {
+    private boolean isExpires(AccountToken accountToken) {
         LocalDateTime now = LocalDateTime.now();
 
         LocalDateTime accessTokenExpiration = accountToken.getAccessTokenExpiresAt();

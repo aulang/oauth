@@ -10,8 +10,6 @@ public interface Constants {
     String STATE = "state";
     String MOBILE = "mobile";
 
-    String AUTHORIZATION = "Authorization";
-
     String EXPIRES_IN = "expires_in";
     String ACCESS_TOKEN = "access_token";
     String REFRESH_TOKEN = "refresh_token";

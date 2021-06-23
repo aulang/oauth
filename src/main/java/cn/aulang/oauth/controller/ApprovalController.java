@@ -2,7 +2,6 @@ package cn.aulang.oauth.controller;
 
 import cn.aulang.framework.web.Response;
 import cn.aulang.framework.web.response.ResponseFactory;
-import cn.aulang.oauth.common.OAuthError;
 import cn.aulang.oauth.entity.AuthCode;
 import cn.aulang.oauth.entity.AuthRequest;
 import cn.aulang.oauth.entity.Client;

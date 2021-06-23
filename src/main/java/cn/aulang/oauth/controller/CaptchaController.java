@@ -15,6 +15,7 @@ import cn.aulang.oauth.model.request.SendCaptchaRequest;
 import cn.aulang.oauth.model.response.SendCaptchaVO;
 import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.RandomUtil;
+import cn.hutool.core.util.StrUtil;
 import com.wf.captcha.base.Captcha;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -28,8 +29,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
 import javax.validation.Valid;
-
-import static cn.hutool.core.text.CharSequenceUtil.isNotBlank;
 
 /**
  * 验证码控制器
@@ -62,7 +61,7 @@ public class CaptchaController {
         }
 
         AuthRequest authRequest;
-        if (isNotBlank(authId)) {
+        if (StrUtil.isNotBlank(authId)) {
             // Web，先要有认证请求，再发生验证码
             // 登录请求是否存在
             authRequest = authRequestBiz.getAuthRequest(authId);
