@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @date 2021-06-20 17:05
  */
 @RestController
-@RequestMapping("/api/profile")
+@RequestMapping("/profile")
 public class ProfileController {
     @Autowired
     private AccountBiz accountBiz;

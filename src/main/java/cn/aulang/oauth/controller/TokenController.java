@@ -35,7 +35,7 @@ import javax.validation.Valid;
  */
 @Slf4j
 @RestController
-@RequestMapping("/api/token")
+@RequestMapping("/token")
 public class TokenController {
     @Autowired
     private ClientBiz clientBiz;

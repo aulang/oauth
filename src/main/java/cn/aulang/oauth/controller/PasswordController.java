@@ -24,7 +24,7 @@ import javax.validation.Valid;
  * @date 2021-06-20 12:09
  */
 @RestController
-@RequestMapping("/api/password")
+@RequestMapping("/password")
 public class PasswordController {
     @Autowired
     private AccountBiz accountBiz;

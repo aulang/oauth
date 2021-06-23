@@ -33,7 +33,7 @@ import java.util.List;
  * @date 2021-06-20 15:27
  */
 @RestController
-@RequestMapping("/api/approval")
+@RequestMapping("/approval")
 public class ApprovalController {
     @Autowired
     private ClientBiz clientBiz;

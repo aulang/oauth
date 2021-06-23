@@ -45,7 +45,7 @@ import java.util.List;
  * @date 2021-06-20 17:17
  */
 @RestController
-@RequestMapping("/api/third")
+@RequestMapping("/third")
 public class ThirdLoginController {
     @Autowired
     private AuthCodeBiz authCodeBiz;

@@ -36,7 +36,7 @@ import javax.validation.Valid;
  * @date 2021-06-19 11:23
  */
 @RestController
-@RequestMapping("/api/login")
+@RequestMapping("/login")
 @EnableConfigurationProperties(LoginProperties.class)
 public class LoginController {
     @Autowired

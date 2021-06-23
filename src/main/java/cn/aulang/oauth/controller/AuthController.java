@@ -37,7 +37,7 @@ public class AuthController {
     @Autowired
     private AuthRequestBiz authRequestBiz;
 
-    @PostMapping("/api/authorize")
+    @PostMapping("/authorize")
     public Response<AuthRequestVO> authorize(@Valid @RequestBody AuthorizeRequest request) {
         // 判断客户端是否存在
         Client client = clientBiz.getClient(request.getClientId());

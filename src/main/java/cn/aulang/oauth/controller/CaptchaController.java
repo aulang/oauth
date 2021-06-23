@@ -37,7 +37,7 @@ import javax.validation.Valid;
  * @date 2021-06-17 22:59
  */
 @RestController
-@RequestMapping("/api/captcha")
+@RequestMapping("/captcha")
 public class CaptchaController {
     @Autowired
     private ClientBiz clientBiz;
