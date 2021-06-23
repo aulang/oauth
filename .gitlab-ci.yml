@@ -8,7 +8,7 @@ build_image:
   only:
     - master
   script:
-    - maven package
+    - mvn package
     - docker build -t aulang/oauth .
 
 stop_service:
