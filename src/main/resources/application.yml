@@ -1,7 +1,7 @@
 server:
   port: 8080
   servlet:
-    context-path: ${CONTEXT_PATH:/oauth/api}
+    context-path: ${CONTEXT_PATH:/api/oauth}
 
 spring:
   data:
