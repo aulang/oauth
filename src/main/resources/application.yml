@@ -4,7 +4,7 @@ server:
 spring:
   data:
     mongodb:
-      uri: mongodb://aulang.cn:27017/oauth
+      uri: mongodb://127.0.0.1:27017/oauth
       auto-index-creation: ${AUTO_CREATE_INDEX:false}
 
 captcha:

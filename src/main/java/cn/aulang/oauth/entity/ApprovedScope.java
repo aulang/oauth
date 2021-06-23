@@ -3,7 +3,6 @@ package cn.aulang.oauth.entity;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.CompoundIndex;
-import org.springframework.data.mongodb.core.index.CompoundIndexes;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -21,13 +20,11 @@ import java.util.Set;
  */
 @Data
 @Document
-@CompoundIndexes({
-        @CompoundIndex(
-                unique = true,
-                name = "idx_approval_accountId_clientId",
-                def = "{'accountId':1, 'clientId':1}"
-        )
-})
+@CompoundIndex(
+        unique = true,
+        name = "idx_approval_accountId_clientId",
+        def = "{'accountId':1, 'clientId':1}"
+)
 public class ApprovedScope implements Serializable {
     private static final long serialVersionUID = 1L;
 
