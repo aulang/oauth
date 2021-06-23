@@ -88,17 +88,6 @@ public class TokenController {
             throw OAuthError.CODE_EXPIRED.exception();
         }
 
-        // Code被消费
-        authCodeBiz.consumeCode(code);
-
-        if (authCode.isSso()) {
-            // 单点登录
-            AccountToken accountToken = accountTokenBiz.findByAuthId(authCode.getAuthId());
-            if (accountToken != null) {
-                return ResponseFactory.success(AccessToken.build(accountToken));
-            }
-        }
-
         AuthRequest authRequest = authRequestBiz.getAuthRequest(authCode.getId());
 
         if (!clientId.equalsIgnoreCase(authRequest.getClientId())) {
@@ -114,13 +103,23 @@ public class TokenController {
             throw OAuthError.CODE_VERIFIER_ERROR.exception();
         }
 
-        AccountToken accountToken = accountTokenBiz.create(
-                authRequest.getId(),
-                authRequest.getClientId(),
-                authRequest.getScopes(),
-                authRequest.getRedirectUri(),
-                authRequest.getAccountId()
-        );
+        // Code被消费
+        authCodeBiz.consumeCode(code);
+
+        AccountToken accountToken;
+        if (authCode.isSso()) {
+            // 单点登录
+            accountToken = accountTokenBiz.findByAuthId(authCode.getAuthId());
+        } else {
+            // 非单点登录
+            accountToken = accountTokenBiz.create(
+                    authRequest.getId(),
+                    authRequest.getClientId(),
+                    authRequest.getScopes(),
+                    authRequest.getRedirectUri(),
+                    authRequest.getAccountId()
+            );
+        }
 
         return ResponseFactory.success(AccessToken.build(accountToken));
     }
