@@ -57,7 +57,7 @@ public class LoginController {
 
         // 秘密错误次数需要验证码
         if (authRequest.getTriedTimes() > loginProperties.getNeedCaptchaTimes()
-                && !authRequest.getCaptcha().equalsIgnoreCase(request.getCaptcha())) {
+                && !StrUtil.equalsIgnoreCase(authRequest.getCaptcha(), request.getCaptcha())) {
             throw OAuthError.CAPTCHA_ERROR.exception();
         }
 
