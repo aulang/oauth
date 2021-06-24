@@ -84,7 +84,7 @@ public class LoginController {
             boolean needCaptcha = triedTimes > loginProperties.getNeedCaptchaTimes();
             if (needCaptcha) {
                 // 需要验证码了，随机塞个数字就行
-                request.setCaptcha(RandomUtil.randomString(4));
+                authRequest.setCaptcha(RandomUtil.randomString(4));
             }
 
             authRequest.setTriedTimes(triedTimes);
