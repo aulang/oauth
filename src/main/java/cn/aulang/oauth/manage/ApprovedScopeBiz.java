@@ -44,6 +44,7 @@ public class ApprovedScopeBiz {
         approvedScope.setApproved(scopes);
 
         LocalDateTime now = LocalDateTime.now();
+        approvedScope.setExpiresIn(client.getApprovalValiditySeconds());
         approvedScope.setExpiresAt(now.plusSeconds(client.getApprovalValiditySeconds()));
 
         approvedScope.setLastUpdatedAt(now);
