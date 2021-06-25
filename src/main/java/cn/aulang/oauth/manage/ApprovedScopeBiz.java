@@ -94,4 +94,11 @@ public class ApprovedScopeBiz {
             create(client, authRequest.getAccountId(), authRequest.getScopes());
         }
     }
+
+    public void reject(AuthRequest authRequest) throws BaseException {
+        ApprovedScope approved = findByAccountIdAndClientId(authRequest.getAccountId(), authRequest.getClientId());
+        if (approved != null) {
+            dao.deleteById(approved.getId());
+        }
+    }
 }

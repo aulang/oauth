@@ -71,6 +71,20 @@ public class ApprovalController {
         );
     }
 
+    @PostMapping("/reject/{authId}")
+    public Response<AuthCodeVO> reject(@PathVariable("authId") String authId) {
+        AuthRequest authRequest = authRequestBiz.checkAuthenticated(authId);
+        approvedScopeBiz.reject(authRequest);
+        return ResponseFactory.success(
+                AuthCodeVO.of(
+                        authId,
+                        null,
+                        authRequest.getState(),
+                        authRequest.getRedirectUri()
+                )
+        );
+    }
+
     @GetMapping("/{authId}")
     public Response<ApprovedScopeVO> approval(@PathVariable("authId") String authId) {
         AuthRequest authRequest = authRequestBiz.checkAuthenticated(authId);
