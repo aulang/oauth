@@ -67,7 +67,8 @@ public class ThirdLoginController {
     }
 
     @GetMapping("/login/{authId}/{serverId}")
-    public Response<ThirdAuthVO> redirectUrl(@PathVariable String authId, @PathVariable String serverId) {
+    public Response<ThirdAuthVO> redirectUrl(@PathVariable("authId") String authId,
+                                             @PathVariable("serverId") String serverId) {
         ThirdServer thirdServer = thirdServerBiz.getThirdServer(serverId);
         String redirectUrl = thirdServerBiz.buildAuthorizeUrl(authId, thirdServer, null);
         return ResponseFactory.success(ThirdAuthVO.of(redirectUrl));
@@ -102,11 +103,11 @@ public class ThirdLoginController {
         );
     }
 
-    @GetMapping("/bind/{serverName}")
+    @GetMapping("/bind/{serverId}")
     public Response<ThirdAuthVO> bind(
-            @PathVariable String serverName,
+            @PathVariable("serverId") String serverId,
             @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization) {
-        ThirdServer thirdServer = thirdServerBiz.findByName(serverName);
+        ThirdServer thirdServer = thirdServerBiz.getThirdServer(serverId);
         if (thirdServer == null) {
             throw OAuthError.THIRD_SERVER_NOT_FOUND.exception();
         }

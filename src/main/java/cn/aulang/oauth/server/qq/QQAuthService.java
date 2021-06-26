@@ -26,7 +26,7 @@ public class QQAuthService extends AbstractAuthService {
 
     @Override
     public boolean supports(ThirdServer server) {
-        return QQ.equals(server.getName());
+        return QQ.equalsIgnoreCase(server.getName());
     }
 
     @Override

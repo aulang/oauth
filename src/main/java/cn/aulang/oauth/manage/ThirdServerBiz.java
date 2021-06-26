@@ -39,7 +39,7 @@ public class ThirdServerBiz {
         return servers;
     }
 
-    @Scheduled(cron = "0 0 6-22/1 * * ?")
+    @Scheduled(cron = "0 0 8-20/1 * * ?")
     private void syncServers() {
         if (servers == null) {
             servers = new CopyOnWriteArrayList<>();
