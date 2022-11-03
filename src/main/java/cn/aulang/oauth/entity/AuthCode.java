@@ -28,6 +28,7 @@ public class AuthCode implements Serializable {
     private Set<String> scopes;
     private String redirectUri;
     private String accountId;
+    private String codeChallenge;
 
     /**
      * 授权码（authorization code）有效期10分钟

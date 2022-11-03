@@ -20,6 +20,7 @@ import java.util.Map;
  * @date 2019/12/2 13:41
  */
 public interface Constants {
+
     String SSO_COOKIE_NAME = "SSO";
 
     String QUESTION = "?";

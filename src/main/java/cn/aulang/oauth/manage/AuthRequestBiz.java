@@ -42,6 +42,7 @@ public class AuthRequestBiz {
                                      String authorizationGrant,
                                      String redirectUri,
                                      Set<String> scopes,
+                                     String codeChallenge,
                                      String state) {
 
         AuthRequest request = new AuthRequest();
@@ -53,6 +54,7 @@ public class AuthRequestBiz {
         request.setAuthorizationGrant(authorizationGrant);
         request.setRedirectUri(redirectUri);
         request.setScopes(scopes);
+        request.setCodeChallenge(codeChallenge);
         request.setState(state);
 
         return dao.save(request);
@@ -62,6 +64,7 @@ public class AuthRequestBiz {
                                      String authorizationGrant,
                                      String redirectUri,
                                      Set<String> scopes,
+                                     String codeChallenge,
                                      String state) {
 
         AuthRequest request = new AuthRequest();
@@ -73,6 +76,7 @@ public class AuthRequestBiz {
         request.setAuthorizationGrant(authorizationGrant);
         request.setRedirectUri(redirectUri);
         request.setScopes(scopes);
+        request.setCodeChallenge(codeChallenge);
         request.setState(state);
 
         return dao.save(request);
@@ -138,6 +142,7 @@ public class AuthRequestBiz {
                         request.getClientId(),
                         request.getScopes(),
                         request.getRedirectUri(),
+                        request.getCodeChallenge(),
                         request.getAccountId()
                 ).getId();
 

@@ -34,6 +34,7 @@ public class AuthRequest implements Serializable {
     private String authorizationGrant;
     private String redirectUri;
     private Set<String> scopes;
+    private String codeChallenge;
     private String state;
 
     /**

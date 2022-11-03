@@ -73,6 +73,7 @@ public class OAuthController {
                             @RequestParam(name = "redirect_uri", required = false) String redirectUri,
                             @RequestParam(name = "scope", required = false) String scope,
                             @RequestParam(name = "state", required = false) String state,
+                            @RequestParam(name = "code_challenge", required = false) String codeChallenge,
                             @CookieValue(name = Constants.SSO_COOKIE_NAME, required = false) String accessToken,
                             HttpServletResponse response,
                             Model model) {
@@ -132,6 +133,7 @@ public class OAuthController {
                             authorizationGrant,
                             registeredUri,
                             scopes,
+                            codeChallenge,
                             state);
                     return returnPageBiz.approvalPage(request, response, model);
                 }
@@ -139,7 +141,7 @@ public class OAuthController {
         }
 
         // 保存登录认证请求信息，重定向登录页面
-        AuthRequest request = requestBiz.createAndSave(clientId, authorizationGrant, registeredUri, scopes, state);
+        AuthRequest request = requestBiz.createAndSave(clientId, authorizationGrant, registeredUri, scopes, codeChallenge, state);
         return returnPageBiz.loginPage(request, client, model);
     }
 
@@ -192,6 +194,7 @@ public class OAuthController {
                                         @RequestParam(name = "code", required = false) String code,
                                         @RequestParam(name = "client_secret", required = false) String clientSecret,
                                         @RequestParam(name = "redirect_uri", required = false) String redirectUri,
+                                        @RequestParam(name = "code_verifier", required = false) String codeVerifier,
 
                                         @RequestParam(name = "username", required = false) String username,
                                         @RequestParam(name = "password", required = false) String password,
@@ -242,12 +245,28 @@ public class OAuthController {
                 if (StrUtil.isBlank(code)) {
                     return ResponseEntity.badRequest().body(Constants.error("code不能为空"));
                 }
-                if (!client.getSecret().equals(clientSecret)) {
+
+                if (StrUtil.isAllBlank(clientSecret, codeVerifier)) {
+                    return ResponseEntity.badRequest().body(Constants.error("client_secret和code_verifier不能全为空"));
+                }
+
+                if (StrUtil.isNotBlank(clientSecret) && !client.getSecret().equals(clientSecret)) {
                     return ResponseEntity.badRequest().body(Constants.error("client_secret错误"));
                 }
+
                 AuthCode authCode = codeBiz.consumeCode(code);
                 if (authCode == null) {
                     return ResponseEntity.badRequest().body(Constants.error("无效code"));
+                }
+
+                if (StrUtil.isBlank(clientSecret)
+                        && StrUtil.isNotBlank(codeVerifier)
+                        && StrUtil.isNotBlank(authCode.getCodeChallenge())) {
+                    // codeVerifier验证
+
+                    // TODO SHA256验证
+
+                    return ResponseEntity.badRequest().body(Constants.error("code_verifier错误"));
                 }
 
                 if (!authCode.getRedirectUri().equalsIgnoreCase(redirectUri)) {
