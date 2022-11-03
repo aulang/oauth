@@ -1,8 +1,8 @@
-package cn.aulang.oauth.server.impl;
+package cn.aulang.oauth.thirdserver.impl;
 
 import cn.aulang.oauth.common.Constants;
-import cn.aulang.oauth.server.core.Profile;
-import cn.aulang.oauth.server.core.ProfileExtractor;
+import cn.aulang.oauth.thirdserver.core.Profile;
+import cn.aulang.oauth.thirdserver.core.ProfileExtractor;
 
 /**
  * @author Aulang

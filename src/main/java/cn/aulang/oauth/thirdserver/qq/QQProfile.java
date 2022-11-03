@@ -1,6 +1,6 @@
-package cn.aulang.oauth.server.qq;
+package cn.aulang.oauth.thirdserver.qq;
 
-import cn.aulang.oauth.server.impl.AbstractProfile;
+import cn.aulang.oauth.thirdserver.impl.AbstractProfile;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**

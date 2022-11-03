@@ -7,7 +7,7 @@ import cn.hutool.crypto.digest.DigestUtil;
  * @email aulang@qq.com
  * @date 2020-1-5 16:33
  */
-public class PasswordUtil {
+public class PasswordUtils {
 
     public static String digest(String password) {
         return DigestUtil.sha256Hex(password);

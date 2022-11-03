@@ -1,9 +1,9 @@
-package cn.aulang.oauth.server.core;
+package cn.aulang.oauth.thirdserver.core;
 
 import cn.aulang.oauth.entity.ThirdServer;
-import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
@@ -22,7 +22,7 @@ public class AuthServiceProvider implements ApplicationContextAware {
     private Collection<AuthService> services;
 
     @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+    public void setApplicationContext(@NonNull ApplicationContext applicationContext) {
         this.applicationContext = applicationContext;
     }
 

@@ -1,6 +1,6 @@
-package cn.aulang.oauth.server.github;
+package cn.aulang.oauth.thirdserver.github;
 
-import cn.aulang.oauth.server.impl.AbstractProfile;
+import cn.aulang.oauth.thirdserver.impl.AbstractProfile;
 
 /**
  * @author Aulang

@@ -1,9 +1,9 @@
-package cn.aulang.oauth.server.qq;
+package cn.aulang.oauth.thirdserver.qq;
 
 import cn.aulang.oauth.common.Constants;
 import cn.aulang.oauth.entity.ThirdServer;
-import cn.aulang.oauth.server.core.AccessToken;
-import cn.aulang.oauth.server.impl.AbstractApi;
+import cn.aulang.oauth.thirdserver.core.AccessToken;
+import cn.aulang.oauth.thirdserver.impl.AbstractApi;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Map;

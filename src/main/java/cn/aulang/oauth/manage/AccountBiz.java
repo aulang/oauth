@@ -8,7 +8,7 @@ import cn.aulang.oauth.model.SendCaptchaResult;
 import cn.aulang.oauth.repository.AccountRepository;
 import cn.aulang.oauth.service.EmailService;
 import cn.aulang.oauth.service.SMSService;
-import cn.aulang.oauth.util.PasswordUtil;
+import cn.aulang.oauth.util.PasswordUtils;
 import cn.hutool.core.util.DesensitizedUtil;
 import cn.hutool.core.util.StrUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -107,7 +107,7 @@ public class AccountBiz {
             throw new AccountLockedException("账号被锁定，请稍后再试");
         }
 
-        if (!PasswordUtil.bcryptCheck(password, account.getPassword())) {
+        if (!PasswordUtils.bcryptCheck(password, account.getPassword())) {
             int passwordErrorTimes = account.getPasswordErrorTimes();
             account.setPasswordErrorTimes(++passwordErrorTimes);
 
@@ -142,7 +142,7 @@ public class AccountBiz {
         Optional<Account> optional = dao.findById(id);
         if (optional.isPresent()) {
             Account account = optional.get();
-            account.setPassword(PasswordUtil.bcrypt(password));
+            account.setPassword(PasswordUtils.bcrypt(password));
             account.setMustChangePassword(mustChangePassword);
             dao.save(account);
             return id;
@@ -153,7 +153,7 @@ public class AccountBiz {
     public Account register(Account account) {
         String password = account.getPassword();
         if (password != null) {
-            account.setPassword(PasswordUtil.bcrypt(password));
+            account.setPassword(PasswordUtils.bcrypt(password));
         }
         return dao.save(account);
     }

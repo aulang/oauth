@@ -1,8 +1,8 @@
-package cn.aulang.oauth.server.github;
+package cn.aulang.oauth.thirdserver.github;
 
 import cn.aulang.oauth.entity.ThirdServer;
-import cn.aulang.oauth.server.core.AccessToken;
-import cn.aulang.oauth.server.impl.AbstractApi;
+import cn.aulang.oauth.thirdserver.core.AccessToken;
+import cn.aulang.oauth.thirdserver.impl.AbstractApi;
 
 /**
  * @author Aulang

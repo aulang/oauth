@@ -1,12 +1,19 @@
 package cn.aulang.oauth.config;
 
 
-import cn.aulang.oauth.factory.HttpConnectionFactory;
-import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
-import org.springframework.beans.factory.annotation.Qualifier;
+import cn.hutool.core.net.DefaultTrustManager;
+import okhttp3.OkHttpClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.client.ClientHttpRequestFactory;
+import org.springframework.http.client.OkHttp3ClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
+
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManager;
+import java.security.SecureRandom;
 
 /**
  * @author Aulang
@@ -17,13 +24,28 @@ import org.springframework.web.client.RestTemplate;
 public class RestTemplateConfiguration {
 
     @Bean
-    @Qualifier("trustStoreSslSocketFactory")
-    public SSLConnectionSocketFactory trustStoreSslSocketFactory() {
-        return new SSLConnectionSocketFactory(HttpConnectionFactory.sslSocketFactory(), HttpConnectionFactory.hostnameVerifier());
+    public RestTemplate restTemplate() throws Exception {
+        return new RestTemplate(clientHttpRequestFactory());
     }
 
-    @Bean
-    public RestTemplate restTemplate() {
-        return new RestTemplate(HttpConnectionFactory.clientHttpRequestFactory());
+    public ClientHttpRequestFactory clientHttpRequestFactory() throws Exception {
+        return new OkHttp3ClientHttpRequestFactory(httpClient());
+    }
+
+    public OkHttpClient httpClient() throws Exception {
+        return new OkHttpClient.Builder()
+                .sslSocketFactory(sslSocketFactory(), DefaultTrustManager.INSTANCE)
+                .hostnameVerifier(hostnameVerifier())
+                .build();
+    }
+
+    public SSLSocketFactory sslSocketFactory() throws Exception {
+        SSLContext sslContext = SSLContext.getInstance("TLS");
+        sslContext.init(null, new TrustManager[]{DefaultTrustManager.INSTANCE}, new SecureRandom());
+        return sslContext.getSocketFactory();
+    }
+
+    public HostnameVerifier hostnameVerifier() {
+        return (hostname, sslSession) -> true;
     }
 }

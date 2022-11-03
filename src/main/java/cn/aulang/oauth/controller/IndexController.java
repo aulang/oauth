@@ -11,7 +11,7 @@ import cn.aulang.oauth.manage.BeiAnBiz;
 import cn.aulang.oauth.manage.ClientBiz;
 import cn.aulang.oauth.manage.MailServerBiz;
 import cn.aulang.oauth.manage.ThirdServerBiz;
-import cn.aulang.oauth.util.PasswordUtil;
+import cn.aulang.oauth.util.PasswordUtils;
 import cn.hutool.crypto.symmetric.AES;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -97,7 +97,7 @@ public class IndexController {
             account.setMobile("17620157736");
             account.setEmail("aulang@qq.com");
 
-            account.setPassword(PasswordUtil.digestAndBcrypt("xxxxxxxxxx"));
+            account.setPassword(PasswordUtils.digestAndBcrypt("xxxxxxxxxx"));
 
             account = accountBiz.save(account);
 

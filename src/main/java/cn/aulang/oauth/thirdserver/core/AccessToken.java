@@ -1,4 +1,4 @@
-package cn.aulang.oauth.server.core;
+package cn.aulang.oauth.thirdserver.core;
 
 import lombok.Data;
 

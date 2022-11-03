@@ -1,10 +1,11 @@
-package cn.aulang.oauth.server.qq;
+package cn.aulang.oauth.thirdserver.qq;
 
 import cn.aulang.oauth.entity.ThirdServer;
 import cn.aulang.oauth.manage.ThirdAccountBiz;
-import cn.aulang.oauth.server.impl.AbstractAuthService;
+import cn.aulang.oauth.thirdserver.impl.AbstractAuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 /**
  * @author Aulang
@@ -20,8 +21,9 @@ public class QQAuthService extends AbstractAuthService {
     private final ThirdAccountBiz thirdAccountBiz;
 
     @Autowired
-    public QQAuthService(ThirdAccountBiz thirdAccountBiz) {
+    public QQAuthService(ThirdAccountBiz thirdAccountBiz, RestTemplate restTemplate) {
         this.thirdAccountBiz = thirdAccountBiz;
+        api.setRestTemplate(restTemplate);
     }
 
     @Override

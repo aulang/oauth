@@ -3,7 +3,7 @@ package cn.aulang.oauth.manage;
 import cn.aulang.oauth.entity.Account;
 import cn.aulang.oauth.entity.ThirdAccount;
 import cn.aulang.oauth.repository.ThirdAccountRepository;
-import cn.aulang.oauth.server.core.Profile;
+import cn.aulang.oauth.thirdserver.core.Profile;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

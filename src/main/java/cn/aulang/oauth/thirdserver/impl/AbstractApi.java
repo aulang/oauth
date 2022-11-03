@@ -1,12 +1,11 @@
-package cn.aulang.oauth.server.impl;
+package cn.aulang.oauth.thirdserver.impl;
 
 import cn.aulang.oauth.common.Constants;
 import cn.aulang.oauth.common.OAuthConstants;
 import cn.aulang.oauth.entity.ThirdServer;
-import cn.aulang.oauth.factory.HttpConnectionFactory;
-import cn.aulang.oauth.server.core.AccessToken;
-import cn.aulang.oauth.server.core.Api;
-import cn.aulang.oauth.server.core.ProfileExtractor;
+import cn.aulang.oauth.thirdserver.core.AccessToken;
+import cn.aulang.oauth.thirdserver.core.Api;
+import cn.aulang.oauth.thirdserver.core.ProfileExtractor;
 import cn.hutool.core.util.StrUtil;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -45,8 +44,8 @@ public abstract class AbstractApi<T extends AbstractProfile> implements Api<T> {
         }
     }
 
+    protected RestTemplate restTemplate = new RestTemplate();
     protected ProfileExtractor profileExtractor = new DefaultProfileExtractor();
-    protected RestTemplate restTemplate = new RestTemplate(HttpConnectionFactory.clientHttpRequestFactory());
 
     protected String buildGetUrl(String url, Map<String, String> params) {
         StringBuilder builder = new StringBuilder(url).append(Constants.QUESTION);

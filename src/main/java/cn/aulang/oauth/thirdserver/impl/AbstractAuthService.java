@@ -1,13 +1,13 @@
-package cn.aulang.oauth.server.impl;
+package cn.aulang.oauth.thirdserver.impl;
 
 import cn.aulang.oauth.entity.Account;
 import cn.aulang.oauth.entity.ThirdAccount;
 import cn.aulang.oauth.entity.ThirdServer;
 import cn.aulang.oauth.exception.AuthException;
 import cn.aulang.oauth.manage.ThirdAccountBiz;
-import cn.aulang.oauth.server.core.AccessToken;
-import cn.aulang.oauth.server.core.AuthService;
-import cn.aulang.oauth.server.core.Profile;
+import cn.aulang.oauth.thirdserver.core.AccessToken;
+import cn.aulang.oauth.thirdserver.core.AuthService;
+import cn.aulang.oauth.thirdserver.core.Profile;
 
 /**
  * @author Aulang
