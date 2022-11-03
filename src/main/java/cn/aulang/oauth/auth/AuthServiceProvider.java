@@ -35,15 +35,7 @@ public class AuthServiceProvider implements ApplicationContextAware {
         return services;
     }
 
-    public AuthService get(ThirdServer server) {
-        Optional<AuthService> optional =
-                getServices()
-                        .parallelStream()
-                        .filter(e -> e.supports(server))
-                        .findFirst();
-        if (optional.isPresent()) {
-            return optional.get();
-        }
-        return null;
+    public Optional<AuthService> get(ThirdServer server) {
+        return getServices().parallelStream().filter(e -> e.supports(server)).findAny();
     }
 }

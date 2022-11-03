@@ -1,10 +1,10 @@
 package cn.aulang.oauth.manage;
 
-import cn.aulang.oauth.repository.AuthCodeRepository;
 import cn.aulang.oauth.entity.AuthCode;
+import cn.aulang.oauth.repository.AuthCodeRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
 import java.util.Optional;
 import java.util.Set;
 
@@ -15,8 +15,13 @@ import java.util.Set;
  */
 @Service
 public class AuthCodeBiz {
-    @Resource
-    private AuthCodeRepository dao;
+
+    private final AuthCodeRepository dao;
+
+    @Autowired
+    public AuthCodeBiz(AuthCodeRepository dao) {
+        this.dao = dao;
+    }
 
     public AuthCode save(AuthCode entity) {
         return dao.save(entity);
@@ -28,11 +33,7 @@ public class AuthCodeBiz {
 
     public AuthCode findOne(String id) {
         Optional<AuthCode> optional = dao.findById(id);
-        if (optional.isPresent()) {
-            return optional.get();
-        } else {
-            return null;
-        }
+        return optional.orElse(null);
     }
 
     public AuthCode consumeCode(String code) {

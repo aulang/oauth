@@ -1,11 +1,11 @@
 package cn.aulang.oauth.manage;
 
-import cn.aulang.oauth.repository.AccountTokenRepository;
-import cn.hutool.core.util.IdUtil;
-import lombok.extern.slf4j.Slf4j;
 import cn.aulang.oauth.entity.AccountToken;
 import cn.aulang.oauth.entity.AuthCode;
 import cn.aulang.oauth.entity.Client;
+import cn.aulang.oauth.repository.AccountTokenRepository;
+import cn.hutool.core.util.IdUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,10 +20,15 @@ import java.util.Set;
 @Slf4j
 @Service
 public class AccountTokenBiz {
+
+    private final ClientBiz clientBiz;
+    private final AccountTokenRepository dao;
+
     @Autowired
-    private ClientBiz clientBiz;
-    @Autowired
-    private AccountTokenRepository dao;
+    public AccountTokenBiz(ClientBiz clientBiz, AccountTokenRepository dao) {
+        this.clientBiz = clientBiz;
+        this.dao = dao;
+    }
 
     public AccountToken findByAccessToken(String accessToken) {
         return dao.findByAccessToken(accessToken);

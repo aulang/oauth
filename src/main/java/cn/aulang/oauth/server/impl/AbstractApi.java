@@ -8,8 +8,6 @@ import cn.aulang.oauth.server.core.AccessToken;
 import cn.aulang.oauth.server.core.Api;
 import cn.aulang.oauth.server.core.ProfileExtractor;
 import cn.hutool.core.util.StrUtil;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -33,10 +31,10 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  * @date 2019-12-7 17:18
  */
 public abstract class AbstractApi<T extends AbstractProfile> implements Api<T> {
-    protected static final ObjectMapper MAPPER = new ObjectMapper().disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
 
     private final Class<T> entityClass;
 
+    @SuppressWarnings("unchecked")
     public AbstractApi() {
         entityClass = (Class<T>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
 
@@ -88,27 +86,26 @@ public abstract class AbstractApi<T extends AbstractProfile> implements Api<T> {
                                      String accessToken,
                                      String authorization) {
         switch (method.toLowerCase()) {
-            case Constants.HEADER: {
+            case Constants.HEADER -> {
                 HttpHeaders headers = new HttpHeaders();
                 headers.set(HttpHeaders.AUTHORIZATION, authorization + StrUtil.SPACE + accessToken);
                 HttpEntity<HttpHeaders> entity = new HttpEntity<>(headers);
                 return restTemplate.exchange(url, HttpMethod.GET, entity, String.class).getBody();
             }
-            case Constants.POST: {
+            case Constants.POST -> {
                 HttpEntity<MultiValueMap<String, String>> requestEntity = buildPostParams(params);
                 return restTemplate.postForEntity(url, requestEntity, String.class).getBody();
             }
-            case Constants.GET: {
+            case Constants.GET -> {
                 String getUrl = buildGetUrl(url, params);
                 return restTemplate.getForEntity(getUrl, String.class).getBody();
             }
-            default: {
-                throw new IllegalArgumentException("暂不支持的请求类型：" + method);
-            }
+            default -> throw new IllegalArgumentException("暂不支持的请求类型：" + method);
         }
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public AccessToken getAccessToken(ThirdServer server, String code) throws IOException {
         String accessTokenUrl = server.getAccessTokenUrl();
         Map<String, String> accessTokenParams = server.getAccessTokenParams();
@@ -129,7 +126,7 @@ public abstract class AbstractApi<T extends AbstractProfile> implements Api<T> {
 
         Map<String, String> responseMap;
         if (Constants.JSON.equalsIgnoreCase(server.getAccessTokenType())) {
-            responseMap = MAPPER.readValue(response, Map.class);
+            responseMap = Constants.JSON_MAPPER.readValue(response, Map.class);
         } else {
             responseMap = parseAccessToken(response);
         }

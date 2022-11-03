@@ -1,9 +1,9 @@
 package cn.aulang.oauth.manage;
 
+import cn.aulang.oauth.entity.MailServer;
 import cn.aulang.oauth.repository.MailServerRepository;
 import cn.hutool.crypto.SecureUtil;
 import cn.hutool.crypto.symmetric.AES;
-import cn.aulang.oauth.entity.MailServer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,11 +16,16 @@ import static cn.aulang.oauth.common.Constants.DEFAULT_KEY;
  */
 @Service
 public class MailServerBiz {
+
+    private final MailServerRepository repository;
+
     @Autowired
-    private MailServerRepository repository;
+    public MailServerBiz(MailServerRepository repository) {
+        this.repository = repository;
+    }
 
     private MailServer server = null;
-    private AES aes = SecureUtil.aes(DEFAULT_KEY);
+    private final AES aes = SecureUtil.aes(DEFAULT_KEY);
 
     public MailServer save(MailServer entity) {
         server = repository.save(entity);
@@ -49,9 +54,7 @@ public class MailServerBiz {
             return repository.save(server);
         }
 
-        /**
-         * 解密密码，会有解密失败异常
-         */
+        // 解密密码，会有解密失败异常
         server.setPass(aes.decryptStr(server.getPass()));
 
         return server;

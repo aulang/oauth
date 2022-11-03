@@ -1,6 +1,5 @@
 package cn.aulang.oauth.controller;
 
-import cn.hutool.crypto.symmetric.AES;
 import cn.aulang.oauth.entity.Account;
 import cn.aulang.oauth.entity.BeiAn;
 import cn.aulang.oauth.entity.BeiAnEntry;
@@ -13,6 +12,7 @@ import cn.aulang.oauth.manage.ClientBiz;
 import cn.aulang.oauth.manage.MailServerBiz;
 import cn.aulang.oauth.manage.ThirdServerBiz;
 import cn.aulang.oauth.util.PasswordUtil;
+import cn.hutool.crypto.symmetric.AES;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
@@ -31,16 +31,22 @@ import static cn.aulang.oauth.common.Constants.DEFAULT_KEY;
  */
 @Controller
 public class IndexController {
+
+    private final BeiAnBiz beiAnBiz;
+    private final ClientBiz clientBiz;
+    private final AccountBiz accountBiz;
+    private final ThirdServerBiz serverBiz;
+    private final MailServerBiz mailServerBiz;
+
     @Autowired
-    private BeiAnBiz beiAnBiz;
-    @Autowired
-    private ClientBiz clientBiz;
-    @Autowired
-    private AccountBiz accountBiz;
-    @Autowired
-    private ThirdServerBiz serverBiz;
-    @Autowired
-    private MailServerBiz mailServerBiz;
+    public IndexController(BeiAnBiz beiAnBiz, ClientBiz clientBiz, AccountBiz accountBiz,
+                           ThirdServerBiz serverBiz, MailServerBiz mailServerBiz) {
+        this.beiAnBiz = beiAnBiz;
+        this.clientBiz = clientBiz;
+        this.accountBiz = accountBiz;
+        this.serverBiz = serverBiz;
+        this.mailServerBiz = mailServerBiz;
+    }
 
     @GetMapping({"/", "/index",})
     public String index() {

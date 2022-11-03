@@ -1,9 +1,9 @@
 package cn.aulang.oauth.manage;
 
-import cn.aulang.oauth.repository.AccountRepository;
-import lombok.extern.slf4j.Slf4j;
 import cn.aulang.oauth.entity.Account;
 import cn.aulang.oauth.model.UnlockAccountDelayed;
+import cn.aulang.oauth.repository.AccountRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -25,13 +25,18 @@ import java.util.concurrent.Executors;
 @Slf4j
 @Service
 public class AccountUnlockBiz implements DisposableBean {
-    @Autowired
-    private AccountRepository dao;
-    @Autowired
-    private MongoTemplate mongoTemplate;
 
-    private DelayQueue<UnlockAccountDelayed> queue = new DelayQueue<>();
-    private ExecutorService executorService = Executors.newSingleThreadExecutor();
+    private final AccountRepository dao;
+    private final MongoTemplate mongoTemplate;
+
+    private final DelayQueue<UnlockAccountDelayed> queue = new DelayQueue<>();
+    private final ExecutorService executorService = Executors.newSingleThreadExecutor();
+
+    @Autowired
+    public AccountUnlockBiz(AccountRepository dao, MongoTemplate mongoTemplate) {
+        this.dao = dao;
+        this.mongoTemplate = mongoTemplate;
+    }
 
     public void delayUnlock(String accountId) {
         queue.put(new UnlockAccountDelayed(accountId));
@@ -47,9 +52,7 @@ public class AccountUnlockBiz implements DisposableBean {
 
     @PostConstruct
     public void init() {
-        /**
-         * 自动解锁之前锁定的账号
-         */
+        // 自动解锁之前锁定的账号
         mongoTemplate.updateMulti(
                 Query.query(Criteria.where("status").is(Account.DISABLED)),
                 Update.update("status", Account.ENABLED).set("passwordErrorTimes", 0),

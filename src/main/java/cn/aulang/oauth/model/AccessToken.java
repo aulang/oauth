@@ -13,11 +13,12 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AccessToken {
-    private String access_token;
-    private String refresh_token;
-    private int expires_in;
 
-    public static AccessToken create(String access_token, String refresh_token, int expires_in) {
-        return new AccessToken(access_token, refresh_token, expires_in);
+    private String accessToken;
+    private String refreshToken;
+    private int expiresIn;
+
+    public static AccessToken create(String accessToken, String refreshToken, int expiresIn) {
+        return new AccessToken(accessToken, refreshToken, expiresIn);
     }
 }

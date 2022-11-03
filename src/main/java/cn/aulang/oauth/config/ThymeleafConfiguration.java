@@ -14,10 +14,15 @@ import javax.annotation.PostConstruct;
  */
 @Configuration
 public class ThymeleafConfiguration {
+
+    private final BeiAnBiz beiAnBiz;
+    private final ThymeleafViewResolver viewResolver;
+
     @Autowired
-    private BeiAnBiz beiAnBiz;
-    @Autowired
-    private ThymeleafViewResolver viewResolver;
+    public ThymeleafConfiguration(BeiAnBiz beiAnBiz, ThymeleafViewResolver viewResolver) {
+        this.beiAnBiz = beiAnBiz;
+        this.viewResolver = viewResolver;
+    }
 
     @PostConstruct
     public void addStaticVariable() {

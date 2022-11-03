@@ -1,10 +1,10 @@
 package cn.aulang.oauth.factory;
 
-import cn.aulang.oauth.property.CaptchaProperties;
-import com.wf.captcha.ChineseCaptcha;
-import com.wf.captcha.SpecCaptcha;
-import com.wf.captcha.base.Captcha;
 import cn.aulang.oauth.captcha.MathCaptcha;
+import cn.aulang.oauth.property.CaptchaProperties;
+import com.pig4cloud.captcha.ChineseCaptcha;
+import com.pig4cloud.captcha.SpecCaptcha;
+import com.pig4cloud.captcha.base.Captcha;
 
 /**
  * @author Aulang
@@ -12,20 +12,18 @@ import cn.aulang.oauth.captcha.MathCaptcha;
  * @date 2019/12/5 10:56
  */
 public class CaptchaFactory {
-    private CaptchaProperties properties;
+
+    private final CaptchaProperties properties;
 
     public CaptchaFactory(CaptchaProperties properties) {
         this.properties = properties;
     }
 
     public Captcha create() {
-        switch (properties.getStyle().toLowerCase()) {
-            case "Spec":
-                return new SpecCaptcha(properties.getWidth(), properties.getHeight(), properties.getLen());
-            case "Chinese":
-                return new ChineseCaptcha(properties.getWidth(), properties.getHeight(), properties.getLen());
-            default:
-                return new MathCaptcha(properties.getWidth(), properties.getHeight(), properties.getLen());
-        }
+        return switch (properties.getStyle().toLowerCase()) {
+            case "spec" -> new SpecCaptcha(properties.getWidth(), properties.getHeight(), properties.getLen());
+            case "chinese" -> new ChineseCaptcha(properties.getWidth(), properties.getHeight(), properties.getLen());
+            default -> new MathCaptcha(properties.getWidth(), properties.getHeight(), properties.getLen());
+        };
     }
 }

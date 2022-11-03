@@ -1,15 +1,15 @@
 package cn.aulang.oauth.manage;
 
+import cn.aulang.oauth.common.Constants;
+import cn.aulang.oauth.entity.Account;
 import cn.aulang.oauth.exception.PasswordExpiredException;
+import cn.aulang.oauth.model.CaptchaSendResult;
+import cn.aulang.oauth.model.Profile;
 import cn.aulang.oauth.repository.AccountRepository;
 import cn.aulang.oauth.service.EmailService;
 import cn.aulang.oauth.service.SMSService;
-import cn.hutool.core.util.StrUtil;
-import cn.aulang.oauth.common.Constants;
-import cn.aulang.oauth.entity.Account;
-import cn.aulang.oauth.model.CaptchaSendResult;
-import cn.aulang.oauth.model.Profile;
 import cn.aulang.oauth.util.PasswordUtil;
+import cn.hutool.core.util.StrUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,15 +23,19 @@ import java.util.Optional;
  */
 @Service
 public class AccountBiz {
-    @Autowired
-    private AccountRepository dao;
+
+    private final AccountRepository dao;
+    private final SMSService smsService;
+    private final EmailService emailService;
+    private final AccountUnlockBiz unlockBiz;
 
     @Autowired
-    private SMSService smsService;
-    @Autowired
-    private EmailService emailService;
-    @Autowired
-    private AccountUnlockBiz unlockBiz;
+    public AccountBiz(AccountRepository dao, SMSService smsService, EmailService emailService, AccountUnlockBiz unlockBiz) {
+        this.dao = dao;
+        this.smsService = smsService;
+        this.emailService = emailService;
+        this.unlockBiz = unlockBiz;
+    }
 
     public Account getOne() {
         return dao.findFirstByStatus(Account.ENABLED);
@@ -68,21 +72,13 @@ public class AccountBiz {
             int result;
             String target;
             if (mobile != null && email == null) {
-                /**
-                 * 发送短信验证码
-                 */
-                /**
-                 * 隐私处理
-                 */
+                // 发送短信验证码
+                // 隐私处理
                 target = mobile.replaceAll("(\\d{3})\\d{4}(\\d{4})", "$1****$2");
                 result = smsService.send(mobile, content);
             } else if (email != null) {
-                /**
-                 * 发送邮件验证码
-                 */
-                /**
-                 * 隐私处理
-                 */
+                // 发送邮件验证码
+                // 隐私处理
                 target = email.replaceAll("(\\w?)(\\w+)(\\w)(@\\w+\\.[a-z]+(\\.[a-z]+)?)", "$1****$3$4");
                 result = emailService.send(email, content);
             } else {
@@ -105,9 +101,7 @@ public class AccountBiz {
             return null;
         }
 
-        /**
-         * 判断账号是否被禁用
-         */
+        // 判断账号是否被禁用
         if (Account.DISABLED == account.getStatus()) {
             throw new AccountLockedException("账号被锁定，请稍后再试");
         }
@@ -116,19 +110,13 @@ public class AccountBiz {
             int passwordErrorTimes = account.getPasswordErrorTimes();
             account.setPasswordErrorTimes(++passwordErrorTimes);
 
-            /**
-             * 密码连续错误一定次锁定账号，5分钟后自动解锁
-             */
+            // 密码连续错误一定次锁定账号，5分钟后自动解锁
             if (passwordErrorTimes > Constants.MAX_PASSWORD_ERROR_TIMES) {
-                /**
-                 * 禁用账号
-                 */
+                // 禁用账号
                 account.setStatus(Account.DISABLED);
                 dao.save(account);
 
-                /**
-                 * 延迟解锁
-                 */
+                // 延迟解锁
                 unlockBiz.delayUnlock(account.getId());
 
                 throw new AccountLockedException("账号被锁定，请稍后再试");

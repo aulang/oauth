@@ -13,11 +13,16 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class QQAuthService extends AbstractAuthService {
+
     public static final String QQ = "QQ";
 
     private final QQApi api = new QQApi();
+    private final ThirdAccountBiz thirdAccountBiz;
+
     @Autowired
-    private ThirdAccountBiz thirdAccountBiz;
+    public QQAuthService(ThirdAccountBiz thirdAccountBiz) {
+        this.thirdAccountBiz = thirdAccountBiz;
+    }
 
     @Override
     public QQApi getApi() {

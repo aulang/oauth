@@ -1,11 +1,10 @@
 package cn.aulang.oauth.manage;
 
-import cn.aulang.oauth.repository.ClientRepository;
-import lombok.extern.slf4j.Slf4j;
 import cn.aulang.oauth.entity.Client;
+import cn.aulang.oauth.repository.ClientRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
 import java.util.Optional;
 
 /**
@@ -13,11 +12,15 @@ import java.util.Optional;
  * @email aulang@aq.com
  * @date 2019/12/1 14:42
  */
-@Slf4j
 @Service
 public class ClientBiz {
-    @Resource
-    private ClientRepository dao;
+
+    private final ClientRepository dao;
+
+    @Autowired
+    public ClientBiz(ClientRepository dao) {
+        this.dao = dao;
+    }
 
     public Client save(Client entity) {
         return dao.save(entity);
@@ -29,10 +32,6 @@ public class ClientBiz {
 
     public Client findOne(String id) {
         Optional<Client> optional = dao.findById(id);
-        if (optional.isPresent()) {
-            return optional.get();
-        } else {
-            return null;
-        }
+        return optional.orElse(null);
     }
 }

@@ -4,8 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.io.Serializable;
-
 /**
  * @author Aulang
  * @email aulang@aq.com
@@ -14,8 +12,7 @@ import java.io.Serializable;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Server implements Serializable {
-    private static final long serialVersionUID = 1L;
+public class Server {
 
     private String id;
     private String name;

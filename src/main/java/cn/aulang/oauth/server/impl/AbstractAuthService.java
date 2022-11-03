@@ -1,13 +1,13 @@
 package cn.aulang.oauth.server.impl;
 
-import cn.aulang.oauth.exception.AuthException;
 import cn.aulang.oauth.entity.Account;
 import cn.aulang.oauth.entity.ThirdAccount;
 import cn.aulang.oauth.entity.ThirdServer;
+import cn.aulang.oauth.exception.AuthException;
+import cn.aulang.oauth.manage.ThirdAccountBiz;
 import cn.aulang.oauth.server.core.AccessToken;
 import cn.aulang.oauth.server.core.AuthService;
 import cn.aulang.oauth.server.core.Profile;
-import cn.aulang.oauth.manage.ThirdAccountBiz;
 
 /**
  * @author Aulang
@@ -15,7 +15,9 @@ import cn.aulang.oauth.manage.ThirdAccountBiz;
  * @date 2019-12-7 17:26
  */
 public abstract class AbstractAuthService implements AuthService {
+
     @Override
+    @SuppressWarnings("unchecked")
     public Account authenticate(ThirdServer server, String code) throws AuthException {
         try {
             AccessToken accessToken = getApi().getAccessToken(server, code);
@@ -39,6 +41,7 @@ public abstract class AbstractAuthService implements AuthService {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public ThirdAccount bind(ThirdServer server, String code, String accountId) throws AuthException {
         try {
             AccessToken accessToken = getApi().getAccessToken(server, code);

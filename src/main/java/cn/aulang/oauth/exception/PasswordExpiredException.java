@@ -1,6 +1,7 @@
 package cn.aulang.oauth.exception;
 
 public class PasswordExpiredException extends AuthException {
+
     private String accountId;
 
     public String getAccountId() {

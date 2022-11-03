@@ -13,11 +13,16 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class GitHubAuthService extends AbstractAuthService {
+
     public static final String GITHUB = "GitHub";
 
     private final GitHubApi api = new GitHubApi();
+    private final ThirdAccountBiz thirdAccountBiz;
+
     @Autowired
-    private ThirdAccountBiz thirdAccountBiz;
+    public GitHubAuthService(ThirdAccountBiz thirdAccountBiz) {
+        this.thirdAccountBiz = thirdAccountBiz;
+    }
 
     @Override
     public GitHubApi getApi() {

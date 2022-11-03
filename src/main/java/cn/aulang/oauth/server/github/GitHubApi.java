@@ -10,6 +10,7 @@ import cn.aulang.oauth.server.impl.AbstractApi;
  * @date 2020-12-07 16:41
  */
 public class GitHubApi extends AbstractApi<GitHubProfile> {
+
     @Override
     public void getDetail(ThirdServer server, AccessToken accessToken, GitHubProfile profile) {
 

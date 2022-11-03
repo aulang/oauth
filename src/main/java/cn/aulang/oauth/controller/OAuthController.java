@@ -43,20 +43,26 @@ import java.util.regex.Pattern;
  */
 @Controller
 public class OAuthController {
+
+    private final AuthCodeBiz codeBiz;
+    private final ClientBiz clientBiz;
+    private final AccountBiz accountBiz;
+    private final AccountTokenBiz tokenBiz;
+    private final AuthRequestBiz requestBiz;
+    private final ReturnPageBiz returnPageBiz;
+    private final ApprovedScopeBiz approvedScopeBiz;
+
     @Autowired
-    private AuthCodeBiz codeBiz;
-    @Autowired
-    private ClientBiz clientBiz;
-    @Autowired
-    private AccountBiz accountBiz;
-    @Autowired
-    private AccountTokenBiz tokenBiz;
-    @Autowired
-    private AuthRequestBiz requestBiz;
-    @Autowired
-    private ReturnPageBiz returnPageBiz;
-    @Autowired
-    private ApprovedScopeBiz approvedScopeBiz;
+    public OAuthController(AuthCodeBiz codeBiz, ClientBiz clientBiz, AccountBiz accountBiz, AccountTokenBiz tokenBiz,
+                           AuthRequestBiz requestBiz, ReturnPageBiz returnPageBiz, ApprovedScopeBiz approvedScopeBiz) {
+        this.codeBiz = codeBiz;
+        this.clientBiz = clientBiz;
+        this.accountBiz = accountBiz;
+        this.tokenBiz = tokenBiz;
+        this.requestBiz = requestBiz;
+        this.returnPageBiz = returnPageBiz;
+        this.approvedScopeBiz = approvedScopeBiz;
+    }
 
     /**
      * 登录认证请求
@@ -72,9 +78,7 @@ public class OAuthController {
                             Model model) {
         Client client = clientBiz.findOne(clientId);
         if (client == null) {
-            /**
-             * clientId不存在
-             */
+            // clientId不存在
             return Constants.errorPage(model, "无效的client_id");
         }
 
@@ -134,9 +138,7 @@ public class OAuthController {
             }
         }
 
-        /**
-         * 保存登录认证请求信息，重定向登录页面
-         */
+        // 保存登录认证请求信息，重定向登录页面
         AuthRequest request = requestBiz.createAndSave(clientId, authorizationGrant, registeredUri, scopes, state);
         return returnPageBiz.loginPage(request, client, model);
     }
@@ -205,10 +207,8 @@ public class OAuthController {
         }
 
         switch (grantType.toLowerCase()) {
-            case OAuthConstants.AuthorizationGrant.PASSWORD: {
-                /**
-                 * 密码模式
-                 */
+            case OAuthConstants.AuthorizationGrant.PASSWORD -> {
+                //密码模式
                 if (StrUtil.hasBlank(username, password)) {
                     return ResponseEntity.badRequest().body(Constants.error("账号和密码不能为空"));
                 }
@@ -237,10 +237,8 @@ public class OAuthController {
                     return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Constants.error("账号或密码错误"));
                 }
             }
-            case OAuthConstants.AuthorizationGrant.AUTHORIZATION_CODE: {
-                /**
-                 * 授权码模式
-                 */
+            case OAuthConstants.AuthorizationGrant.AUTHORIZATION_CODE -> {
+                //授权码模式
                 if (StrUtil.isBlank(code)) {
                     return ResponseEntity.badRequest().body(Constants.error("code不能为空"));
                 }
@@ -266,10 +264,8 @@ public class OAuthController {
                         )
                 );
             }
-            case OAuthConstants.AuthorizationGrant.REFRESH_TOKEN: {
-                /**
-                 * 刷新access_token
-                 */
+            case OAuthConstants.AuthorizationGrant.REFRESH_TOKEN -> {
+                // 刷新access_token
                 if (StrUtil.isBlank(refreshToken)) {
                     return ResponseEntity.badRequest().body(Constants.error("refresh_token不能为空"));
                 }
@@ -287,17 +283,13 @@ public class OAuthController {
                     return ResponseEntity.badRequest().body(Constants.error("无效的refresh_token"));
                 }
             }
-            case OAuthConstants.AuthorizationGrant.CLIENT_CREDENTIALS: {
-                /**
-                 * 凭证式
-                 */
+            case OAuthConstants.AuthorizationGrant.CLIENT_CREDENTIALS -> {
+                // 凭证式
                 if (!client.getSecret().equals(clientSecret)) {
                     return ResponseEntity.badRequest().body(Constants.error("client_secret错误"));
                 }
 
-                /**
-                 * 凭证模式的取Client里配置的accountId
-                 */
+                // 凭证模式的取Client里配置的accountId
                 String accountId = client.getAccountId();
                 if (StrUtil.isBlank(accountId)) {
                     return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Constants.error("服务端配置错误"));
@@ -313,7 +305,7 @@ public class OAuthController {
                         )
                 );
             }
-            default: {
+            default -> {
                 return ResponseEntity.badRequest().body(Constants.error("无效的grantType"));
             }
         }

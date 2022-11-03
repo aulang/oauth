@@ -4,10 +4,10 @@ import cn.aulang.oauth.common.Constants;
 import cn.aulang.oauth.entity.AccountToken;
 import cn.aulang.oauth.entity.AuthRequest;
 import cn.aulang.oauth.entity.Client;
-import cn.aulang.oauth.model.AccessToken;
 import cn.aulang.oauth.manage.AccountTokenBiz;
 import cn.aulang.oauth.manage.AuthRequestBiz;
 import cn.aulang.oauth.manage.ClientBiz;
+import cn.aulang.oauth.model.AccessToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -22,12 +22,17 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 public class TokenController {
+
+    private final ClientBiz clientBiz;
+    private final AccountTokenBiz tokenBiz;
+    private final AuthRequestBiz requestBiz;
+
     @Autowired
-    private ClientBiz clientBiz;
-    @Autowired
-    private AccountTokenBiz tokenBiz;
-    @Autowired
-    private AuthRequestBiz requestBiz;
+    public TokenController(ClientBiz clientBiz, AccountTokenBiz tokenBiz, AuthRequestBiz requestBiz) {
+        this.clientBiz = clientBiz;
+        this.tokenBiz = tokenBiz;
+        this.requestBiz = requestBiz;
+    }
 
     @PostMapping(path = "/api/token", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> captcha(@RequestParam(name = "authorize_id") String authorizeId,
@@ -52,7 +57,7 @@ public class TokenController {
         String clientId = request.getClientId();
         Client client = clientBiz.findOne(clientId);
         if (client == null) {
-            ResponseEntity.badRequest().body(Constants.error("无效的客户端"));
+            return ResponseEntity.badRequest().body(Constants.error("无效的客户端"));
         }
 
         AccountToken accountToken = tokenBiz.create(

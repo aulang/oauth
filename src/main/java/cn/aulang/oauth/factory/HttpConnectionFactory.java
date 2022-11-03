@@ -1,11 +1,5 @@
 package cn.aulang.oauth.factory;
 
-/**
- * @author Aulang
- * @email aulang@qq.com
- * @date 2019-12-7 17:19
- */
-
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
@@ -21,6 +15,10 @@ import java.security.cert.X509Certificate;
 
 /**
  * HTTP连接工厂，忽略HTTPS证书
+ *
+ * @author Aulang
+ * @email aulang@qq.com
+ * @date 2019-12-7 17:19
  */
 public class HttpConnectionFactory {
     public static ClientHttpRequestFactory clientHttpRequestFactory() {

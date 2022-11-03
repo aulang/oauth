@@ -4,7 +4,6 @@ import cn.aulang.oauth.entity.Account;
 import cn.aulang.oauth.entity.ThirdAccount;
 import cn.aulang.oauth.repository.ThirdAccountRepository;
 import cn.aulang.oauth.server.core.Profile;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,13 +12,17 @@ import org.springframework.stereotype.Service;
  * @email aulang@qq.com
  * @date 2019-12-7 17:29
  */
-@Slf4j
 @Service
 public class ThirdAccountBiz {
+
+    private final AccountBiz accountBiz;
+    private final ThirdAccountRepository dao;
+
     @Autowired
-    private AccountBiz accountBiz;
-    @Autowired
-    private ThirdAccountRepository dao;
+    public ThirdAccountBiz(AccountBiz accountBiz, ThirdAccountRepository dao) {
+        this.accountBiz = accountBiz;
+        this.dao = dao;
+    }
 
     public ThirdAccount getAccount(Profile profile) {
         String profileId = profile.getId();

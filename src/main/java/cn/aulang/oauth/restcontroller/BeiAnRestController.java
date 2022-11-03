@@ -17,8 +17,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/beian")
 public class BeiAnRestController {
+
+    private final BeiAnBiz beiAnBiz;
+
     @Autowired
-    private BeiAnBiz beiAnBiz;
+    public BeiAnRestController(BeiAnBiz beiAnBiz) {
+        this.beiAnBiz = beiAnBiz;
+    }
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<BeiAn> get() {

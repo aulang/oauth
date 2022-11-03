@@ -2,9 +2,9 @@ package cn.aulang.oauth.restcontroller;
 
 import cn.aulang.oauth.common.Constants;
 import cn.aulang.oauth.entity.AccountToken;
-import cn.aulang.oauth.model.Profile;
 import cn.aulang.oauth.manage.AccountBiz;
 import cn.aulang.oauth.manage.AccountTokenBiz;
+import cn.aulang.oauth.model.Profile;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -20,10 +20,15 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 public class ProfileRestController {
+
+    private final AccountBiz accountBiz;
+    private final AccountTokenBiz tokenBiz;
+
     @Autowired
-    private AccountBiz accountBiz;
-    @Autowired
-    private AccountTokenBiz tokenBiz;
+    public ProfileRestController(AccountBiz accountBiz, AccountTokenBiz tokenBiz) {
+        this.accountBiz = accountBiz;
+        this.tokenBiz = tokenBiz;
+    }
 
     @GetMapping(path = "/api/profile", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> me(@RequestHeader("Authorization") String authorization) {

@@ -1,10 +1,10 @@
 package cn.aulang.oauth.manage;
 
-import cn.aulang.oauth.repository.ThirdServerRepository;
 import cn.aulang.oauth.common.Constants;
 import cn.aulang.oauth.common.OAuthConstants;
 import cn.aulang.oauth.entity.ThirdServer;
 import cn.aulang.oauth.model.Server;
+import cn.aulang.oauth.repository.ThirdServerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -23,10 +23,14 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class ThirdServerBiz {
     public static List<Server> servers;
 
+    private final AuthStateBiz stateBiz;
+    private final ThirdServerRepository dao;
+
     @Autowired
-    private AuthStateBiz stateBiz;
-    @Autowired
-    private ThirdServerRepository dao;
+    public ThirdServerBiz(AuthStateBiz stateBiz, ThirdServerRepository dao) {
+        this.stateBiz = stateBiz;
+        this.dao = dao;
+    }
 
     public List<ThirdServer> findEnabled() {
         return dao.findByEnabledOrderBySortAsc(true);
@@ -60,11 +64,7 @@ public class ThirdServerBiz {
 
     public ThirdServer findOne(String id) {
         Optional<ThirdServer> optional = dao.findById(id);
-        if (optional.isPresent()) {
-            return optional.get();
-        } else {
-            return null;
-        }
+        return optional.orElse(null);
     }
 
     public ThirdServer findByName(String name) {
@@ -73,12 +73,10 @@ public class ThirdServerBiz {
 
     private String buildGetUrl(String url, Map<String, String> params) {
         StringBuilder builder = new StringBuilder(url).append(Constants.QUESTION);
-        params.entrySet().forEach(
-                e -> builder.append(e.getKey())
-                        .append(Constants.EQUAL)
-                        .append(e.getValue())
-                        .append(Constants.AND)
-        );
+        params.forEach((key, value) -> builder.append(key)
+                .append(Constants.EQUAL)
+                .append(value)
+                .append(Constants.AND));
         return builder.toString();
     }
 

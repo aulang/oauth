@@ -1,10 +1,8 @@
 package cn.aulang.oauth.captcha;
 
-import cn.hutool.script.ScriptUtil;
-import com.wf.captcha.ArithmeticCaptcha;
+import com.googlecode.aviator.AviatorEvaluator;
+import com.pig4cloud.captcha.ArithmeticCaptcha;
 
-import javax.script.ScriptEngine;
-import javax.script.ScriptException;
 import java.awt.*;
 
 /**
@@ -44,12 +42,10 @@ public class MathCaptcha extends ArithmeticCaptcha {
                 }
             }
         }
-        ScriptEngine engine = ScriptUtil.getScript("graal.js");
-        try {
-            chars = String.valueOf(engine.eval(sb.toString().replaceAll("x", "*")));
-        } catch (ScriptException e) {
-            e.printStackTrace();
-        }
+
+        String expression = sb.toString().replaceAll("x", "*");
+        chars = String.valueOf(AviatorEvaluator.execute(expression));
+
         sb.append("=?");
         setArithmeticString(sb.toString());
         return chars.toCharArray();

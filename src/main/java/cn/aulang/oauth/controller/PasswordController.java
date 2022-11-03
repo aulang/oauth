@@ -1,10 +1,10 @@
 package cn.aulang.oauth.controller;
 
-import lombok.extern.slf4j.Slf4j;
 import cn.aulang.oauth.common.Constants;
 import cn.aulang.oauth.entity.AuthRequest;
 import cn.aulang.oauth.manage.AccountBiz;
 import cn.aulang.oauth.manage.AuthRequestBiz;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -19,10 +19,15 @@ import org.springframework.web.bind.annotation.RequestParam;
 @Slf4j
 @Controller
 public class PasswordController {
+
+    private final AccountBiz accountBiz;
+    private final AuthRequestBiz requestBiz;
+
     @Autowired
-    private AccountBiz accountBiz;
-    @Autowired
-    private AuthRequestBiz requestBiz;
+    public PasswordController(AccountBiz accountBiz, AuthRequestBiz requestBiz) {
+        this.accountBiz = accountBiz;
+        this.requestBiz = requestBiz;
+    }
 
     @PostMapping("/change_passwd")
     public String changePwd(@RequestParam(name = "authorize_id") String authorizeId,

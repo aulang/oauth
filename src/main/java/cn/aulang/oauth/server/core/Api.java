@@ -9,6 +9,7 @@ import cn.aulang.oauth.entity.ThirdServer;
  * 调用第三方服务API接口
  */
 public interface Api<T extends Profile> {
+
     AccessToken getAccessToken(ThirdServer server, String code) throws Exception;
 
     T getProfile(ThirdServer server, AccessToken accessToken) throws Exception;

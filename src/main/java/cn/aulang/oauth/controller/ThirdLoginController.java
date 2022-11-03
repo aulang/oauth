@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.Optional;
 
 /**
  * @author Aulang
@@ -70,16 +71,16 @@ public class ThirdLoginController {
             return Constants.errorPage(model, "无效的第三方服务");
         }
 
-        AuthService authService = provider.get(server);
-        if (authService == null) {
+        Optional<AuthService> optional = provider.get(server);
+        if (optional.isEmpty()) {
             return Constants.errorPage(model, "没有第三方服务提供者");
         }
 
+        AuthService authService = optional.get();
+
         String authorizeId = authState.getAuthorizeId();
         if (Constants.BIND_STATE_AUTHORIZE_ID.equals(authorizeId)) {
-            /**
-             * 账号绑定
-             */
+            //账号绑定
             try {
                 authService.bind(server, code, authState.getAccountId());
                 model.addAttribute("name", server.getName());

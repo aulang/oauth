@@ -5,6 +5,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
@@ -16,6 +17,8 @@ import java.time.LocalDateTime;
 @Data
 @Document
 public class Account implements Serializable {
+
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public static final int ENABLED = 1;

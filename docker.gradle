@@ -1,0 +1,17 @@
+jib {
+    def base_name = bootJar.archiveBaseName.getOrNull()
+    from {
+        image = 'openjdk:17-jdk-alpine'
+    }
+    to {
+        image = "$rootProject.name/$base_name"
+    }
+    container {
+        jvmFlags = ['-server -Xms128m -Xmx512m -XX:MetaspaceSize=64m -XX:MaxMetaspaceSize=128m',
+                    '-Djava.security.egd=file:/dev/./urandom',
+                    '-Duser.timezone=Asia/Shanghai'
+        ]
+        creationTime = "USE_CURRENT_TIMESTAMP"
+    }
+    allowInsecureRegistries = true
+}

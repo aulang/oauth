@@ -7,5 +7,6 @@ package cn.aulang.oauth.server.core;
  * 第三方用户信息提取器
  */
 public interface ProfileExtractor {
+
     <T extends Profile> T extract(String responseBody, Class<T> type) throws Exception;
 }

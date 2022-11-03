@@ -1,9 +1,8 @@
 package cn.aulang.oauth.manage;
 
-import cn.aulang.oauth.repository.ApprovedScopeRepository;
-import lombok.extern.slf4j.Slf4j;
 import cn.aulang.oauth.entity.ApprovedScope;
 import cn.aulang.oauth.entity.Client;
+import cn.aulang.oauth.repository.ApprovedScopeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,11 +15,15 @@ import java.util.HashSet;
  * @email aulang@aq.com
  * @date 2019/12/6 13:35
  */
-@Slf4j
 @Service
 public class ApprovedScopeBiz {
+
+    private final ApprovedScopeRepository dao;
+
     @Autowired
-    private ApprovedScopeRepository dao;
+    public ApprovedScopeBiz(ApprovedScopeRepository dao) {
+        this.dao = dao;
+    }
 
     public ApprovedScope findByAccountIdAndClientId(String accountId, String clientId) {
         return dao.findByAccountIdAndClientId(accountId, clientId);

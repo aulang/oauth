@@ -12,6 +12,7 @@ import java.util.Map;
  */
 @Data
 public class AccessToken {
+
     private String accessToken;
     private String refreshToken;
     private String expiresIn;

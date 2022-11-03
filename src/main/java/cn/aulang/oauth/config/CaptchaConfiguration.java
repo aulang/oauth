@@ -15,8 +15,13 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @EnableConfigurationProperties(CaptchaProperties.class)
 public class CaptchaConfiguration {
+
+    private final CaptchaProperties properties;
+
     @Autowired
-    private CaptchaProperties properties;
+    public CaptchaConfiguration(CaptchaProperties properties) {
+        this.properties = properties;
+    }
 
     @Bean
     public CaptchaFactory captchaFactory() {

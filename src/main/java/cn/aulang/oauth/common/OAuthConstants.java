@@ -6,6 +6,7 @@ package cn.aulang.oauth.common;
  * @date 2019/12/2 13:45
  */
 public interface OAuthConstants {
+
     String CODE = "code";
     String STATE = "state";
     String TOKEN = "token";
@@ -25,18 +26,13 @@ public interface OAuthConstants {
         String REFRESH_TOKEN = "refresh_token";
 
         static String typeOf(String responseType) {
-            switch (responseType.toLowerCase()) {
-                case CODE:
-                    return AUTHORIZATION_CODE;
-                case TOKEN:
-                    return IMPLICIT;
-                case PASSWORD:
-                    return PASSWORD;
-                case CLIENT_CREDENTIALS:
-                    return CLIENT_CREDENTIALS;
-                default:
-                    return null;
-            }
+            return switch (responseType.toLowerCase()) {
+                case CODE -> AUTHORIZATION_CODE;
+                case TOKEN -> IMPLICIT;
+                case PASSWORD -> PASSWORD;
+                case CLIENT_CREDENTIALS -> CLIENT_CREDENTIALS;
+                default -> null;
+            };
         }
     }
 }

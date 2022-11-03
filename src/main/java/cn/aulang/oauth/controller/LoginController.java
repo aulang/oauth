@@ -1,6 +1,5 @@
 package cn.aulang.oauth.controller;
 
-import cn.hutool.core.util.RandomUtil;
 import cn.aulang.oauth.common.Constants;
 import cn.aulang.oauth.entity.AuthRequest;
 import cn.aulang.oauth.entity.Client;
@@ -9,7 +8,7 @@ import cn.aulang.oauth.manage.AccountBiz;
 import cn.aulang.oauth.manage.AuthRequestBiz;
 import cn.aulang.oauth.manage.ClientBiz;
 import cn.aulang.oauth.manage.ReturnPageBiz;
-import org.springframework.beans.factory.annotation.Autowired;
+import cn.hutool.core.util.RandomUtil;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,14 +27,18 @@ import java.io.IOException;
  */
 @Controller
 public class LoginController {
-    @Autowired
-    private ClientBiz clientBiz;
-    @Autowired
-    private AccountBiz accountBiz;
-    @Autowired
-    private AuthRequestBiz requestBiz;
-    @Autowired
-    private ReturnPageBiz returnPageBiz;
+
+    private final ClientBiz clientBiz;
+    private final AccountBiz accountBiz;
+    private final AuthRequestBiz requestBiz;
+    private final ReturnPageBiz returnPageBiz;
+
+    public LoginController(ClientBiz clientBiz, AccountBiz accountBiz, AuthRequestBiz requestBiz, ReturnPageBiz returnPageBiz) {
+        this.clientBiz = clientBiz;
+        this.accountBiz = accountBiz;
+        this.requestBiz = requestBiz;
+        this.returnPageBiz = returnPageBiz;
+    }
 
     @GetMapping("/login/{authorizeId}")
     public String login(@PathVariable String authorizeId, HttpServletResponse response, Model model) {
@@ -46,14 +49,10 @@ public class LoginController {
         }
 
         if (request.isAuthenticated()) {
-            /**
-             * 已经登录，到授权页面
-             */
+            // 已经登录，到授权页面
             return returnPageBiz.approvalPage(request, response, model);
         } else {
-            /**
-             * 未登录，到登录页面
-             */
+            // 未登录，到登录页面
             return returnPageBiz.loginPage(request, null, model);
         }
     }
@@ -109,9 +108,7 @@ public class LoginController {
 
         int triedTimes = request.getTriedTimes() + 1;
         if (request.getTriedTimes() > Constants.NEED_CAPTCHA_TIMES) {
-            /**
-             * 需要验证码了，随机塞个数字就行
-             */
+            // 需要验证码了，随机塞个数字就行
             request.setCaptcha(RandomUtil.randomString(4));
         }
 

@@ -1,5 +1,13 @@
 package cn.aulang.oauth.common;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.json.JsonMapper;
+import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator;
 import org.springframework.ui.Model;
 
 import javax.servlet.http.Cookie;
@@ -31,6 +39,14 @@ public interface Constants {
     String REDIRECT = "redirect:";
     String BIND_STATE_AUTHORIZE_ID = "bind_third_account";
     byte[] DEFAULT_KEY = "QGDCilNe3S3Nn8OFqRAhKoS8DRo21jVk".getBytes();
+
+    JsonMapper JSON_MAPPER = JsonMapper.builder()
+            .disable(SerializationFeature.FAIL_ON_EMPTY_BEANS)
+            .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+            .serializationInclusion(JsonInclude.Include.NON_NULL)
+            .visibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY)
+            .activateDefaultTyping(LaissezFaireSubTypeValidator.instance, ObjectMapper.DefaultTyping.NON_FINAL)
+            .build();
 
 
     static Map<String, String> error(String msg) {

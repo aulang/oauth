@@ -15,6 +15,7 @@ import org.springframework.web.client.RestTemplate;
  */
 @Configuration
 public class RestTemplateConfiguration {
+
     @Bean
     @Qualifier("trustStoreSslSocketFactory")
     public SSLConnectionSocketFactory trustStoreSslSocketFactory() {

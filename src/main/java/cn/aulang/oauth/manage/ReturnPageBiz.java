@@ -1,12 +1,12 @@
 package cn.aulang.oauth.manage;
 
-import cn.hutool.core.collection.CollectionUtil;
 import cn.aulang.oauth.common.Constants;
 import cn.aulang.oauth.common.OAuthConstants;
 import cn.aulang.oauth.entity.AccountToken;
 import cn.aulang.oauth.entity.ApprovedScope;
 import cn.aulang.oauth.entity.AuthRequest;
 import cn.aulang.oauth.entity.Client;
+import cn.hutool.core.collection.CollectionUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
@@ -23,14 +23,19 @@ import java.util.Set;
  */
 @Service
 public class ReturnPageBiz {
+
+    private final ClientBiz clientBiz;
+    private final ThirdServerBiz serverBiz;
+    private final AuthRequestBiz requestBiz;
+    private final ApprovedScopeBiz approvedScopeBiz;
+
     @Autowired
-    private ClientBiz clientBiz;
-    @Autowired
-    private ThirdServerBiz serverBiz;
-    @Autowired
-    private AuthRequestBiz requestBiz;
-    @Autowired
-    private ApprovedScopeBiz approvedScopeBiz;
+    public ReturnPageBiz(ClientBiz clientBiz, ThirdServerBiz serverBiz, AuthRequestBiz requestBiz, ApprovedScopeBiz approvedScopeBiz) {
+        this.clientBiz = clientBiz;
+        this.serverBiz = serverBiz;
+        this.requestBiz = requestBiz;
+        this.approvedScopeBiz = approvedScopeBiz;
+    }
 
     public String loginPage(AuthRequest request, Client client, Model model) {
         String authorizeId = request.getId();
@@ -62,16 +67,12 @@ public class ReturnPageBiz {
 
         Set<String> requestScopes = request.getScopes();
         if (CollectionUtil.isNotEmpty(requestScopes)) {
-            /**
-             * 自动授权
-             */
+            //自动授权
             if (client.getAutoApprovedScopes() != null
                     && client.getAutoApprovedScopes().containsAll(requestScopes)) {
                 return grantToken(request, response, model);
             }
-            /**
-             * 用户已授权
-             */
+            //用户已授权
             ApprovedScope approvedScope = approvedScopeBiz.findByAccountIdAndClientId(
                     request.getAccountId(),
                     client.getId()
@@ -82,15 +83,11 @@ public class ReturnPageBiz {
                 return grantToken(request, response, model);
             }
         } else {
-            /**
-             * 没有请求权限
-             */
+            //没有请求权限
             return grantToken(request, response, model);
         }
 
-        /**
-         * 需要用户授权
-         */
+        // 需要用户授权
         model.addAttribute("scopes", requestScopes);
         model.addAttribute("authorizeId", authorizeId);
         model.addAttribute("clientName", client.getName());
@@ -111,9 +108,7 @@ public class ReturnPageBiz {
      * 授权单点登录Token
      */
     public String grantSsoToken(String redirectUri, String state, AccountToken accountToken) {
-        /**
-         * access_token=ACCESS_TOKEN&expires_in=EXPIRES_IN&state=STATE
-         */
+        // access_token=ACCESS_TOKEN&expires_in=EXPIRES_IN&state=STATE
         StringBuilder url = new StringBuilder(Constants.REDIRECT);
         url.append(redirectUri);
 

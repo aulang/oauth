@@ -8,6 +8,7 @@ import cn.hutool.crypto.digest.DigestUtil;
  * @date 2020-1-5 16:33
  */
 public class PasswordUtil {
+
     public static String digest(String password) {
         return DigestUtil.sha256Hex(password);
     }

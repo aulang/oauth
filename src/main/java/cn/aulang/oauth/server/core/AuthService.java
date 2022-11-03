@@ -12,7 +12,8 @@ import cn.aulang.oauth.exception.AuthException;
  * 第三方认证服务
  */
 public interface AuthService {
-    <T extends Profile> Api<T> getApi();
+
+    Api getApi();
 
     Account authenticate(ThirdServer server, String code) throws AuthException;
 

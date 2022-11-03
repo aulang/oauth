@@ -8,6 +8,7 @@ import cn.aulang.oauth.server.impl.AbstractProfile;
  * @date 2019-12-7 17:51
  */
 public class GitHubProfile extends AbstractProfile {
+
     private Long id;
     private String name;
     private String login;

@@ -14,10 +14,11 @@ import java.util.concurrent.TimeUnit;
  */
 @Getter
 public class UnlockAccountDelayed implements Delayed {
+
     public static final int DEFAULT_LOCKED_MINUTES = 5;
 
-    private String accountId;
-    private LocalDateTime unlockTime;
+    private final String accountId;
+    private final LocalDateTime unlockTime;
 
     public UnlockAccountDelayed(String accountId) {
         this(accountId, DEFAULT_LOCKED_MINUTES);
@@ -34,16 +35,14 @@ public class UnlockAccountDelayed implements Delayed {
     }
 
     @Override
-    public int compareTo(Delayed o) {
-        if (o == null || !(o instanceof UnlockAccountDelayed)) {
+    public int compareTo(Delayed other) {
+        if (!(other instanceof UnlockAccountDelayed delayed)) {
             return 1;
         }
 
-        if (o == this) {
+        if (other == this) {
             return 0;
         }
-
-        UnlockAccountDelayed delayed = (UnlockAccountDelayed) o;
 
         if (this.unlockTime.isBefore(delayed.unlockTime)) {
             return 1;

@@ -8,6 +8,7 @@ import cn.aulang.oauth.server.core.Profile;
  * @date 2019-12-7 17:23
  */
 public abstract class AbstractProfile implements Profile {
+
     protected String serverName;
     protected String originInfo;
 

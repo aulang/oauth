@@ -12,6 +12,7 @@ import org.springframework.web.servlet.mvc.WebContentInterceptor;
  */
 @Configuration
 public class WebMvcConfiguration implements WebMvcConfigurer {
+
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         WebContentInterceptor contentInterceptor = new WebContentInterceptor();

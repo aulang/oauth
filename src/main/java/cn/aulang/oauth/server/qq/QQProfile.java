@@ -1,6 +1,7 @@
 package cn.aulang.oauth.server.qq;
 
 import cn.aulang.oauth.server.impl.AbstractProfile;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * @author Aulang
@@ -8,7 +9,9 @@ import cn.aulang.oauth.server.impl.AbstractProfile;
  * @date 2019-12-7 17:51
  */
 public class QQProfile extends AbstractProfile {
-    private String client_id;
+
+    @JsonProperty("client_id")
+    private String clientId;
     private String openid;
     private String nickname;
 
@@ -26,12 +29,12 @@ public class QQProfile extends AbstractProfile {
         return openid;
     }
 
-    public String getClient_id() {
-        return client_id;
+    public String getClientId() {
+        return clientId;
     }
 
-    public void setClient_id(String client_id) {
-        this.client_id = client_id;
+    public void setClientId(String clientId) {
+        this.clientId = clientId;
     }
 
     public void setOpenid(String openid) {

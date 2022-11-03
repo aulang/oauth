@@ -7,6 +7,7 @@ package cn.aulang.oauth.server.core;
  * 第三方用户信息
  */
 public interface Profile {
+
     String getId();
 
     String getUsername();

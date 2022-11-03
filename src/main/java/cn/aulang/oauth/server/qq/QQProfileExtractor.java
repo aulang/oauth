@@ -1,5 +1,6 @@
 package cn.aulang.oauth.server.qq;
 
+import cn.aulang.oauth.common.Constants;
 import cn.aulang.oauth.server.core.Profile;
 import cn.aulang.oauth.server.impl.DefaultProfileExtractor;
 
@@ -10,6 +11,7 @@ import cn.aulang.oauth.server.impl.DefaultProfileExtractor;
  * callback( {"client_id":"APPID","openid":"OPENID"} );
  */
 public class QQProfileExtractor extends DefaultProfileExtractor {
+
     private String getJson(String callback) {
         return callback
                 .replace("callback(", "")
@@ -21,7 +23,7 @@ public class QQProfileExtractor extends DefaultProfileExtractor {
     public <T extends Profile> T extract(String responseBody, Class<T> type) throws Exception {
         String json = getJson(responseBody);
 
-        T t = MAPPER.readValue(json, type);
+        T t = Constants.JSON_MAPPER.readValue(json, type);
 
         t.setOriginInfo(responseBody);
 

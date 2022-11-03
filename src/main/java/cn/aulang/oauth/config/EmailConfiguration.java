@@ -15,8 +15,13 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 public class EmailConfiguration {
+
+    private final MailServerBiz mailServerBiz;
+
     @Autowired
-    private MailServerBiz mailServerBiz;
+    public EmailConfiguration(MailServerBiz mailServerBiz) {
+        this.mailServerBiz = mailServerBiz;
+    }
 
     @Bean
     public MailAccount mailAccount() {

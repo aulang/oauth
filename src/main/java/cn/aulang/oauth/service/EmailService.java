@@ -14,8 +14,13 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @Service
 public class EmailService {
+
+    private final MailAccount mailAccount;
+
     @Autowired
-    private MailAccount mailAccount;
+    public EmailService(MailAccount mailAccount) {
+        this.mailAccount = mailAccount;
+    }
 
     public int send(String email, String content) {
         try {

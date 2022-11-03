@@ -7,6 +7,7 @@ import org.springframework.data.mongodb.core.index.CompoundIndexes;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Set;
@@ -27,6 +28,8 @@ import java.util.Set;
         )
 })
 public class AccountToken implements Serializable {
+
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Id

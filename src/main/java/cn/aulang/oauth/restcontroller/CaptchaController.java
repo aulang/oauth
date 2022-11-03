@@ -1,14 +1,14 @@
 package cn.aulang.oauth.restcontroller;
 
-import cn.hutool.core.util.RandomUtil;
-import cn.hutool.core.util.StrUtil;
-import com.wf.captcha.base.Captcha;
-import lombok.extern.slf4j.Slf4j;
 import cn.aulang.oauth.entity.AuthRequest;
 import cn.aulang.oauth.factory.CaptchaFactory;
 import cn.aulang.oauth.manage.AccountBiz;
 import cn.aulang.oauth.manage.AuthRequestBiz;
 import cn.aulang.oauth.model.CaptchaSendResult;
+import cn.hutool.core.util.RandomUtil;
+import cn.hutool.core.util.StrUtil;
+import com.pig4cloud.captcha.base.Captcha;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -29,12 +29,17 @@ import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBo
 @Slf4j
 @RestController
 public class CaptchaController {
+
+    private final AccountBiz accountBiz;
+    private final CaptchaFactory factory;
+    private final AuthRequestBiz requestBiz;
+
     @Autowired
-    private AccountBiz accountBiz;
-    @Autowired
-    private CaptchaFactory factory;
-    @Autowired
-    private AuthRequestBiz requestBiz;
+    public CaptchaController(AccountBiz accountBiz, CaptchaFactory factory, AuthRequestBiz requestBiz) {
+        this.accountBiz = accountBiz;
+        this.factory = factory;
+        this.requestBiz = requestBiz;
+    }
 
     @GetMapping(path = "/api/captcha/{authorizeId}", produces = MediaType.IMAGE_PNG_VALUE)
     public ResponseEntity<StreamingResponseBody> captcha(@PathVariable String authorizeId) {
@@ -67,22 +72,16 @@ public class CaptchaController {
                                           @RequestParam(name = "mobile") String mobile) {
         AuthRequest request;
         if (StrUtil.isNotBlank(authorizeId)) {
-            /**
-             * Web端
-             */
+            // Web端
             request = requestBiz.findOne(authorizeId);
             if (request == null) {
                 return ResponseEntity.badRequest().body("登录请求不存在或已失效");
             }
         } else if (StrUtil.isNotBlank(clientId)) {
-            /**
-             * 移动端
-             */
+            // 移动端
             request = new AuthRequest();
             request.setClientId(clientId);
-            /**
-             * 移动端验证码登录没有redirectUri默认填充captcha
-             */
+            // 移动端验证码登录没有redirectUri默认填充captcha
             request.setRedirectUri("captcha");
         } else {
             return ResponseEntity.badRequest().body("参数不合法");
@@ -108,9 +107,7 @@ public class CaptchaController {
         request.setAccountId(accountId);
         request = requestBiz.save(request);
 
-        /**
-         * 不能返回给前端
-         */
+        // 不能返回给前端
         result.setAccountId(null);
         result.setRequestId(request.getId());
 
