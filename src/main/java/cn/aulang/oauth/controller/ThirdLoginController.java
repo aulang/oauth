@@ -1,7 +1,5 @@
 package cn.aulang.oauth.controller;
 
-import lombok.extern.slf4j.Slf4j;
-import cn.aulang.oauth.auth.AuthServiceProvider;
 import cn.aulang.oauth.common.Constants;
 import cn.aulang.oauth.entity.Account;
 import cn.aulang.oauth.entity.AccountToken;
@@ -15,6 +13,8 @@ import cn.aulang.oauth.manage.AuthStateBiz;
 import cn.aulang.oauth.manage.ReturnPageBiz;
 import cn.aulang.oauth.manage.ThirdServerBiz;
 import cn.aulang.oauth.server.core.AuthService;
+import cn.aulang.oauth.server.core.AuthServiceProvider;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -80,7 +80,7 @@ public class ThirdLoginController {
 
         String authorizeId = authState.getAuthorizeId();
         if (Constants.BIND_STATE_AUTHORIZE_ID.equals(authorizeId)) {
-            //账号绑定
+            // 账号绑定
             try {
                 authService.bind(server, code, authState.getAccountId());
                 model.addAttribute("name", server.getName());

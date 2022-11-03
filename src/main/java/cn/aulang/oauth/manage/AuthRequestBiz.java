@@ -98,7 +98,7 @@ public class AuthRequestBiz {
             redirectUri.append(Constants.AND);
         }
 
-        //如果有state要添加state
+        // 如果有state要添加state
         // state=STATE&
         String state = request.getState();
         if (StrUtil.isNotBlank(state)) {

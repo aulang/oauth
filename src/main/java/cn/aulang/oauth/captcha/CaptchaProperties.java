@@ -1,4 +1,4 @@
-package cn.aulang.oauth.property;
+package cn.aulang.oauth.captcha;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;

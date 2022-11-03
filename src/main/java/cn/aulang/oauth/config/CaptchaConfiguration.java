@@ -1,7 +1,7 @@
 package cn.aulang.oauth.config;
 
-import cn.aulang.oauth.factory.CaptchaFactory;
-import cn.aulang.oauth.property.CaptchaProperties;
+import cn.aulang.oauth.captcha.CaptchaFactory;
+import cn.aulang.oauth.captcha.CaptchaProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;

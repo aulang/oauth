@@ -3,12 +3,13 @@ package cn.aulang.oauth.manage;
 import cn.aulang.oauth.common.Constants;
 import cn.aulang.oauth.entity.Account;
 import cn.aulang.oauth.exception.PasswordExpiredException;
-import cn.aulang.oauth.model.CaptchaSendResult;
 import cn.aulang.oauth.model.Profile;
+import cn.aulang.oauth.model.SendCaptchaResult;
 import cn.aulang.oauth.repository.AccountRepository;
 import cn.aulang.oauth.service.EmailService;
 import cn.aulang.oauth.service.SMSService;
 import cn.aulang.oauth.util.PasswordUtil;
+import cn.hutool.core.util.DesensitizedUtil;
 import cn.hutool.core.util.StrUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -61,7 +62,7 @@ public class AccountBiz {
         return dao.findByUsernameOrMobileOrEmail(loginName, loginName, loginName);
     }
 
-    public CaptchaSendResult sendCaptcha(String loginName, String captcha) throws RuntimeException {
+    public SendCaptchaResult sendCaptcha(String loginName, String captcha) throws RuntimeException {
         Account account = findByLoginName(loginName);
         if (account != null) {
             String content = "您申请的验证码是：" + captcha;
@@ -74,12 +75,12 @@ public class AccountBiz {
             if (mobile != null && email == null) {
                 // 发送短信验证码
                 // 隐私处理
-                target = mobile.replaceAll("(\\d{3})\\d{4}(\\d{4})", "$1****$2");
+                target = DesensitizedUtil.mobilePhone(mobile);
                 result = smsService.send(mobile, content);
             } else if (email != null) {
                 // 发送邮件验证码
                 // 隐私处理
-                target = email.replaceAll("(\\w?)(\\w+)(\\w)(@\\w+\\.[a-z]+(\\.[a-z]+)?)", "$1****$3$4");
+                target = DesensitizedUtil.email(email);
                 result = emailService.send(email, content);
             } else {
                 return null;
@@ -88,7 +89,7 @@ public class AccountBiz {
             if (result < 0) {
                 throw new RuntimeException("发送验证码失败");
             }
-            return new CaptchaSendResult(null, account.getId(), target);
+            return SendCaptchaResult.of(null, account.getId(), target);
         }
         return null;
     }

@@ -13,18 +13,18 @@ import java.util.concurrent.TimeUnit;
  * @date 2020-1-1 20:23
  */
 @Getter
-public class UnlockAccountDelayed implements Delayed {
+public class UnlockDelayed implements Delayed {
 
     public static final int DEFAULT_LOCKED_MINUTES = 5;
 
     private final String accountId;
     private final LocalDateTime unlockTime;
 
-    public UnlockAccountDelayed(String accountId) {
+    public UnlockDelayed(String accountId) {
         this(accountId, DEFAULT_LOCKED_MINUTES);
     }
 
-    public UnlockAccountDelayed(String accountId, int lockedMinutes) {
+    public UnlockDelayed(String accountId, int lockedMinutes) {
         this.accountId = accountId;
         this.unlockTime = LocalDateTime.now().plusMinutes(lockedMinutes);
     }
@@ -36,7 +36,7 @@ public class UnlockAccountDelayed implements Delayed {
 
     @Override
     public int compareTo(Delayed other) {
-        if (!(other instanceof UnlockAccountDelayed delayed)) {
+        if (!(other instanceof UnlockDelayed delayed)) {
             return 1;
         }
 

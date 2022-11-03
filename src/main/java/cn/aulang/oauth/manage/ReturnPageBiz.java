@@ -67,12 +67,12 @@ public class ReturnPageBiz {
 
         Set<String> requestScopes = request.getScopes();
         if (CollectionUtil.isNotEmpty(requestScopes)) {
-            //自动授权
+            // 自动授权
             if (client.getAutoApprovedScopes() != null
                     && client.getAutoApprovedScopes().containsAll(requestScopes)) {
                 return grantToken(request, response, model);
             }
-            //用户已授权
+            // 用户已授权
             ApprovedScope approvedScope = approvedScopeBiz.findByAccountIdAndClientId(
                     request.getAccountId(),
                     client.getId()
@@ -83,7 +83,7 @@ public class ReturnPageBiz {
                 return grantToken(request, response, model);
             }
         } else {
-            //没有请求权限
+            // 没有请求权限
             return grantToken(request, response, model);
         }
 

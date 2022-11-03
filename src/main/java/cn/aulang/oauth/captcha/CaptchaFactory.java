@@ -1,7 +1,5 @@
-package cn.aulang.oauth.factory;
+package cn.aulang.oauth.captcha;
 
-import cn.aulang.oauth.captcha.MathCaptcha;
-import cn.aulang.oauth.property.CaptchaProperties;
 import com.pig4cloud.captcha.ChineseCaptcha;
 import com.pig4cloud.captcha.SpecCaptcha;
 import com.pig4cloud.captcha.base.Captcha;

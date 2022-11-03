@@ -11,6 +11,7 @@ import java.awt.*;
  * @date 2020-05-02 23:38
  */
 public class MathCaptcha extends ArithmeticCaptcha {
+
     public MathCaptcha() {
     }
 

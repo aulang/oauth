@@ -1,6 +1,8 @@
 package cn.aulang.oauth.model;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * @author Aulang
@@ -8,7 +10,9 @@ import lombok.Data;
  * @date 2019/12/5 11:32
  */
 @Data
-public class CaptchaSendResult {
+@NoArgsConstructor
+@AllArgsConstructor(staticName = "of")
+public class SendCaptchaResult {
     /**
      * 登录认证请求ID
      */
@@ -21,13 +25,4 @@ public class CaptchaSendResult {
      * 发送目标
      */
     private String target;
-
-    public CaptchaSendResult() {
-    }
-
-    public CaptchaSendResult(String requestId, String accountId, String target) {
-        this.requestId = requestId;
-        this.accountId = accountId;
-        this.target = target;
-    }
 }

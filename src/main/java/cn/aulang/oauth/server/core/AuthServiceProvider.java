@@ -1,7 +1,6 @@
-package cn.aulang.oauth.auth;
+package cn.aulang.oauth.server.core;
 
 import cn.aulang.oauth.entity.ThirdServer;
-import cn.aulang.oauth.server.core.AuthService;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -18,6 +17,7 @@ import java.util.Optional;
  */
 @Service
 public class AuthServiceProvider implements ApplicationContextAware {
+
     private ApplicationContext applicationContext;
     private Collection<AuthService> services;
 

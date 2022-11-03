@@ -1,10 +1,10 @@
 package cn.aulang.oauth.restcontroller;
 
+import cn.aulang.oauth.captcha.CaptchaFactory;
 import cn.aulang.oauth.entity.AuthRequest;
-import cn.aulang.oauth.factory.CaptchaFactory;
 import cn.aulang.oauth.manage.AccountBiz;
 import cn.aulang.oauth.manage.AuthRequestBiz;
-import cn.aulang.oauth.model.CaptchaSendResult;
+import cn.aulang.oauth.model.SendCaptchaResult;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import com.pig4cloud.captcha.base.Captcha;
@@ -90,7 +90,7 @@ public class CaptchaController {
         String captcha = RandomUtil.randomNumbers(6);
 
         String accountId;
-        CaptchaSendResult result;
+        SendCaptchaResult result;
         try {
             result = accountBiz.sendCaptcha(mobile, captcha);
             if (result == null) {

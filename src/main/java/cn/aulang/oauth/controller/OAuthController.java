@@ -208,7 +208,7 @@ public class OAuthController {
 
         switch (grantType.toLowerCase()) {
             case OAuthConstants.AuthorizationGrant.PASSWORD -> {
-                //密码模式
+                // 密码模式
                 if (StrUtil.hasBlank(username, password)) {
                     return ResponseEntity.badRequest().body(Constants.error("账号和密码不能为空"));
                 }
@@ -238,7 +238,7 @@ public class OAuthController {
                 }
             }
             case OAuthConstants.AuthorizationGrant.AUTHORIZATION_CODE -> {
-                //授权码模式
+                // 授权码模式
                 if (StrUtil.isBlank(code)) {
                     return ResponseEntity.badRequest().body(Constants.error("code不能为空"));
                 }
