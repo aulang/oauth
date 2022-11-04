@@ -15,7 +15,9 @@ import cn.aulang.oauth.manage.AuthRequestBiz;
 import cn.aulang.oauth.manage.ClientBiz;
 import cn.aulang.oauth.manage.ReturnPageBiz;
 import cn.aulang.oauth.model.AccessToken;
+import cn.hutool.core.codec.Base64;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.crypto.digest.DigestUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -246,31 +248,35 @@ public class OAuthController {
                     return ResponseEntity.badRequest().body(Constants.error("code不能为空"));
                 }
 
-                if (StrUtil.isAllBlank(clientSecret, codeVerifier)) {
-                    return ResponseEntity.badRequest().body(Constants.error("client_secret和code_verifier不能全为空"));
-                }
-
-                if (StrUtil.isNotBlank(clientSecret) && !client.getSecret().equals(clientSecret)) {
-                    return ResponseEntity.badRequest().body(Constants.error("client_secret错误"));
-                }
 
                 AuthCode authCode = codeBiz.consumeCode(code);
                 if (authCode == null) {
                     return ResponseEntity.badRequest().body(Constants.error("无效code"));
                 }
 
-                if (StrUtil.isBlank(clientSecret)
-                        && StrUtil.isNotBlank(codeVerifier)
-                        && StrUtil.isNotBlank(authCode.getCodeChallenge())) {
-                    // codeVerifier验证
-
-                    // TODO SHA256验证
-
-                    return ResponseEntity.badRequest().body(Constants.error("code_verifier错误"));
-                }
-
                 if (!authCode.getRedirectUri().equalsIgnoreCase(redirectUri)) {
                     return ResponseEntity.badRequest().body(Constants.error("redirect_uri不匹配"));
+                }
+
+                if (StrUtil.isNotBlank(authCode.getCodeChallenge())) {
+                    // codeVerifier验证
+                    if (StrUtil.isBlank(codeVerifier)) {
+                        return ResponseEntity.badRequest().body(Constants.error("code_verifier不能为空"));
+                    }
+
+                    String codeChallenge = Base64.encodeUrlSafe(DigestUtil.sha256(codeVerifier));
+                    if (!codeChallenge.equals(authCode.getCodeChallenge())) {
+                        return ResponseEntity.badRequest().body(Constants.error("code_verifier错误"));
+                    }
+                } else {
+                    // clientSecret验证
+                    if (StrUtil.isBlank(clientSecret)) {
+                        return ResponseEntity.badRequest().body(Constants.error("clientSecret不能为空"));
+                    }
+
+                    if (!client.getSecret().equals(clientSecret)) {
+                        return ResponseEntity.badRequest().body(Constants.error("client_secret错误"));
+                    }
                 }
 
                 AccountToken accountToken = tokenBiz.createByCode(authCode);
