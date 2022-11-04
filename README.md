@@ -16,7 +16,7 @@
 4. 重定向返回redirect_uri
 - 认证成功：redirect_uri?code=xxxxx-xxxx-xxxx-xxxxx&state=xxxxxx
 - 认证失败：redirect_uri?error=reject&state=xxxxxx  
-`如已单点登录，则重定向返回：redirect_uri?code=xxxxx-xxxx-xxxx-xxxxx&state=xxxxxx`
+`如已单点登录，则无需再登录直接重定向返回：redirect_uri?code=xxxxx-xxxx-xxxx-xxxxx&state=xxxxxx`
 
 5. 根据code获取Token
     1. 路径：/token
@@ -63,7 +63,7 @@
 4. 重定向返回redirect_uri
 - 认证成功：redirect_uri?access_token=xxxxx-xxxx-xxxx-xxxxx&expires_in=xxx&state=xxxxxx
 - 认证失败：redirect_uri?error=reject&state=xxxxxx  
-`如已单点登录，则重定向返回：redirect_uri?access_token=xxxxx-xxxx-xxxx-xxxxx&expires_in=xxx&state=xxxxxx`
+`如已单点登录，则无需再登录直接重定向返回：redirect_uri?access_token=xxxxx-xxxx-xxxx-xxxxx&expires_in=xxx&state=xxxxxx`
 
 #### 3. 密码模式（账号密码获取token）
 1. 路径: /token
@@ -142,7 +142,7 @@
 4. 重定向返回redirect_uri
 - 认证成功：redirect_uri?code=xxxxx-xxxx-xxxx-xxxxx&state=xxxxxx
 - 认证失败：redirect_uri?error=reject&state=xxxxxx  
-  `如已单点登录，则重定向返回：redirect_uri?code=xxxxx-xxxx-xxxx-xxxxx&state=xxxxxx`
+  `如已单点登录，则无需再登录直接重定向返回：redirect_uri?code=xxxxx-xxxx-xxxx-xxxxx&state=xxxxxx`
 
 5. 根据code获取Token
     1. 路径：/token
