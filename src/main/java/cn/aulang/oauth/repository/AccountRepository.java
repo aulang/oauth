@@ -11,6 +11,7 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface AccountRepository extends MongoRepository<Account, String> {
+    
     Account findFirstByStatus(int status);
 
     Account findByUsername(String username);

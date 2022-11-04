@@ -1,6 +1,7 @@
 package cn.aulang.oauth.model;
 
 import lombok.Getter;
+import org.springframework.lang.NonNull;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -35,7 +36,7 @@ public class UnlockDelayed implements Delayed {
     }
 
     @Override
-    public int compareTo(Delayed other) {
+    public int compareTo(@NonNull Delayed other) {
         if (!(other instanceof UnlockDelayed delayed)) {
             return 1;
         }
