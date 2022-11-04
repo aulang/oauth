@@ -149,7 +149,7 @@ public class LoginController {
     @GetMapping("/logout")
     public void logout(@RequestParam(name = "redirect_uri", required = false) String redirectUri,
                        HttpServletResponse response) throws IOException {
-        response.addCookie(Constants.removeSsoCookie());
+        Constants.removeSsoCookie(response);
         response.sendRedirect(redirectUri != null ? redirectUri : "/");
     }
 }

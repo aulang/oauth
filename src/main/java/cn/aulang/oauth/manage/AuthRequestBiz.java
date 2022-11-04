@@ -91,6 +91,9 @@ public class AuthRequestBiz {
         return optional.orElse(null);
     }
 
+    /**
+     * TODO 锚点#处理
+     */
     public String redirect(AuthRequest request, HttpServletResponse response, Model model) {
         StringBuilder redirectUri = new StringBuilder(Constants.REDIRECT);
         redirectUri.append(request.getRedirectUri());
@@ -106,8 +109,7 @@ public class AuthRequestBiz {
         // state=STATE&
         String state = request.getState();
         if (StrUtil.isNotBlank(state)) {
-            redirectUri
-                    .append(OAuthConstants.STATE)
+            redirectUri.append(OAuthConstants.STATE)
                     .append(Constants.EQUAL)
                     .append(state)
                     .append(Constants.AND);
@@ -115,36 +117,25 @@ public class AuthRequestBiz {
 
         switch (request.getAuthorizationGrant()) {
             case OAuthConstants.AuthorizationGrant.IMPLICIT -> {
-                // 简化模式: access_token=ACCESS_TOKEN&expires_in=EXPIRES_IN
+                // 简化模式: access_token=ACCESS_TOKEN&expires_in=EXPIRES_IN&state=STATE
                 Client client = clientBiz.findOne(request.getClientId());
-                String accessToken = tokenBiz.create(
-                        request.getClientId(),
-                        request.getScopes(),
-                        request.getRedirectUri(),
-                        request.getAccountId()
-                ).getAccessToken();
+                String accessToken = tokenBiz.create(request.getClientId(), request.getScopes(),
+                        request.getRedirectUri(), request.getAccountId()).getAccessToken();
                 long expires_in = client.getAccessTokenValiditySeconds();
-                redirectUri
-                        .append(OAuthConstants.ACCESS_TOKEN).append(Constants.EQUAL).append(accessToken)
+
+                redirectUri.append(OAuthConstants.ACCESS_TOKEN).append(Constants.EQUAL).append(accessToken)
                         .append(Constants.AND)
                         .append(OAuthConstants.EXPIRES_IN).append(Constants.EQUAL).append(expires_in);
 
-                if (response != null && !response.isCommitted()) {
-                    // 单点登录，简化模式才能单点登录
-                    response.addCookie(Constants.setSsoCookie(accessToken));
-                }
+                // 设置单点登录Cookie
+                Constants.setSsoCookie(response, accessToken);
 
                 return redirectUri.toString();
             }
             case OAuthConstants.AuthorizationGrant.AUTHORIZATION_CODE -> {
-                // 授权码模式：code=CODE
-                String code = codeBiz.create(
-                        request.getClientId(),
-                        request.getScopes(),
-                        request.getRedirectUri(),
-                        request.getCodeChallenge(),
-                        request.getAccountId()
-                ).getId();
+                // 授权码模式：code=CODE&state=STATE
+                String code = codeBiz.create(request.getClientId(), request.getScopes(), request.getRedirectUri(),
+                        request.getCodeChallenge(), request.getAccountId()).getId();
 
                 redirectUri.append(OAuthConstants.CODE).append(Constants.EQUAL).append(code);
 

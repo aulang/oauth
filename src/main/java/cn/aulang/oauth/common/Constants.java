@@ -11,6 +11,7 @@ import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator
 import org.springframework.ui.Model;
 
 import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -61,19 +62,29 @@ public interface Constants {
         return "error";
     }
 
-    static Cookie setSsoCookie(String value) {
-        Cookie cookie = new Cookie(SSO_COOKIE_NAME, value);
+    static void setSsoCookie(HttpServletResponse response, String accessToken) {
+        if (response == null || response.isCommitted()) {
+            return;
+        }
+
+        Cookie cookie = new Cookie(SSO_COOKIE_NAME, accessToken);
         cookie.setHttpOnly(true);
         cookie.setMaxAge(-1);
         cookie.setPath("/");
-        return cookie;
+
+        response.addCookie(cookie);
     }
 
-    static Cookie removeSsoCookie() {
+    static void removeSsoCookie(HttpServletResponse response) {
+        if (response == null || response.isCommitted()) {
+            return;
+        }
+
         Cookie cookie = new Cookie(SSO_COOKIE_NAME, null);
         cookie.setHttpOnly(true);
         cookie.setMaxAge(0);
         cookie.setPath("/");
-        return cookie;
+
+        response.addCookie(cookie);
     }
 }

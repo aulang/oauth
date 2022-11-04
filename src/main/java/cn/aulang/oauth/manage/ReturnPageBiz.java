@@ -2,7 +2,6 @@ package cn.aulang.oauth.manage;
 
 import cn.aulang.oauth.common.Constants;
 import cn.aulang.oauth.common.OAuthConstants;
-import cn.aulang.oauth.entity.AccountToken;
 import cn.aulang.oauth.entity.ApprovedScope;
 import cn.aulang.oauth.entity.AuthRequest;
 import cn.aulang.oauth.entity.Client;
@@ -12,8 +11,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 
 import javax.servlet.http.HttpServletResponse;
-import java.time.Duration;
-import java.time.LocalDateTime;
 import java.util.Set;
 
 /**
@@ -102,42 +99,6 @@ public class ReturnPageBiz {
             return loginPage(request, null, model);
         }
         return requestBiz.redirect(request, response, model);
-    }
-
-    /**
-     * 授权单点登录Token
-     */
-    public String grantSsoToken(String redirectUri, String state, AccountToken accountToken) {
-        // access_token=ACCESS_TOKEN&expires_in=EXPIRES_IN&state=STATE
-        StringBuilder url = new StringBuilder(Constants.REDIRECT);
-        url.append(redirectUri);
-
-
-        if (url.lastIndexOf(Constants.QUESTION) == -1) {
-            url.append(Constants.QUESTION);
-        } else {
-            url.append(Constants.AND);
-        }
-
-        String accessToken = accountToken.getAccessToken();
-
-        Duration duration = Duration.between(LocalDateTime.now(), accountToken.getAccessTokenExpiresAt());
-
-        long expiresIn = duration.getSeconds();
-        url.append(OAuthConstants.ACCESS_TOKEN)
-                .append(Constants.EQUAL)
-                .append(accessToken)
-                .append(Constants.AND)
-                .append(OAuthConstants.EXPIRES_IN)
-                .append(Constants.EQUAL)
-                .append(expiresIn);
-        if (state != null) {
-            url.append(Constants.AND)
-                    .append(OAuthConstants.STATE)
-                    .append(Constants.EQUAL)
-                    .append(state);
-        }
-        return url.toString();
     }
 
     public String rejectToken(AuthRequest request) {

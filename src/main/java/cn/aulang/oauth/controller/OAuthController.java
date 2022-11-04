@@ -32,7 +32,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.security.auth.login.AccountLockedException;
 import javax.servlet.http.HttpServletResponse;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -73,12 +72,11 @@ public class OAuthController {
     public String authorize(@RequestParam(name = "client_id") String clientId,
                             @RequestParam(name = "response_type") String responseType,
                             @RequestParam(name = "redirect_uri", required = false) String redirectUri,
-                            @RequestParam(name = "scope", required = false) String scope,
+                            @RequestParam(name = "scope", required = false) List<String> requestScopes,
                             @RequestParam(name = "state", required = false) String state,
                             @RequestParam(name = "code_challenge", required = false) String codeChallenge,
                             @CookieValue(name = Constants.SSO_COOKIE_NAME, required = false) String accessToken,
-                            HttpServletResponse response,
-                            Model model) {
+                            HttpServletResponse response, Model model) {
         Client client = clientBiz.findOne(clientId);
         if (client == null) {
             // clientId不存在
@@ -113,8 +111,7 @@ public class OAuthController {
         }
 
         Set<String> scopes = new HashSet<>();
-        if (scope != null) {
-            List<String> requestScopes = Arrays.asList(scope.split(","));
+        if (requestScopes != null) {
             if (!client.getScopes().keySet().containsAll(requestScopes)) {
                 return Constants.errorPage(model, "无效的scope");
             }
@@ -126,24 +123,20 @@ public class OAuthController {
         if (accessToken != null) {
             AccountToken accountToken = tokenBiz.findByAccessToken(accessToken);
             if (accountToken != null) {
+                AuthRequest request = requestBiz.createAndSave(accountToken.getAccountId(), clientId,
+                        authorizationGrant, registeredUri, scopes, codeChallenge, state);
+
                 if (accountToken.getScopes().containsAll(scopes)) {
-                    return returnPageBiz.grantSsoToken(redirectUri, state, accountToken);
+                    return requestBiz.redirect(request, response, model);
                 } else {
-                    AuthRequest request = requestBiz.createAndSave(
-                            accountToken.getAccountId(),
-                            clientId,
-                            authorizationGrant,
-                            registeredUri,
-                            scopes,
-                            codeChallenge,
-                            state);
                     return returnPageBiz.approvalPage(request, response, model);
                 }
             }
         }
 
         // 保存登录认证请求信息，重定向登录页面
-        AuthRequest request = requestBiz.createAndSave(clientId, authorizationGrant, registeredUri, scopes, codeChallenge, state);
+        AuthRequest request = requestBiz.createAndSave(clientId, authorizationGrant,
+                registeredUri, scopes, codeChallenge, state);
         return returnPageBiz.loginPage(request, client, model);
     }
 
@@ -151,8 +144,7 @@ public class OAuthController {
     public String approval(@RequestParam(name = "authorize_id") String authorizeId,
                            @RequestParam(name = "scopes", required = false) String[] scopes,
                            @RequestParam(name = "authorized", defaultValue = "true") boolean authorized,
-                           HttpServletResponse response,
-                           Model model) {
+                           HttpServletResponse response, Model model) {
         AuthRequest request = requestBiz.findOne(authorizeId);
         if (request == null) {
             return Constants.errorPage(model, "登录请求不存在或已失效");
@@ -201,7 +193,8 @@ public class OAuthController {
                                         @RequestParam(name = "username", required = false) String username,
                                         @RequestParam(name = "password", required = false) String password,
 
-                                        @RequestParam(name = "refresh_token", required = false) String refreshToken) {
+                                        @RequestParam(name = "refresh_token", required = false) String refreshToken,
+                                        HttpServletResponse response) {
         Client client = clientBiz.findOne(clientId);
         if (client == null) {
             return ResponseEntity.badRequest().body(Constants.error("无效的客户端"));
@@ -224,13 +217,13 @@ public class OAuthController {
                         Set<String> scopes = client.getAutoApprovedScopes();
                         AccountToken accountToken = tokenBiz.create(clientId, scopes, grantType, accountId);
 
-                        return ResponseEntity.ok(
-                                AccessToken.create(
-                                        accountToken.getAccessToken(),
-                                        accountToken.getRefreshToken(),
-                                        client.getAccessTokenValiditySeconds()
-                                )
-                        );
+                        AccessToken accessToken = AccessToken.create(accountToken.getAccessToken(),
+                                accountToken.getRefreshToken(), client.getAccessTokenValiditySeconds());
+
+                        // 设置单点登录Cookie
+                        Constants.setSsoCookie(response, accessToken.getAccessToken());
+
+                        return ResponseEntity.ok(accessToken);
                     } else {
                         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Constants.error("账号或密码错误"));
                     }
@@ -247,7 +240,6 @@ public class OAuthController {
                 if (StrUtil.isBlank(code)) {
                     return ResponseEntity.badRequest().body(Constants.error("code不能为空"));
                 }
-
 
                 AuthCode authCode = codeBiz.consumeCode(code);
                 if (authCode == null) {
@@ -281,13 +273,13 @@ public class OAuthController {
 
                 AccountToken accountToken = tokenBiz.createByCode(authCode);
 
-                return ResponseEntity.ok(
-                        AccessToken.create(
-                                accountToken.getAccessToken(),
-                                accountToken.getRefreshToken(),
-                                client.getAccessTokenValiditySeconds()
-                        )
-                );
+                AccessToken accessToken = AccessToken.create(accountToken.getAccessToken(),
+                        accountToken.getRefreshToken(), client.getAccessTokenValiditySeconds());
+
+                // 设置单点登录Cookie
+                Constants.setSsoCookie(response, accessToken.getAccessToken());
+
+                return ResponseEntity.ok(accessToken);
             }
             case OAuthConstants.AuthorizationGrant.REFRESH_TOKEN -> {
                 // 刷新access_token
@@ -297,13 +289,13 @@ public class OAuthController {
 
                 AccountToken accountToken = tokenBiz.refreshAccessToken(refreshToken);
                 if (accountToken != null) {
-                    return ResponseEntity.ok(
-                            AccessToken.create(
-                                    accountToken.getAccessToken(),
-                                    accountToken.getRefreshToken(),
-                                    client.getAccessTokenValiditySeconds()
-                            )
-                    );
+                    AccessToken accessToken = AccessToken.create(accountToken.getAccessToken(),
+                            accountToken.getRefreshToken(), client.getAccessTokenValiditySeconds());
+
+                    // 设置单点登录Cookie
+                    Constants.setSsoCookie(response, accessToken.getAccessToken());
+
+                    return ResponseEntity.ok(accessToken);
                 } else {
                     return ResponseEntity.badRequest().body(Constants.error("无效的refresh_token"));
                 }
@@ -322,13 +314,13 @@ public class OAuthController {
 
                 AccountToken accountToken = tokenBiz.create(clientId, client.getAutoApprovedScopes(), grantType, accountId);
 
-                return ResponseEntity.ok(
-                        AccessToken.create(
-                                accountToken.getAccessToken(),
-                                accountToken.getRefreshToken(),
-                                client.getAccessTokenValiditySeconds()
-                        )
-                );
+                AccessToken accessToken = AccessToken.create(accountToken.getAccessToken(),
+                        accountToken.getRefreshToken(), client.getAccessTokenValiditySeconds());
+
+                // 设置单点登录Cookie
+                Constants.setSsoCookie(response, accessToken.getAccessToken());
+
+                return ResponseEntity.ok(accessToken);
             }
             default -> {
                 return ResponseEntity.badRequest().body(Constants.error("无效的grantType"));
