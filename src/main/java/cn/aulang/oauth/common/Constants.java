@@ -27,6 +27,7 @@ public interface Constants {
     String QUESTION = "?";
     String EQUAL = "=";
     String AND = "&";
+    char HASH = '#';
 
     String JSON = "json";
 

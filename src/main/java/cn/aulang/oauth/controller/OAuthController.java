@@ -127,7 +127,7 @@ public class OAuthController {
                         authorizationGrant, registeredUri, scopes, codeChallenge, state);
 
                 if (accountToken.getScopes().containsAll(scopes)) {
-                    return requestBiz.redirect(request, response, model);
+                    return returnPageBiz.redirect(request, response, model);
                 } else {
                     return returnPageBiz.approvalPage(request, response, model);
                 }
