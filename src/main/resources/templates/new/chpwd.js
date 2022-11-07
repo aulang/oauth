@@ -1,20 +1,10 @@
-Vue.createApp({
-  data() {
-    return {
-      password: '',
-      repassword: '',
-      errorMsg: errorMsg
-    }
-  },
-  methods: {
-    submitChangePassword(e) {
-      if (this.password !== this.repassword) {
-        this.errorMsg = '两次密码不一致'
-      } else {
-        return true
-      }
+function changePassword(e) {
+  let password = document.getElementById('password').value
+  let repassword = document.getElementById('repassword').value
 
-      e.preventDefault()
-    }
+  if (password !== repassword) {
+    document.getElementById('error-msg').innerHTML = '两次密码不一致'
   }
-}).mount('#main')
+
+  e.preventDefault()
+}

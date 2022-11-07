@@ -6,6 +6,11 @@ body {
   background-color: #f5f5f5;
 }
 
+.logo {
+  width: 8rem;
+  height: 8rem;
+}
+
 .form-login {
   width: 100%;
   max-width: 330px;
@@ -19,6 +24,7 @@ body {
 
 .form-login .fs2rem {
   font-size: 2rem;
+  height: 2rem;
 }
 
 .form-login :focus-within {
