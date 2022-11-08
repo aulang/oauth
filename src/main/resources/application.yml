@@ -1,5 +1,6 @@
 server:
   port: 8080
+  shutdown: graceful
   servlet:
     context-path: /oauth
     session:
@@ -7,9 +8,18 @@ server:
         http-only: true
 
 spring:
+  jackson:
+    default-property-inclusion: non_null
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
   data:
     mongodb:
-      uri: mongodb://127.0.0.1:27017/oauth
+      host: 127.0.0.1
+      port: 27017
+      database: oauth
+      username: adminx
+      password: unicloud
+      authentication-database: admin
 
 captcha:
   len: 2

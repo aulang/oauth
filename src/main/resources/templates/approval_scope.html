@@ -1,45 +1,62 @@
-<!doctype html>
-<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<!DOCTYPE html>
+<html lang="zh-CN">
 <head>
-    <meta charset="UTF-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
-    <title>账号授权</title>
-    <link th:href="@{/public/css/bootstrap.css}" rel="stylesheet"/>
-    <link th:href="@{/css/login.css}" rel="stylesheet"/>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="login.css" rel="stylesheet"/>
+  <title>Aulang</title>
 </head>
+
 <body class="text-center">
+<main class="form-login">
+  <div class="row">
+    <picture>
+      <img class="img-fluid mb-4 logo" src="logo.png" alt="logo"/>
+    </picture>
+    <h1 class="h3 mb-3 fw-normal">访问授权</h1>
+  </div>
 
-<div class="login-top">
-    <img class="mb-3" th:src="${logoUrl}" th:alt-title="${clientName}" width="100px" height="100px"/>
-    <h5 class="h5 mb-3 font-weight-normal">账号授权</h5>
-</div>
+  <div class="row">
+    <p class="text-danger text-center text-break" id="error-msg"></p>
+  </div>
 
-<form method="post" th:action="@{/approval}" class="form-login">
-    <input type="hidden" name="authorize_id" th:value="${authorizeId}"/>
-
-    <div class="form-group">
-        <span>授权<span th:text="${clientName}"></span>获取您的</span>
-    </div>
-
-    <div class="form-group">
-        <div class="form-check" th:each="scope : ${scopes}">
-            <input type="checkbox" name="scopes" th:value="${scope}" th:id="${scope}" checked="checked"
-                   class="form-check-input"/>
-            <label class="form-check-label" th:for="${scope}" th:text="${scopeNames.get(scope)}"></label>
+  <form method="post" onsubmit="approval(event)">
+    <div class="card">
+      <h5 class="card-header text-start">授权【xxx】访问您的：</h5>
+      <div class="card-body row g-3">
+        <div class="text-start">
+          <label>
+            <input type="checkbox" name="scopes" value="scope1" class="form-check-input"/>
+            <span class="form-check-label">权限1</span>
+          </label>
         </div>
+        <div class="text-start">
+          <label>
+            <input type="checkbox" name="scopes" value="scope2" class="form-check-input"/>
+            <span class="form-check-label">权限2</span>
+          </label>
+        </div>
+        <div class="text-start">
+          <label>
+            <input type="checkbox" name="scopes" value="scope3" class="form-check-input"/>
+            <span class="form-check-label">权限3</span>
+          </label>
+        </div>
+
+        <div class="text-end">
+          <button type="submit" name="authorized" value="false" class="btn btn-secondary">取消</button>
+          <button type="submit" name="authorized" value="true" class="btn btn-primary ms-3">授权</button>
+        </div>
+      </div>
     </div>
+  </form>
 
-    <div class="form-group">
-        <button type="submit" name="authorized" value="false" class="btn btn-secondary mr-3">拒绝</button>
-        <button type="submit" name="authorized" value="true" class="btn btn-primary">授权</button>
-    </div>
-</form>
+  <div class="row mt-5 mb-3">
+    <p class="text-muted">&copy; Aulang 2018 - 2022</p>
+  </div>
+</main>
 
-<div class="login-footer">
-    <p class="mt-5 mb-3 text-muted">
-        <span>&copy;2018 Aulang</span>
-    </p>
-</div>
-
+<script src="approval.js"></script>
 </body>
 </html>

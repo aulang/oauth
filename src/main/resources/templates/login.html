@@ -1,88 +1,135 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
-    <title>登录</title>
-    <link th:href="@{/public/css/bootstrap.css}" rel="stylesheet"/>
-    <link th:href="@{/css/login.css}" rel="stylesheet"/>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link th:href="@{/css/login.css}" rel="stylesheet"/>
+  <title>Aulang</title>
 </head>
+
 <body class="text-center">
-<input type="hidden" id="authorize_id" th:value="${authorizeId}"/>
+<input type="hidden" id="authorize-id" th:value="${authorizeId}"/>
 
-<div class="login-top">
-    <img class="mb-3" th:src="@{/images/logo.png}" alt="Aulang"/>
-    <h4 class="h4 mb-3 font-weight-normal">请登录</h4>
-    <span th:text="${error}" id="errorMsg" style="color: red"></span>
-</div>
+<main class="form-login">
+  <div class="row">
+    <picture>
+      <img th:src="@{/img/logo.png}" class="img-fluid mb-4 logo" alt="logo"/>
+    </picture>
+    <h1 class="h3 mb-3 fw-normal">请登录</h1>
+  </div>
 
-<form method="post" th:action="@{/login}" id="loginForm" class="form-login">
+  <div class="row">
+    <p th:text="${error}" class="text-danger text-center text-break" id="error-msg"></p>
+  </div>
+
+  <form method="post" th:action="@{/login}" onsubmit="passwordLogin(event)" id="passwordForm">
     <input type="hidden" name="authorize_id" th:value="${authorizeId}"/>
 
-    <label for="username" class="sr-only">账号</label>
-    <input type="text" id="username" name="username" class="form-control username"
-           placeholder="用户名" autofocus="autofocus" required="required" autocomplete="off"/>
-
-    <label for="password" class="sr-only">密码</label>
-    <input type="password" id="password" name="password" class="form-control"
-           th:classappend="${captcha}?'captcha-pwd':'password'"
-           placeholder="密  码" required="required"/>
-
-    <div th:if="${captcha}" class="form-captcha">
-        <input type="text" id="captcha" name="captcha" class="form-control captcha"
-               placeholder="验证码" required="required" autocomplete="off"/>
-        <img th:src="@{'/api/captcha/' + ${authorizeId}}" id="captchaImg"
-             title="点击刷新" alt="验证码"/>
+    <div class="form-floating">
+      <input type="text"
+             name="username"
+             th:value="${username}"
+             class="form-control border-top-radius"
+             placeholder="账号"
+             id="username"
+             required
+      />
+      <label for="username">账号</label>
+    </div>
+    <div class="form-floating">
+      <input type="password"
+             name="password"
+             class="form-control border-middle-radius"
+             placeholder="密码"
+             id="password"
+             required
+      />
+      <label for="password">密码</label>
     </div>
 
-    <div class="checkbox mt-3 mb-3">
-        <label>
-            <input type="checkbox" id="rememberMe"/> 记住账号
-        </label>
+    <div th:if="${captcha}" class="form-floating input-group">
+      <input type="text"
+             name="captcha"
+             class="form-control border-bottom-radius"
+             placeholder="验证码"
+             id="captcha"
+             required
+      />
+      <label for="captcha">验证码</label>
+      <img th:src="@{'/api/captcha/' + ${authorizeId}}" title="点击刷新" alt="验证码"
+           class="form-control border-bottom-radius captcha-img" onclick="refreshCaptcha(this)"/>
     </div>
 
-    <button type="button" class="btn btn-lg btn-primary btn-block" id="loginSubmit">登 录</button>
-</form>
+    <div class="checkbox mb-3">
+      <input type="checkbox" class="form-check-input" id="remember-me"/>
+      <label class="form-check-label" for="remember-me">记住账号</label>
+    </div>
+    <button type="submit" class="w-100 btn btn-lg btn-primary">登 录</button>
+  </form>
 
-<form method="post" th:action="@{/login/captcha}" id="mobileLoginForm" class="form-login" style="display: none">
+  <form th:action="@{/login/captcha}" class="d-none" onsubmit="mobileLogin(event)" id="mobileForm">
     <input type="hidden" name="authorize_id" th:value="${authorizeId}"/>
 
-    <label for="mobile" class="sr-only">手机号</label>
-    <input type="text" id="mobile" name="mobile" class="form-control username"
-           placeholder="手机号" autofocus="autofocus" required="required" autocomplete="off"/>
-
-    <div class="input-group mb-3">
-        <input type="text" id="mobileCaptcha" name="captcha" class="form-control captcha"
-               placeholder="验证码" required="required" autocomplete="off"/>
-        <div class="input-group-append">
-            <button type="button" th:href="@{/api/captcha}" id="sendCaptcha"
-                    class="btn btn-outline-primary mobileCaptcha">发送验证码</button>
-        </div>
+    <div class="form-floating">
+      <input type="text"
+             name="mobile"
+             class="form-control border-top-radius"
+             placeholder="手机号"
+             id="mobile"
+             required
+      />
+      <label for="mobile">手机号</label>
     </div>
 
-    <button type="button" th:href="@{'/api/captcha/' + ${authorizeId} + '/'}" id="mobileLoginSubmit"
-            class="btn btn-lg btn-primary btn-block">登 录</button>
-</form>
-
-<div class="login-footer">
-    <div class="third-login">
-        <a id="loginModeSwitch">
-            <img th:src="@{/images/phone.png}" title="账号/短信登录"/>
-        </a>
-
-        <a th:each="server : ${servers}"
-           th:href="@{'/third_login/' + ${authorizeId} + '/' + ${server.id}}">
-            <img th:src="${server.logoUrl}" th:title="${server.name}"/>
-        </a>
+    <div class="form-floating input-group mb-3">
+      <input type="text"
+             name="captcha"
+             class="form-control border-bottom-radius"
+             placeholder="验证码"
+             id="security-code"
+             required
+      />
+      <label for="security-code">验证码</label>
+      <button type="button"
+              th:data-url="@{/api/captcha}"
+              class="btn btn-outline-secondary border-bottom-radius mw-30"
+              onclick="sendSecurityCode(this)"
+      >
+        发送验证码
+      </button>
     </div>
 
-    <p class="mt-5 mb-3 text-muted">
-        <span>&copy;2018 Aulang</span>
-    </p>
-</div>
+    <button type="submit"
+            th:data-url="@{/api/captcha}"
+            class="w-100 btn btn-lg btn-primary">登 录</button>
+  </form>
 
-<script type="text/javascript" th:src="@{/public/js/jquery.js}"></script>
-<script type="text/javascript" th:src="@{/public/js/sha256.js}"></script>
+  <div class="row mt-3">
+    <div class="col">
+      <a class="btn btn-link d-none" onclick="changeLoginType()" title="账号密码登录" id="passwordIcon">
+        <img class="fs2rem" th:src="@{/svg/password.svg}" alt="账号密码登录"/>
+      </a>
+
+      <a class="btn btn-link" onclick="changeLoginType()" title="验证码登录" id="mobileIcon">
+        <img class="fs2rem" th:src="@{/svg/phone.svg}" alt="验证码登录"/>
+      </a>
+
+      <a class="btn btn-link" th:each="server : ${servers}"
+         th:href="@{'/third_login/' + ${authorizeId} + '/' + ${server.id}}"
+         th:title="${'使用' + server.name + '登录'}">
+        <img class="fs2rem" th:src="${server.logoUrl}" th:alt="${server.name}"/>
+      </a>
+    </div>
+  </div>
+
+  <div class="row mt-5 mb-3">
+    <p class="text-muted">&copy; Aulang 2018 - 2022</p>
+  </div>
+</main>
+
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/js-sha256@0.9.0/src/sha256.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/axios@1.1.2/dist/axios.min.js"></script>
 <script type="text/javascript" th:src="@{/js/cookie.js}"></script>
 <script type="text/javascript" th:src="@{/js/login.js}"></script>
 </body>

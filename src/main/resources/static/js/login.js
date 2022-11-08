@@ -1,145 +1,110 @@
-$(function () {
-    var authorizeId = $('#authorize_id').val();
+let loginByPassword = true
+let sendSecurityCodeSuccess = false
 
-    if (!cookieEnabled()) {
-        $('#errorMsg').html('您的浏览器禁用了cookie，您无法使用单点登录！');
+function init() {
+    let usernameCookie = getCookie('USERNAME')
+    let username = document.getElementById('username')
+    if (usernameCookie && !username.value) {
+        username.value = usernameCookie
+    }
+}
+
+init()
+
+function passwordLogin() {
+    let password = document.getElementById('password')
+    password.value = sha256(password.value)
+    rememberMe()
+}
+
+function mobileLogin(e) {
+    if (!sendSecurityCodeSuccess) {
+        document.getElementById('error-msg').innerHTML = '请先发送验证码'
     }
 
-    var username = $('#username');
-    var password = $('#password');
-    var captcha = $('#captcha');
-
-    var userName = getCookie('USERNAME');
-    if (userName) {
-        username.val(userName);
+    let securityCode = document.getElementById('security-code')
+    if (!securityCode.checkValidity()) {
+        securityCode.reportValidity()
+        return
     }
 
-    $('#captchaImg').click(function () {
-        this.src = this.src.split('?')[0] + '?rnd=' + Math.random();
-    });
+    // TODO 获取URL
+    let url = element.dataset.url
+    let authorizeId = document.getElementById('authorize-id').value;
 
-    $('#loginSubmit').click(function () {
-        if (!$.trim(username.val())) {
-            $('#errorMsg').html('请输入账号');
-            return;
-        }
+    let getUrl = `${url}/${authorizeId}/${code}`
 
-        var passwordVal = password.val();
-        if (!$.trim(passwordVal)) {
-            $('#errorMsg').html('请输入密码');
-            return;
-        }
+    e.preventDefault()
+}
 
-        if (captcha.length > 0 && !$.trim(captcha.val())) {
-            $('#errorMsg').html('请输入验证码');
-            return;
-        }
+function refreshCaptcha(element) {
+    element.src = element.src.split('?')[0] + '?rnd=' + Math.random()
+}
 
-        rememberMe();
+function changeLoginType() {
+    if (loginByPassword) {
+        document.getElementById('passwordForm').classList.add('d-none')
+        document.getElementById('mobileForm').classList.remove('d-none')
 
-        /**
-         * 密码进行SHA256
-         */
-        password.val(sha256(passwordVal));
+        document.getElementById('passwordIcon').classList.remove('d-none')
+        document.getElementById('mobileIcon').classList.add('d-none')
+    } else {
+        document.getElementById('passwordForm').classList.remove('d-none')
+        document.getElementById('mobileForm').classList.add('d-none')
 
-        $('#loginForm').submit();
-    });
+        document.getElementById('passwordIcon').classList.add('d-none')
+        document.getElementById('mobileIcon').classList.remove('d-none')
+    }
+    loginByPassword = !loginByPassword
+}
 
-    $('#mobileLoginSubmit').click(function () {
-        var mobile = $('#mobile').val();
-        var mobileCaptcha = $('#mobileCaptcha').val();
-        if (!mobile) {
-            $("#errorMsg").html("请输入手机号码");
-            return;
-        }
-        if (!sentCaptcha) {
-            $("#errorMsg").html("请先发送验证码");
-            return;
-        }
-        if (!mobileCaptcha) {
-            $("#errorMsg").html("请输入验证码");
-            return;
-        }
+function sendSecurityCode(element) {
+    let mobile = document.getElementById('mobile')
+    if (!mobile.checkValidity()) {
+        mobile.reportValidity()
+        return
+    }
 
-        var url = $(this).attr("href") + mobileCaptcha;
+    let mobileValue = mobile.value
+    let url = element.dataset.url
+    let authorizeId = document.getElementById('authorize-id').value;
 
-        $.ajax({
-            type: "get",
-            url: url,
-            dataType: "text"
-        }).done(function () {
-            $('#mobileLoginForm').submit();
-        }).fail(function () {
-            $("#errorMsg").html("验证码错误");
-        });
-    });
+    let postUrl = `${url}?authorize_id=${authorizeId}&mobile=${mobileValue}`
 
-    var sentCaptcha = false;
-    $('#sendCaptcha').click(function () {
-        var $this = $(this);
-        var url = $this.attr("href");
+    element.disabled = true
+    axios.post(postUrl).then(() => {
+        sendSecurityCodeSuccess = true
+        document.getElementById('error-msg').innerHTML = ''
 
-        var mobile = $("#mobile").val();
-        if (!mobile || !/^1[\d]{10}$/.test(mobile)) {
-            $("#errorMsg").html("请输入手机号码");
-            return;
-        }
+        let counter = 60
+        let timer = setInterval(() => {
+            counter = counter - 1
 
-        $this.attr("disabled", true);
-        $.ajax({
-            type: "post",
-            url: url,
-            data: {authorize_id: authorizeId, mobile: mobile},
-            dataType: "json"
-        }).done(function (result) {
-            /**
-             * result.target
-             * result.requestId
-             */
-            sentCaptcha = true;
-            $("#errorMsg").html("已向您的" + result.target + "发送验证码");
+            element.innerHTML = `${counter}s`
 
-            var seconds = 60;
-            var timer = setInterval(function () {
-                --seconds;
-                $this.html(seconds + 'S');
-                if (seconds < 1) {
-                    $this.attr("disabled", false);
-                    $this.html('发送验证码');
-                    clearInterval(timer);
-                    timer = null;
-                }
-            }, 1000);
-        }).fail(function (res) {
-            sentCaptcha = false;
-            $this.attr("disabled", false);
-            $("#errorMsg").html(res.responseText);
-        });
-    });
-
-    $('#loginModeSwitch').click(function () {
-        $('#loginForm').toggle();
-        $('#mobileLoginForm').toggle();
-    });
-
-    $(document).keyup(function (event) {
-        if (event.keyCode == 13) {
-            if ($('#loginForm').is(":visible")) {
-                $("#loginSubmit").trigger("click");
-            } else {
-                $("#mobileLoginSubmit").trigger("click");
+            if (counter === 0) {
+                element.innerHTML = '发送验证码'
+                element.disabled = false
+                clearInterval(timer)
             }
+        }, 1000)
+    }).catch((error) => {
+        if (error.response.data) {
+            document.getElementById('error-msg').innerHTML = error.response.data
+        } else {
+            document.getElementById('error-msg').innerHTML = '验证码发送失败'
         }
-    });
-});
+        element.disabled = false
+    })
+}
 
 function rememberMe() {
-    if ($('#rememberMe').prop('checked')) {
-        var userName = $('#username').val();
-        if (userName) {
-            cookie('USERNAME', userName, 7);
+    if (document.getElementById('remember-me').checked) {
+        let username = document.getElementById('username').value
+        if (username) {
+            cookie('USERNAME', username, 7)
         }
     } else {
-        removeCookie('USERNAME');
+        removeCookie('USERNAME')
     }
 }
