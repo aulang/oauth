@@ -1,1 +1,2 @@
-function approval(e) {}
+function approval(e) {
+}

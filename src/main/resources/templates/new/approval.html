@@ -1,62 +1,62 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet" />
-    <link href="login.css" rel="stylesheet" />
-    <title>Aulang</title>
-  </head>
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="login.css" rel="stylesheet"/>
+  <title>Aulang</title>
+</head>
 
-  <body class="text-center">
-    <main class="form-login">
-      <div class="row">
-        <picture>
-          <img class="img-fluid mb-4 logo" src="logo.png" alt="logo" />
-        </picture>
-        <h1 class="h3 mb-3 fw-normal">访问授权</h1>
-      </div>
+<body class="text-center">
+<main class="form-login">
+  <div class="row">
+    <picture>
+      <img class="img-fluid mb-4 logo" src="logo.png" alt="logo"/>
+    </picture>
+    <h1 class="h3 mb-3 fw-normal">访问授权</h1>
+  </div>
 
-      <div class="row">
-        <p class="text-danger text-center text-break" id="error-msg"></p>
-      </div>
+  <div class="row">
+    <p class="text-danger text-center text-break" id="error-msg"></p>
+  </div>
 
-      <form method="post" onsubmit="approval(event)">
-        <div class="card">
-          <h5 class="card-header text-start">授权【xxx】访问您的：</h5>
-          <div class="card-body row g-3">
-            <div class="text-start">
-              <label>
-                <input type="checkbox" name="scopes" value="scope1" class="form-check-input" />
-                <span class="form-check-label">权限1</span>
-              </label>
-            </div>
-            <div class="text-start">
-              <label>
-                <input type="checkbox" name="scopes" value="scope2" class="form-check-input" />
-                <span class="form-check-label">权限2</span>
-              </label>
-            </div>
-            <div class="text-start">
-              <label>
-                <input type="checkbox" name="scopes" value="scope3" class="form-check-input" />
-                <span class="form-check-label">权限3</span>
-              </label>
-            </div>
-
-            <div class="text-end">
-              <button type="submit" name="authorized" value="false" class="btn btn-secondary">取消</button>
-              <button type="submit" name="authorized" value="true" class="btn btn-primary ms-3">授权</button>
-            </div>
-          </div>
+  <form method="post" onsubmit="approval(event)">
+    <div class="card">
+      <h5 class="card-header text-start">授权【xxx】访问您的：</h5>
+      <div class="card-body row g-3">
+        <div class="text-start">
+          <label>
+            <input type="checkbox" name="scopes" value="scope1" class="form-check-input"/>
+            <span class="form-check-label">权限1</span>
+          </label>
         </div>
-      </form>
+        <div class="text-start">
+          <label>
+            <input type="checkbox" name="scopes" value="scope2" class="form-check-input"/>
+            <span class="form-check-label">权限2</span>
+          </label>
+        </div>
+        <div class="text-start">
+          <label>
+            <input type="checkbox" name="scopes" value="scope3" class="form-check-input"/>
+            <span class="form-check-label">权限3</span>
+          </label>
+        </div>
 
-      <div class="row mt-5 mb-3">
-        <p class="text-muted">&copy; Aulang 2018 - 2022</p>
+        <div class="text-end">
+          <button type="submit" name="authorized" value="false" class="btn btn-secondary">取消</button>
+          <button type="submit" name="authorized" value="true" class="btn btn-primary ms-3">授权</button>
+        </div>
       </div>
-    </main>
+    </div>
+  </form>
 
-    <script src="approval.js"></script>
-  </body>
+  <div class="row mt-5 mb-3">
+    <p class="text-muted">&copy; Aulang 2018 - 2022</p>
+  </div>
+</main>
+
+<script src="approval.js"></script>
+</body>
 </html>
