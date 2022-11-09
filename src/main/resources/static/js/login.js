@@ -87,6 +87,7 @@ function sendSecurityCode(element) {
     axios.post(postUrl).then(() => {
         sendSecurityCodeSuccess = true
         document.getElementById('error-msg').innerHTML = ''
+        document.getElementById('error-msg').innerHTML = '验证码发送成功'
 
         let counter = 60
         let timer = setInterval(() => {

@@ -4,7 +4,7 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
-  <link href="login.css" rel="stylesheet"/>
+  <link th:href="@{/css/login.css}" rel="stylesheet"/>
   <title>Aulang</title>
 </head>
 
@@ -12,7 +12,7 @@
 <main class="form-login">
   <div class="row">
     <picture>
-      <img class="img-fluid mb-4 logo" src="logo.png" alt="logo"/>
+      <img th:src="@{/img/logo.png}" class="img-fluid mb-4 logo" alt="logo"/>
     </picture>
     <h1 class="h3 mb-3 fw-normal">访问授权</h1>
   </div>
@@ -21,26 +21,14 @@
     <p class="text-danger text-center text-break" id="error-msg"></p>
   </div>
 
-  <form method="post" onsubmit="approval(event)">
+  <form method="post" th:action="@{/approval}">
     <div class="card">
-      <h5 class="card-header text-start">授权【xxx】访问您的：</h5>
+      <h5 class="card-header text-start" th:text="${'授权【' + clientName + '】访问您的：'}"></h5>
       <div class="card-body row g-3">
-        <div class="text-start">
+        <div th:each="scope : ${scopes}" class="text-start">
           <label>
-            <input type="checkbox" name="scopes" value="scope1" class="form-check-input"/>
-            <span class="form-check-label">权限1</span>
-          </label>
-        </div>
-        <div class="text-start">
-          <label>
-            <input type="checkbox" name="scopes" value="scope2" class="form-check-input"/>
-            <span class="form-check-label">权限2</span>
-          </label>
-        </div>
-        <div class="text-start">
-          <label>
-            <input type="checkbox" name="scopes" value="scope3" class="form-check-input"/>
-            <span class="form-check-label">权限3</span>
+            <input type="checkbox" name="scopes" th:value="${scope}" th:id="${scope}" class="form-check-input"/>
+            <span th:for="${scope}" th:text="${scopeNames.get(scope)}" class="form-check-label"></span>
           </label>
         </div>
 
@@ -56,7 +44,5 @@
     <p class="text-muted">&copy; Aulang 2018 - 2022</p>
   </div>
 </main>
-
-<script src="approval.js"></script>
 </body>
 </html>

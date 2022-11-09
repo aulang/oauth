@@ -32,14 +32,14 @@ public class PasswordController {
     @PostMapping("/change_passwd")
     public String changePwd(@RequestParam(name = "authorize_id") String authorizeId,
                             @RequestParam(name = "password") String password,
-                            @RequestParam(name = "confirmed_password") String confirmedPassword,
+                            @RequestParam(name = "repassword") String repassword,
                             Model model) {
         AuthRequest request = requestBiz.findOne(authorizeId);
         if (request == null) {
             return Constants.errorPage(model, "登录请求不存在或已失效");
         }
 
-        if (!password.equals(confirmedPassword)) {
+        if (!password.equals(repassword)) {
             model.addAttribute("error", "两次密码不一致");
             return "change_passwd";
         }
