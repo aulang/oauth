@@ -9,7 +9,7 @@
 </head>
 
 <body class="text-center">
-<input type="hidden" id="authorize-id" th:value="${authorizeId}"/>
+<input type="hidden" id="authorize-id" th:value="${authorizeId}" th:data-url="@{'/login/'+ ${authorizeId}}"/>
 
 <main class="form-login">
   <div class="row">

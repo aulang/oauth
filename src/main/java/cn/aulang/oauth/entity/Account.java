@@ -51,7 +51,7 @@ public class Account implements Serializable {
     /**
      * 是否需要修改密码
      */
-    boolean mustChangePassword = false;
+    private boolean mustChangePassword = false;
 
     /**
      * 需要修改密码的理由

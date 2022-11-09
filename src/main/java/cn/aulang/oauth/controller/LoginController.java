@@ -49,6 +49,12 @@ public class LoginController {
         }
 
         if (request.isAuthenticated()) {
+            if (request.isMustChangePassword()) {
+                model.addAttribute("authorizeId", authorizeId);
+                model.addAttribute("error", request.getMustChangePasswordReason());
+                return "change_passwd";
+            }
+
             // 已经登录，到授权页面
             return returnPageBiz.approvalPage(request, response, model);
         } else {
@@ -95,11 +101,15 @@ public class LoginController {
         } catch (AccountLockedException e) {
             return "account_locked";
         } catch (PasswordExpiredException e) {
+            String reason = e.getMessage();
+
             request.setAuthenticated(true);
+            request.setMustChangePassword(true);
             request.setAccountId(e.getAccountId());
+            request.setMustChangePasswordReason(reason);
             requestBiz.save(request);
 
-            model.addAttribute("error", e.getMessage());
+            model.addAttribute("error", reason);
             model.addAttribute("authorizeId", authorizeId);
             return "change_passwd";
         } catch (Exception e) {

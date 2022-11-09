@@ -1,7 +1,15 @@
 let loginByPassword = true
 let sendSecurityCodeSuccess = false
 
+const regPhone = /^1[0-9]{10}$/
+const regEmail = /^\w+@[a-z0-9]+\.[a-z]+$/
+
 function init() {
+    let url = document.getElementById('authorize-id').dataset.url
+    if (url && location.pathname !== url) {
+        history.replaceState({url: url, title: document.title}, document.title, url)
+    }
+
     let usernameCookie = getCookie('USERNAME')
     let username = document.getElementById('username')
     if (usernameCookie && !username.value) {
@@ -23,8 +31,7 @@ function mobileLogin(element) {
     }
 
     let securityCode = document.getElementById('security-code')
-    if (!securityCode.checkValidity()) {
-        securityCode.reportValidity()
+    if (!securityCode.reportValidity()) {
         return
     }
 
@@ -72,12 +79,17 @@ function changeLoginType() {
 
 function sendSecurityCode(element) {
     let mobile = document.getElementById('mobile')
-    if (!mobile.checkValidity()) {
-        mobile.reportValidity()
+    if (!mobile.reportValidity()) {
         return
     }
 
     let mobileValue = mobile.value
+    if (!regPhone.test(mobileValue) && !regEmail.test(mobileValue)) {
+        mobile.setCustomValidity('请输入手机号或邮箱');
+        mobile.reportValidity()
+        return
+    }
+
     let url = element.dataset.url
     let authorizeId = document.getElementById('authorize-id').value;
 

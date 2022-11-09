@@ -50,6 +50,15 @@ public class AuthRequest implements Serializable {
      */
     private boolean authenticated = false;
     /**
+     * 是否需要修改密码
+     */
+    private boolean mustChangePassword = false;
+    /**
+     * 需要修改密码的理由
+     */
+    private String mustChangePasswordReason;
+
+    /**
      * 登录认证请求有效时间8小时
      */
     @Indexed(expireAfterSeconds = 28800)

@@ -56,6 +56,8 @@ public class PasswordController {
             }
             request.setAccountId(null);
             request.setAuthenticated(false);
+            request.setMustChangePassword(false);
+            request.setMustChangePasswordReason(null);
             requestBiz.save(request);
         } catch (Exception e) {
             log.error("修改密码失败", e);
