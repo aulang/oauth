@@ -57,13 +57,14 @@ public class CaptchaController {
         }
     }
 
-    @GetMapping(path = "/api/captcha/{authorizeId}/{code}", produces = MediaType.TEXT_PLAIN_VALUE)
-    public ResponseEntity<String> captcha(@PathVariable String authorizeId, @PathVariable String code) {
+    @GetMapping(path = "/api/captcha/{authorizeId}/{code}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Boolean> captcha(@PathVariable String authorizeId, @PathVariable String code) {
         AuthRequest request = requestBiz.findOne(authorizeId);
         if (request != null && code.equals(request.getCaptcha())) {
-            return ResponseEntity.ok("true");
+            return ResponseEntity.ok(true);
+        } else {
+            return ResponseEntity.ok(false);
         }
-        return ResponseEntity.badRequest().body("false");
     }
 
     @PostMapping(path = "/api/captcha", produces = MediaType.APPLICATION_JSON_VALUE)

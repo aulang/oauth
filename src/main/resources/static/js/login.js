@@ -17,7 +17,7 @@ function passwordLogin() {
     rememberMe()
 }
 
-function mobileLogin(e) {
+function mobileLogin(element) {
     if (!sendSecurityCodeSuccess) {
         document.getElementById('error-msg').innerHTML = '请先发送验证码'
     }
@@ -28,13 +28,25 @@ function mobileLogin(e) {
         return
     }
 
-    // TODO 获取URL
     let url = element.dataset.url
+    let code = securityCode.value;
     let authorizeId = document.getElementById('authorize-id').value;
 
     let getUrl = `${url}/${authorizeId}/${code}`
 
-    e.preventDefault()
+    axios.get(getUrl).then((response) => {
+        if (response.data) {
+            document.getElementById('mobileForm').submit();
+        } else {
+            document.getElementById('error-msg').innerHTML = '验证码错误'
+        }
+    }).catch((error) => {
+        if (error.response.data) {
+            document.getElementById('error-msg').innerHTML = error.response.data
+        } else {
+            document.getElementById('error-msg').innerHTML = '验证码错误'
+        }
+    });
 }
 
 function refreshCaptcha(element) {
