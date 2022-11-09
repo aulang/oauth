@@ -79,6 +79,7 @@ function changeLoginType() {
 
 function sendSecurityCode(element) {
     let mobile = document.getElementById('mobile')
+    mobile.setCustomValidity('');
     if (!mobile.reportValidity()) {
         return
     }
