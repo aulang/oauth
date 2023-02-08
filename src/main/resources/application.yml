@@ -8,21 +8,41 @@ server:
         http-only: true
 
 spring:
+  application:
+    name: oauth
+  profiles:
+    default: prod
+  lifecycle:
+    timeout-per-shutdown-phase: 30s
   jackson:
     default-property-inclusion: non_null
     date-format: yyyy-MM-dd HH:mm:ss
     time-zone: GMT+8
-  data:
-    mongodb:
-      host: 127.0.0.1
-      port: 27017
-      database: oauth
-      username: adminx
-      password: unicloud
-      authentication-database: admin
+  datasource:
+    url: jdbc:mysql://127.0.0.1:3306/npj_oauth?useSSL=false&charsetEncoding=utf8mb4
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root
+    password: 123456
+    hikari:
+      pool-name: OAuth_DB_Pool
+      minimum-idle: 8
+      idle-timeout: 600000
+      maximum-pool-size: 32
+      auto-commit: true
+      max-lifetime: 1800000
+      connection-timeout: 60000
+      connection-test-query: SELECT 1
+  cache:
+    type: caffeine
+    caffeine:
+      spec: maximumSize=10240,expireAfterWrite=1h
+
+jwt:
+  file-path: classpath:oauth.pfx
+  password: bhDqGkz4dLQART7M
 
 captcha:
   len: 2
-  width: 100
-  height: 42
+  width: 128
+  height: 50
   style: Math

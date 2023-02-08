@@ -5,9 +5,7 @@ import cn.aulang.oauth.thirdserver.core.Profile;
 import cn.aulang.oauth.thirdserver.core.ProfileExtractor;
 
 /**
- * @author Aulang
- * @email aulang@qq.com
- * @date 2019-12-7 17:23
+ * @author wulang
  */
 public class DefaultProfileExtractor implements ProfileExtractor {
 

@@ -1,16 +1,16 @@
 package cn.aulang.oauth.manage;
 
+import cn.aulang.oauth.common.OAuthConstants;
 import cn.aulang.oauth.entity.AuthState;
 import cn.aulang.oauth.repository.AuthStateRepository;
+import cn.hutool.core.date.DateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
+import java.util.Date;
 
 /**
- * @author Aulang
- * @email aulang@qq.com
- * @date 2019-12-7 18:03
+ * @author wulang
  */
 @Service
 public class AuthStateBiz {
@@ -23,7 +23,8 @@ public class AuthStateBiz {
     }
 
     public AuthState save(AuthState entity) {
-        return dao.save(entity);
+        dao.save(entity);
+        return entity;
     }
 
     public AuthState create(String authorizeId, String serverId, String accountId) {
@@ -34,8 +35,19 @@ public class AuthStateBiz {
         return save(state);
     }
 
-    public AuthState findByState(String state) {
-        Optional<AuthState> optional = dao.findById(state);
-        return optional.orElse(null);
+    public AuthState getByState(String state) {
+        AuthState authState = dao.findById(state).orElse(null);
+
+        if (authState == null) {
+            return null;
+        }
+
+        Date tenMinutesLater = DateUtil.offsetMinute(authState.getCreateDate(), OAuthConstants.DEFAULT_EXPIRES_MINUTES);
+        if (tenMinutesLater.before(new Date())) {
+            dao.deleteById(authState.getId());
+            return null;
+        }
+
+        return authState;
     }
 }

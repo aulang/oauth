@@ -1,51 +1,83 @@
 package cn.aulang.oauth.entity;
 
-import cn.hutool.core.util.IdUtil;
+import cn.aulang.oauth.common.Constants;
+import cn.hutool.core.util.StrUtil;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import lombok.Data;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.io.Serial;
-import java.io.Serializable;
-import java.time.LocalDateTime;
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
-import java.util.Map;
+import java.util.List;
 import java.util.Set;
 
 /**
- * @author Aulang
- * @email aulang@aq.com
- * @date 2019/12/1 14:39
+ * @author wulang
  */
 @Data
-@Document
-public class Client implements Serializable {
+@Entity
+@Table(name = "client")
+public class Client {
 
-    @Serial
-    private static final long serialVersionUID = 1L;
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
+
+    @Column(nullable = false)
     private String name;
-    private String secret = IdUtil.fastSimpleUUID();
-    private boolean enabled = true;
+    @Column(nullable = false)
+    private String secret;
+    @Column(nullable = false)
+    private Boolean enabled = true;
 
-    private String logoUrl;
-    /**
-     * {code,名称}
-     */
-    private Map<String, String> scopes = new HashMap<>();
-    private Set<String> autoApprovedScopes = new HashSet<>();
-    private Set<String> authorizationGrants = new HashSet<>();
-    private Set<String> registeredRedirectUris = new HashSet<>();
-    private int accessTokenValiditySeconds = 2592000;
-    private int refreshTokenValiditySeconds = 7776000;
-    private int approvalValiditySeconds = 2592000;
+    @Column(name = "logo_page")
+    private String logoPage;
 
-    /**
-     * client_credentials凭证模式对应的账号ID
-     */
-    private String accountId;
+    private String grants;
+    @Column(name = "redirect_uris")
+    private String redirectUris;
 
-    private LocalDateTime createdDateTime = LocalDateTime.now();
+    @Column(name = "access_token_expires_in")
+    private Integer accessTokenExpiresIn = 28800;
+    @Column(name = "refresh_token_expires_in")
+    private Integer refreshTokenExpiresIn = 2592000;
+
+    private String creator;
+    @Column(name = "create_date")
+    private Date createDate;
+    @Column(name = "update_date")
+    private Date updateDate;
+
+
+    @Transient
+    private Set<String> authorizationGrants = null;
+    @Transient
+    private List<String> registeredUris = null;
+
+    public Set<String> getAuthorizationGrants() {
+        if (authorizationGrants == null && StrUtil.isBlank(grants)) {
+            return new HashSet<>();
+        } else {
+            List<String> strings = StrUtil.split(grants, Constants.SEPARATOR);
+            authorizationGrants = new HashSet<>(strings);
+        }
+
+        return authorizationGrants;
+    }
+
+    public List<String> getRegisteredUris() {
+        if (registeredUris == null && StrUtil.isBlank(redirectUris)) {
+            return new ArrayList<>();
+        } else {
+            registeredUris = StrUtil.split(redirectUris, Constants.SEPARATOR);
+        }
+
+        return registeredUris;
+    }
 }

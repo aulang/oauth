@@ -5,9 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * @author Aulang
- * @email aulang@aq.com
- * @date 2019/12/5 11:32
+ * @author wulang
  */
 @Data
 @NoArgsConstructor
@@ -16,7 +14,7 @@ public class SendCaptchaResult {
     /**
      * 登录认证请求ID
      */
-    private String requestId;
+    private String authorizeId;
     /**
      * 发送账号ID
      */

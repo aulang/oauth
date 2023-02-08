@@ -3,10 +3,8 @@ package cn.aulang.oauth.thirdserver.core;
 import cn.aulang.oauth.entity.ThirdServer;
 
 /**
- * @author Aulang
- * @email aulang@qq.com
- * @date 2019-12-7 17:11
  * 调用第三方服务API接口
+ * @author wulang
  */
 public interface Api<T extends Profile> {
 

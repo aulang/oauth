@@ -8,12 +8,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collection;
 import java.util.Map;
-import java.util.Optional;
 
 /**
- * @author Aulang
- * @email aulang@qq.com
- * @date 2019-12-7 17:57
+ * @author wulang
  */
 @Service
 public class AuthServiceProvider implements ApplicationContextAware {
@@ -35,7 +32,7 @@ public class AuthServiceProvider implements ApplicationContextAware {
         return services;
     }
 
-    public Optional<AuthService> get(ThirdServer server) {
-        return getServices().parallelStream().filter(e -> e.supports(server)).findAny();
+    public AuthService get(ThirdServer server) {
+        return getServices().parallelStream().filter(e -> e.supports(server)).findAny().orElse(null);
     }
 }

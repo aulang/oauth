@@ -2,12 +2,14 @@ package cn.aulang.oauth;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 /**
- * @author Aulang
- * @email aulang@qq.com
- * @date 2019-11-24 22:50
+ * @author wulang
  */
+@EnableCaching
+@EnableJpaRepositories
 @SpringBootApplication
 public class OAuthApplication {
 

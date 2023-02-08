@@ -1,10 +1,8 @@
 package cn.aulang.oauth.thirdserver.core;
 
 /**
- * @author Aulang
- * @email aulang@qq.com
- * @date 2019-12-7 17:15
  * 第三方用户信息提取器
+ * @author wulang
  */
 public interface ProfileExtractor {
 

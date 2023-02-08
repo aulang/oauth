@@ -4,9 +4,7 @@ import cn.aulang.oauth.thirdserver.impl.AbstractProfile;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
- * @author Aulang
- * @email aulang@qq.com
- * @date 2019-12-7 17:51
+ * @author wulang
  */
 public class QQProfile extends AbstractProfile {
 

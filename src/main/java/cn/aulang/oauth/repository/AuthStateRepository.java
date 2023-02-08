@@ -1,14 +1,12 @@
 package cn.aulang.oauth.repository;
 
 import cn.aulang.oauth.entity.AuthState;
-import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 /**
- * @author Aulang
- * @email aulang@qq.com
- * @date 2019-12-7 18:03
+ * @author wulang
  */
 @Repository
-public interface AuthStateRepository extends MongoRepository<AuthState, String> {
+public interface AuthStateRepository extends JpaRepository<AuthState, String> {
 }

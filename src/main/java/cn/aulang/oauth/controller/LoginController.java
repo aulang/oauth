@@ -9,21 +9,20 @@ import cn.aulang.oauth.manage.AuthRequestBiz;
 import cn.aulang.oauth.manage.ClientBiz;
 import cn.aulang.oauth.manage.ReturnPageBiz;
 import cn.hutool.core.util.RandomUtil;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.security.auth.login.AccountLockedException;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
- * @author Aulang
- * @email aulang@aq.com
- * @date 2019/12/6 11:01
+ * @author wulang
  */
 @Controller
 public class LoginController {
@@ -41,22 +40,20 @@ public class LoginController {
     }
 
     @GetMapping("/login/{authorizeId}")
-    public String login(@PathVariable String authorizeId, HttpServletResponse response, Model model) {
-        AuthRequest request = requestBiz.findOne(authorizeId);
+    public String login(@PathVariable String authorizeId, Model model) {
+        AuthRequest request = requestBiz.get(authorizeId);
 
         if (request == null) {
             return Constants.errorPage(model, "登录认证请求不存在或已失效");
         }
 
-        if (request.isAuthenticated()) {
-            if (request.isMustChangePassword()) {
-                model.addAttribute("authorizeId", authorizeId);
-                model.addAttribute("error", request.getMustChangePasswordReason());
-                return "change_passwd";
+        if (request.getAuthenticated()) {
+            if (request.getMustChpwd() != null && request.getMustChpwd()) {
+                returnPageBiz.changePwdPage(request, model);
             }
 
             // 已经登录，到授权页面
-            return returnPageBiz.approvalPage(request, response, model);
+            return returnPageBiz.redirect(request, model);
         } else {
             // 未登录，到登录页面
             return returnPageBiz.loginPage(request, null, model);
@@ -68,14 +65,13 @@ public class LoginController {
                         @RequestParam(name = "username") String username,
                         @RequestParam(name = "password") String password,
                         @RequestParam(name = "captcha", required = false) String captcha,
-                        HttpServletResponse response,
                         Model model) {
-        AuthRequest request = requestBiz.findOne(authorizeId);
+        AuthRequest request = requestBiz.get(authorizeId);
         if (request == null) {
             return Constants.errorPage(model, "登录请求不存在或已失效");
         }
 
-        Client client = clientBiz.findOne(request.getClientId());
+        Client client = clientBiz.get(request.getClientId());
         if (client == null) {
             return Constants.errorPage(model, "无效的client_id");
         }
@@ -94,7 +90,7 @@ public class LoginController {
                 request.setAccountId(accountId);
                 request.setAuthenticated(true);
                 request = requestBiz.save(request);
-                return returnPageBiz.approvalPage(request, response, model);
+                return returnPageBiz.redirect(request, model);
             } else {
                 model.addAttribute("error", "账号或密码错误");
             }
@@ -104,9 +100,9 @@ public class LoginController {
             String reason = e.getMessage();
 
             request.setAuthenticated(true);
-            request.setMustChangePassword(true);
+            request.setMustChpwd(true);
             request.setAccountId(e.getAccountId());
-            request.setMustChangePasswordReason(reason);
+            request.setChpwdReason(reason);
             requestBiz.save(request);
 
             model.addAttribute("error", reason);
@@ -137,8 +133,8 @@ public class LoginController {
     public String login(@RequestParam(name = "authorize_id") String authorizeId,
                         @RequestParam(name = "mobile") String mobile,
                         @RequestParam(name = "captcha") String captcha,
-                        HttpServletResponse response, Model model) {
-        AuthRequest request = requestBiz.findOne(authorizeId);
+                        Model model) {
+        AuthRequest request = requestBiz.get(authorizeId);
         if (request == null) {
             return Constants.errorPage(model, "登录请求不存在或已失效");
         }
@@ -155,12 +151,16 @@ public class LoginController {
         request.setAuthenticated(true);
         request = requestBiz.save(request);
 
-        return returnPageBiz.approvalPage(request, response, model);
+        return returnPageBiz.redirect(request, model);
     }
 
     @GetMapping("/logout")
     public void logout(@RequestParam(name = "redirect_uri", required = false) String redirectUri,
+                       @CookieValue(name = Constants.SSO_COOKIE_NAME, required = false) String authorizeId,
                        HttpServletResponse response) throws IOException {
+        if (authorizeId != null) {
+            requestBiz.delete(authorizeId);
+        }
         Constants.removeSsoCookie(response);
         response.sendRedirect(redirectUri != null ? redirectUri : "/");
     }

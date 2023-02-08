@@ -1,65 +1,49 @@
 package cn.aulang.oauth.entity;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.Data;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.index.CompoundIndex;
-import org.springframework.data.mongodb.core.index.CompoundIndexes;
-import org.springframework.data.mongodb.core.index.Indexed;
-import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.io.Serial;
-import java.io.Serializable;
-import java.time.LocalDateTime;
-import java.util.Set;
+import java.util.Date;
+
 
 /**
- * @author Aulang
- * @email aulang@aq.com
- * @date 2019/12/2 18:22
  * 账号Token
+ *
+ * @author wulang
  */
 @Data
-@Document
-@CompoundIndexes({
-        @CompoundIndex(
-                unique = true,
-                name = "idx_accountId_clientId_redirectUri",
-                def = "{'accountId':1, 'clientId':1, 'redirectUri':1}"
-        )
-})
-public class AccountToken implements Serializable {
-
-    @Serial
-    private static final long serialVersionUID = 1L;
+@Entity
+@Table(name = "account_token")
+public class AccountToken {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
-    /**
-     * access_token
-     */
-    @Indexed(unique = true, sparse = true)
+
+    @Column(name = "access_token", nullable = false)
     private String accessToken;
-    /**
-     * access_token失效时间
-     */
-    @Indexed(expireAfterSeconds = 0)
-    private LocalDateTime accessTokenExpiresAt;
+    @Column(name = "access_token_expires_at", nullable = false)
+    private Date accessTokenExpiresAt;
 
-    /**
-     * refresh_token
-     */
-    @Indexed(unique = true, sparse = true)
+    @Column(name = "refresh_token", unique = true, nullable = false)
     private String refreshToken;
-    /**
-     * refresh_token失效时间
-     */
-    @Indexed(expireAfterSeconds = 0)
-    private LocalDateTime refreshTokenExpiresAt;
+    @Column(name = "refresh_token_expires_at", nullable = false)
+    private Date refreshTokenExpiresAt;
 
+    @Column(name = "client_id", nullable = false)
     private String clientId;
-    private Set<String> scopes;
+    @Column(name = "redirect_uri", nullable = false)
     private String redirectUri;
+    @Column(name = "account_id", nullable = false)
     private String accountId;
 
-    private LocalDateTime createdDateTime = LocalDateTime.now();
+    @Column(name = "create_date")
+    private Date createDate;
+    @Column(name = "update_date")
+    private Date updateDate;
 }

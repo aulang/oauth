@@ -3,136 +3,138 @@ package cn.aulang.oauth.manage;
 import cn.aulang.oauth.entity.AccountToken;
 import cn.aulang.oauth.entity.AuthCode;
 import cn.aulang.oauth.entity.Client;
+import cn.aulang.oauth.jwt.JwtHelper;
+import cn.aulang.oauth.model.Profile;
 import cn.aulang.oauth.repository.AccountTokenRepository;
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.IdUtil;
+import cn.hutool.core.util.StrUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
-import java.util.Set;
+import java.util.Date;
 
 /**
- * @author Aulang
- * @email aulang@qq.com
- * @date 2019-12-4 21:17
+ * @author wulang
  */
 @Slf4j
 @Service
 public class AccountTokenBiz {
 
+    private final JwtHelper jwtHelper;
     private final ClientBiz clientBiz;
+    private final AccountBiz accountBiz;
     private final AccountTokenRepository dao;
 
     @Autowired
-    public AccountTokenBiz(ClientBiz clientBiz, AccountTokenRepository dao) {
+    public AccountTokenBiz(JwtHelper jwtHelper, ClientBiz clientBiz, AccountBiz accountBiz, AccountTokenRepository dao) {
+        this.jwtHelper = jwtHelper;
         this.clientBiz = clientBiz;
+        this.accountBiz = accountBiz;
         this.dao = dao;
     }
 
-    public AccountToken findByAccessToken(String accessToken) {
-        return dao.findByAccessToken(accessToken);
+    public AccountToken get(String id) {
+        return dao.findById(id).orElse(null);
     }
 
-    public AccountToken findByAccountIdAndClientIdAndRedirectUri(String accountId, String clientId, String redirectUri) {
-        return dao.findByAccountIdAndClientIdAndRedirectUri(accountId, clientId, redirectUri);
-    }
-
-    public AccountToken save(AccountToken token) {
-        AccountToken accountToken = findByAccountIdAndClientIdAndRedirectUri(
-                token.getAccountId(),
-                token.getClientId(),
-                token.getRedirectUri()
+    public AccountToken save(AccountToken entity) {
+        AccountToken accountToken = dao.findByClientIdAndRedirectUriAndAccountId(
+                entity.getClientId(),
+                entity.getRedirectUri(),
+                entity.getAccountId()
         );
 
         if (accountToken != null) {
-            token.setId(accountToken.getId());
+            entity.setId(accountToken.getId());
         }
 
-        return dao.save(token);
+        if (StrUtil.isBlank(entity.getId())) {
+            entity.setUpdateDate(null);
+            entity.setCreateDate(new Date());
+        } else {
+            entity.setCreateDate(null);
+            entity.setUpdateDate(new Date());
+        }
+
+        dao.save(entity);
+        return entity;
     }
 
     public AccountToken refreshAccessToken(String refreshToken) {
         try {
-            return refreshAccessToken(refreshToken, IdUtil.fastSimpleUUID());
+            AccountToken accountToken = dao.findByRefreshToken(refreshToken);
+            if (accountToken == null) {
+                return null;
+            }
+
+            return refreshAccessToken(accountToken);
         } catch (Exception e) {
             log.error("刷新令牌失败", e);
             return null;
         }
     }
 
-    public AccountToken refreshAccessToken(String refreshToken, String newAccessToken) {
-        AccountToken accountToken = dao.findByRefreshToken(refreshToken);
+    public AccountToken refreshAccessToken(AccountToken accountToken) throws Exception {
+        Date now = new Date();
 
-        if (accountToken == null) {
-            return null;
-        }
-
-        LocalDateTime now = LocalDateTime.now();
-
-        LocalDateTime refreshTokenExpiration = accountToken.getRefreshTokenExpiresAt();
-        if (refreshTokenExpiration != null && refreshTokenExpiration.isBefore(now)) {
+        Date refreshTokenExpiration = accountToken.getRefreshTokenExpiresAt();
+        if (refreshTokenExpiration != null && refreshTokenExpiration.before(now)) {
             throw new RuntimeException("令牌已过期");
         }
 
+        String clientId = accountToken.getClientId();
+        Profile profile = accountBiz.getProfile(accountToken.getAccountId(), clientId);
+
+        Client client = clientBiz.get(clientId);
+        Date accessTokenExpiresAt = DateUtil.offsetSecond(now, client.getAccessTokenExpiresIn());
+
+        String newAccessToken = jwtHelper.encode(profile, accessTokenExpiresAt);
         accountToken.setAccessToken(newAccessToken);
 
-        Client client = clientBiz.findOne(accountToken.getClientId());
-        accountToken.setAccessTokenExpiresAt(now.plusSeconds(client.getAccessTokenValiditySeconds()));
-        accountToken.setRefreshTokenExpiresAt(now.plusSeconds(client.getRefreshTokenValiditySeconds()));
+        accountToken.setAccessTokenExpiresAt(accessTokenExpiresAt);
+        accountToken.setRefreshTokenExpiresAt(DateUtil.offsetSecond(now, client.getRefreshTokenExpiresIn()));
 
         return save(accountToken);
     }
 
     public AccountToken create(
             String clientId,
-            Set<String> scopes,
             String redirectUri,
             String accountId) {
-        String accessToken = IdUtil.fastSimpleUUID();
-        String refreshToken = IdUtil.fastSimpleUUID();
-        return create(accessToken, refreshToken, clientId, scopes, redirectUri, accountId);
-    }
-
-    public AccountToken create(
-            String accessToken,
-            String refreshToken,
-            String clientId,
-            Set<String> scopes,
-            String redirectUri,
-            String accountId) {
-        AccountToken accountToken = new AccountToken();
-
-        accountToken.setScopes(scopes);
-        accountToken.setClientId(clientId);
-        accountToken.setRedirectUri(redirectUri);
-        accountToken.setAccountId(accountId);
-        accountToken.setAccessToken(accessToken);
-        accountToken.setRefreshToken(refreshToken);
-
-
-        Client client = clientBiz.findOne(clientId);
+        Client client = clientBiz.get(clientId);
         if (client == null) {
             throw new RuntimeException("客户端不存在");
         }
 
-        LocalDateTime now = LocalDateTime.now();
+        Date now = new Date();
+        Date accessTokenExpiresAt = DateUtil.offsetSecond(now, client.getAccessTokenExpiresIn());
 
-        accountToken.setAccessTokenExpiresAt(now.plusSeconds(client.getAccessTokenValiditySeconds()));
+        String accessToken;
+        try {
+            Profile profile = accountBiz.getProfile(accountId, clientId);
+            accessToken = jwtHelper.encode(profile, accessTokenExpiresAt);
+        } catch (Exception e) {
+            throw new RuntimeException("生成access_token失败", e);
+        }
 
-        accountToken.setRefreshTokenExpiresAt(now.plusSeconds(client.getRefreshTokenValiditySeconds()));
+        AccountToken accountToken = new AccountToken();
+        accountToken.setClientId(clientId);
+        accountToken.setRedirectUri(redirectUri);
+        accountToken.setAccountId(accountId);
+        accountToken.setAccessToken(accessToken);
+        accountToken.setRefreshToken(IdUtil.fastSimpleUUID());
+
+        accountToken.setAccessTokenExpiresAt(accessTokenExpiresAt);
+        accountToken.setRefreshTokenExpiresAt(DateUtil.offsetSecond(now, client.getRefreshTokenExpiresIn()));
 
         return save(accountToken);
     }
 
     public AccountToken createByCode(AuthCode code) {
-        String accessToken = IdUtil.fastSimpleUUID();
-        String refreshToken = IdUtil.fastSimpleUUID();
         return create(
-                accessToken,
-                refreshToken,
                 code.getClientId(),
-                code.getScopes(),
                 code.getRedirectUri(),
                 code.getAccountId()
         );

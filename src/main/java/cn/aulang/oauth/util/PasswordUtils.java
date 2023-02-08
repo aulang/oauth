@@ -3,9 +3,7 @@ package cn.aulang.oauth.util;
 import cn.hutool.crypto.digest.DigestUtil;
 
 /**
- * @author Aulang
- * @email aulang@qq.com
- * @date 2020-1-5 16:33
+ * @author wulang
  */
 public class PasswordUtils {
 

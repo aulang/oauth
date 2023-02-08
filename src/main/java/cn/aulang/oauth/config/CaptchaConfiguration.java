@@ -8,9 +8,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * @author Aulang
- * @email aulang@aq.com
- * @date 2019/12/5 10:28
+ * @author wulang
  */
 @Configuration
 @EnableConfigurationProperties(CaptchaProperties.class)

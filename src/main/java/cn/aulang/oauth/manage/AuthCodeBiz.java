@@ -1,17 +1,16 @@
 package cn.aulang.oauth.manage;
 
+import cn.aulang.oauth.common.OAuthConstants;
 import cn.aulang.oauth.entity.AuthCode;
 import cn.aulang.oauth.repository.AuthCodeRepository;
+import cn.hutool.core.date.DateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
-import java.util.Set;
+import java.util.Date;
 
 /**
- * @author Aulang
- * @email aulang@aq.com
- * @date 2019/12/1 17:02
+ * @author wulang
  */
 @Service
 public class AuthCodeBiz {
@@ -23,35 +22,34 @@ public class AuthCodeBiz {
         this.dao = dao;
     }
 
+
     public AuthCode save(AuthCode entity) {
-        return dao.save(entity);
-    }
-
-    public void delete(String id) {
-        dao.deleteById(id);
-    }
-
-    public AuthCode findOne(String id) {
-        Optional<AuthCode> optional = dao.findById(id);
-        return optional.orElse(null);
+        dao.save(entity);
+        return entity;
     }
 
     public AuthCode consumeCode(String code) {
-        AuthCode authCode = findOne(code);
+        AuthCode authCode = dao.findById(code).orElse(null);
         if (authCode == null) {
             return null;
         }
-        delete(authCode.getId());
+
+        Date tenMinutesLater = DateUtil.offsetMinute(authCode.getCreateDate(), OAuthConstants.DEFAULT_EXPIRES_MINUTES);
+        if (tenMinutesLater.before(new Date())) {
+            dao.deleteById(authCode.getId());
+            return null;
+        }
+
+        dao.deleteById(authCode.getId());
         return authCode;
     }
 
-    public AuthCode create(String clientId, Set<String> scopes, String redirectUri, String codeChallenge, String accountId) {
+    public AuthCode create(String clientId, String redirectUri, String codeChallenge, String accountId) {
         AuthCode code = new AuthCode();
         code.setCodeChallenge(codeChallenge);
         code.setRedirectUri(redirectUri);
         code.setAccountId(accountId);
         code.setClientId(clientId);
-        code.setScopes(scopes);
         return save(code);
     }
 }

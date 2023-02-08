@@ -1,38 +1,39 @@
 package cn.aulang.oauth.entity;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.Data;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.index.Indexed;
-import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.io.Serial;
-import java.io.Serializable;
-import java.time.LocalDateTime;
-import java.util.Set;
+import java.util.Date;
 
 /**
- * @author Aulang
- * @email aulang@aq.com
- * @date 2019/12/1 16:53
+ * @author wulang
  */
 @Data
-@Document
-public class AuthCode implements Serializable {
+@Entity
+@Table(name = "auth_code")
+public class AuthCode {
 
-    @Serial
-    private static final long serialVersionUID = 1L;
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
+    @Column(name = "client_id", nullable = false)
     private String clientId;
-    private Set<String> scopes;
+    @Column(name = "redirect_uri", nullable = false)
     private String redirectUri;
-    private String accountId;
+    @Column(name = "code_challenge")
     private String codeChallenge;
+    @Column(name = "account_id", nullable = false)
+    private String accountId;
 
     /**
      * 授权码（authorization code）有效期10分钟
      */
-    @Indexed(expireAfterSeconds = 600)
-    private LocalDateTime createdDateTime = LocalDateTime.now();
+    @Column(name = "create_date", nullable = false)
+    private Date createDate = new Date();
 }

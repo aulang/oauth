@@ -25,9 +25,7 @@ import java.util.Map;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
- * @author Aulang
- * @email aulang@qq.com
- * @date 2019-12-7 17:18
+ * @author wulang
  */
 public abstract class AbstractApi<T extends AbstractProfile> implements Api<T> {
 
@@ -87,7 +85,7 @@ public abstract class AbstractApi<T extends AbstractProfile> implements Api<T> {
         switch (method.toLowerCase()) {
             case Constants.HEADER -> {
                 HttpHeaders headers = new HttpHeaders();
-                headers.set(HttpHeaders.AUTHORIZATION, authorization + StrUtil.SPACE + accessToken);
+                headers.set(HttpHeaders.AUTHORIZATION, authorization + " " + accessToken);
                 HttpEntity<HttpHeaders> entity = new HttpEntity<>(headers);
                 return restTemplate.exchange(url, HttpMethod.GET, entity, String.class).getBody();
             }
@@ -105,9 +103,9 @@ public abstract class AbstractApi<T extends AbstractProfile> implements Api<T> {
 
     @Override
     @SuppressWarnings("unchecked")
-    public AccessToken getAccessToken(ThirdServer server, String code) throws IOException {
+    public AccessToken getAccessToken(ThirdServer server, String code) throws Exception {
         String accessTokenUrl = server.getAccessTokenUrl();
-        Map<String, String> accessTokenParams = server.getAccessTokenParams();
+        Map<String, String> accessTokenParams = Constants.toMap(server.getAccessTokenParams());
         accessTokenParams.put(OAuthConstants.CODE, code);
 
         String response;
@@ -145,7 +143,8 @@ public abstract class AbstractApi<T extends AbstractProfile> implements Api<T> {
     public T getProfile(ThirdServer server, AccessToken accessToken) throws Exception {
         String profileUrl = server.getProfileUrl();
         String profileMethod = server.getProfileMethod();
-        Map<String, String> profileParams = server.getProfileParams();
+
+        Map<String, String> profileParams = Constants.toMap(server.getProfileParams());
         profileParams.put(OAuthConstants.ACCESS_TOKEN, accessToken.getAccessToken());
 
         String responseBody = getHttpResponse(

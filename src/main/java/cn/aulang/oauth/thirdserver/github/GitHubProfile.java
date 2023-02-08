@@ -3,9 +3,7 @@ package cn.aulang.oauth.thirdserver.github;
 import cn.aulang.oauth.thirdserver.impl.AbstractProfile;
 
 /**
- * @author Aulang
- * @email aulang@qq.com
- * @date 2019-12-7 17:51
+ * @author wulang
  */
 public class GitHubProfile extends AbstractProfile {
 

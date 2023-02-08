@@ -1,66 +1,70 @@
 package cn.aulang.oauth.entity;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.Data;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.index.Indexed;
-import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.io.Serial;
-import java.io.Serializable;
-import java.time.LocalDateTime;
-import java.util.Set;
+import java.util.Date;
 
 /**
- * @author Aulang
- * @email aulang@qq.com
- * @date 2019-12-3 22:13
- * <p>
  * 登录认证请求
+ *
+ * @author wulang
  */
 @Data
-@Document
-public class AuthRequest implements Serializable {
+@Entity
+@Table(name = "auth_request")
+public class AuthRequest {
 
-    @Serial
-    private static final long serialVersionUID = 1L;
-
-    /**
-     * authorizeId
-     */
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
+    @Column(name = "client_Id", nullable = false)
     private String clientId;
-    private String authorizationGrant;
+    @Column(name = "auth_grant", nullable = false)
+    private String authGrant;
+    @Column(name = "redirect_uri", nullable = false)
     private String redirectUri;
-    private Set<String> scopes;
+    @Column(name = "code_challenge")
     private String codeChallenge;
     private String state;
 
     /**
      * 密码错误尝试次数
      */
-    private int triedTimes = 0;
+    @Column(name = "tried_times", nullable = false)
+    private Integer triedTimes = 0;
     private String captcha;
     private String mobile;
 
+    @Column(name = "account_id")
     private String accountId;
     /**
      * 是否已认证通过
      */
-    private boolean authenticated = false;
+    @Column(nullable = false)
+    private Boolean authenticated = false;
     /**
      * 是否需要修改密码
      */
-    private boolean mustChangePassword = false;
+    @Column(name = "must_chwd")
+    private Boolean mustChpwd = false;
     /**
      * 需要修改密码的理由
      */
-    private String mustChangePasswordReason;
+    @Column(name = "chpwd_reason")
+    private String chpwdReason = "请修改密码！";
 
     /**
      * 登录认证请求有效时间8小时
      */
-    @Indexed(expireAfterSeconds = 28800)
-    private LocalDateTime createdDateTime = LocalDateTime.now();
+    @Column(name = "create_date")
+    private Date createDate;
+    @Column(name = "update_date")
+    private Date updateDate;
 }

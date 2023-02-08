@@ -1,17 +1,15 @@
 package cn.aulang.oauth.thirdserver.qq;
 
-import cn.aulang.oauth.common.Constants;
-import cn.aulang.oauth.entity.ThirdServer;
 import cn.aulang.oauth.thirdserver.core.AccessToken;
 import cn.aulang.oauth.thirdserver.impl.AbstractApi;
+import cn.aulang.oauth.common.Constants;
+import cn.aulang.oauth.entity.ThirdServer;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Map;
 
 /**
- * @author Aulang
- * @email aulang@qq.com
- * @date 2019-12-7 17:53
+ * @author wulang
  */
 @Slf4j
 public class QQApi extends AbstractApi<QQProfile> {

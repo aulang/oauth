@@ -5,9 +5,7 @@ import com.pig4cloud.captcha.SpecCaptcha;
 import com.pig4cloud.captcha.base.Captcha;
 
 /**
- * @author Aulang
- * @email aulang@aq.com
- * @date 2019/12/5 10:56
+ * @author wulang
  */
 public class CaptchaFactory {
 
@@ -18,10 +16,13 @@ public class CaptchaFactory {
     }
 
     public Captcha create() {
-        return switch (properties.getStyle().toLowerCase()) {
-            case "spec" -> new SpecCaptcha(properties.getWidth(), properties.getHeight(), properties.getLen());
-            case "chinese" -> new ChineseCaptcha(properties.getWidth(), properties.getHeight(), properties.getLen());
-            default -> new MathCaptcha(properties.getWidth(), properties.getHeight(), properties.getLen());
-        };
+        switch (properties.getStyle().toLowerCase()) {
+            case "spec":
+                return new SpecCaptcha(properties.getWidth(), properties.getHeight(), properties.getLen());
+            case "chinese":
+                return new ChineseCaptcha(properties.getWidth(), properties.getHeight(), properties.getLen());
+            default:
+                return new MathCaptcha(properties.getWidth(), properties.getHeight(), properties.getLen());
+        }
     }
 }

@@ -1,14 +1,12 @@
 package cn.aulang.oauth.thirdserver.qq;
 
-import cn.aulang.oauth.common.Constants;
 import cn.aulang.oauth.thirdserver.core.Profile;
 import cn.aulang.oauth.thirdserver.impl.DefaultProfileExtractor;
+import cn.aulang.oauth.common.Constants;
 
 /**
- * @author Aulang
- * @email aulang@qq.com
- * @date 2019-12-7 17:52
  * callback( {"client_id":"APPID","openid":"OPENID"} );
+ * @author wulang
  */
 public class QQProfileExtractor extends DefaultProfileExtractor {
 

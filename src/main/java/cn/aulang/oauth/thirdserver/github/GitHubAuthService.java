@@ -8,9 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 /**
- * @author Aulang
- * @email aulang@qq.com
- * @date 2019-12-7 17:54
+ * @author wulang
  */
 @Service
 public class GitHubAuthService extends AbstractAuthService {

@@ -3,9 +3,7 @@ package cn.aulang.oauth.thirdserver.impl;
 import cn.aulang.oauth.thirdserver.core.Profile;
 
 /**
- * @author Aulang
- * @email aulang@qq.com
- * @date 2019-12-7 17:23
+ * @author wulang
  */
 public abstract class AbstractProfile implements Profile {
 

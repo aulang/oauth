@@ -1,16 +1,14 @@
 package cn.aulang.oauth.thirdserver.qq;
 
+import cn.aulang.oauth.thirdserver.impl.AbstractAuthService;
 import cn.aulang.oauth.entity.ThirdServer;
 import cn.aulang.oauth.manage.ThirdAccountBiz;
-import cn.aulang.oauth.thirdserver.impl.AbstractAuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 /**
- * @author Aulang
- * @email aulang@qq.com
- * @date 2019-12-7 17:54
+ * @author wulang
  */
 @Service
 public class QQAuthService extends AbstractAuthService {

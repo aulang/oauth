@@ -3,15 +3,15 @@ package cn.aulang.oauth.manage;
 import cn.aulang.oauth.entity.AuthRequest;
 import cn.aulang.oauth.repository.AuthRequestReRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
-import java.util.Set;
+import java.util.Date;
 
 /**
- * @author Aulang
- * @email aulang@qq.com
- * @date 2019-12-4 21:26
+ * @author wulang
  */
 @Service
 public class AuthRequestBiz {
@@ -23,33 +23,10 @@ public class AuthRequestBiz {
         this.dao = dao;
     }
 
-    public AuthRequest createAndSave(String accountId,
-                                     String clientId,
-                                     String authorizationGrant,
-                                     String redirectUri,
-                                     Set<String> scopes,
-                                     String codeChallenge,
-                                     String state) {
-
-        AuthRequest request = new AuthRequest();
-
-        request.setAccountId(accountId);
-        request.setAuthenticated(true);
-
-        request.setClientId(clientId);
-        request.setAuthorizationGrant(authorizationGrant);
-        request.setRedirectUri(redirectUri);
-        request.setScopes(scopes);
-        request.setCodeChallenge(codeChallenge);
-        request.setState(state);
-
-        return dao.save(request);
-    }
-
+    @CachePut(cacheNames = "AuthRequest", key = "#result.id")
     public AuthRequest createAndSave(String clientId,
-                                     String authorizationGrant,
+                                     String authGrant,
                                      String redirectUri,
-                                     Set<String> scopes,
                                      String codeChallenge,
                                      String state) {
 
@@ -57,23 +34,34 @@ public class AuthRequestBiz {
 
         request.setAccountId(null);
         request.setAuthenticated(false);
+        request.setMustChpwd(false);
 
         request.setClientId(clientId);
-        request.setAuthorizationGrant(authorizationGrant);
+        request.setAuthGrant(authGrant);
         request.setRedirectUri(redirectUri);
-        request.setScopes(scopes);
         request.setCodeChallenge(codeChallenge);
         request.setState(state);
 
-        return dao.save(request);
+        request.setCreateDate(new Date());
+
+        dao.save(request);
+        return request;
     }
 
+    @CachePut(cacheNames = "AuthRequest", key = "#entity.id")
     public AuthRequest save(AuthRequest entity) {
-        return dao.save(entity);
+        entity.setUpdateDate(new Date());
+        dao.save(entity);
+        return entity;
     }
 
-    public AuthRequest findOne(String id) {
-        Optional<AuthRequest> optional = dao.findById(id);
-        return optional.orElse(null);
+    @Cacheable(cacheNames = "AuthRequest", key = "#id")
+    public AuthRequest get(String id) {
+        return dao.findById(id).orElse(null);
+    }
+
+    @CacheEvict(cacheNames = "AuthRequest", key = "#id")
+    public void delete(String id) {
+        dao.deleteById(id);
     }
 }

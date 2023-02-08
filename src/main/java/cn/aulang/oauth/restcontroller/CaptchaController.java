@@ -1,6 +1,7 @@
 package cn.aulang.oauth.restcontroller;
 
 import cn.aulang.oauth.captcha.CaptchaFactory;
+import cn.aulang.oauth.common.Constants;
 import cn.aulang.oauth.entity.AuthRequest;
 import cn.aulang.oauth.manage.AccountBiz;
 import cn.aulang.oauth.manage.AuthRequestBiz;
@@ -21,10 +22,9 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
 /**
- * @author Aulang
- * @email aulang@aq.com
- * @date 2019/12/5 10:15
  * 验证码服务
+ *
+ * @author wulang
  */
 @Slf4j
 @RestController
@@ -43,7 +43,7 @@ public class CaptchaController {
 
     @GetMapping(path = "/api/captcha/{authorizeId}", produces = MediaType.IMAGE_PNG_VALUE)
     public ResponseEntity<StreamingResponseBody> captcha(@PathVariable String authorizeId) {
-        AuthRequest request = requestBiz.findOne(authorizeId);
+        AuthRequest request = requestBiz.get(authorizeId);
         if (request != null) {
             Captcha captcha = factory.create();
 
@@ -59,7 +59,7 @@ public class CaptchaController {
 
     @GetMapping(path = "/api/captcha/{authorizeId}/{code}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Boolean> captcha(@PathVariable String authorizeId, @PathVariable String code) {
-        AuthRequest request = requestBiz.findOne(authorizeId);
+        AuthRequest request = requestBiz.get(authorizeId);
         if (request != null && code.equals(request.getCaptcha())) {
             return ResponseEntity.ok(true);
         } else {
@@ -68,15 +68,15 @@ public class CaptchaController {
     }
 
     @PostMapping(path = "/api/captcha", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Object> captcha(@RequestParam(name = "authorize_id", required = false) String authorizeId,
-                                          @RequestParam(name = "client_id", required = false) String clientId,
-                                          @RequestParam(name = "mobile") String mobile) {
+    public ResponseEntity<?> captcha(@RequestParam(name = "authorize_id", required = false) String authorizeId,
+                                     @RequestParam(name = "client_id", required = false) String clientId,
+                                     @RequestParam(name = "mobile") String mobile) {
         AuthRequest request;
         if (StrUtil.isNotBlank(authorizeId)) {
             // Web端
-            request = requestBiz.findOne(authorizeId);
+            request = requestBiz.get(authorizeId);
             if (request == null) {
-                return ResponseEntity.badRequest().body("登录请求不存在或已失效");
+                return ResponseEntity.badRequest().body(Constants.error(HttpStatus.BAD_REQUEST.value(), "登录请求不存在或已失效"));
             }
         } else if (StrUtil.isNotBlank(clientId)) {
             // 移动端
@@ -85,7 +85,7 @@ public class CaptchaController {
             // 移动端验证码登录没有redirectUri默认填充captcha
             request.setRedirectUri("captcha");
         } else {
-            return ResponseEntity.badRequest().body("参数不合法");
+            return ResponseEntity.badRequest().body(Constants.error(HttpStatus.BAD_REQUEST.value(), "参数不合法"));
         }
 
         String captcha = RandomUtil.randomNumbers(6);
@@ -100,7 +100,8 @@ public class CaptchaController {
             accountId = result.getAccountId();
         } catch (Exception e) {
             log.error("发送验证码失败", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("发送验证码失败");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Constants.error(HttpStatus.INTERNAL_SERVER_ERROR.value(), "发送验证码失败"));
         }
 
         request.setMobile(mobile);
@@ -110,7 +111,7 @@ public class CaptchaController {
 
         // 不能返回给前端
         result.setAccountId(null);
-        result.setRequestId(request.getId());
+        result.setAuthorizeId(request.getId());
 
         return ResponseEntity.ok(result);
     }

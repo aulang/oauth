@@ -6,9 +6,7 @@ import com.pig4cloud.captcha.ArithmeticCaptcha;
 import java.awt.*;
 
 /**
- * @author Aulang
- * @email aulang@aq.com
- * @date 2020-05-02 23:38
+ * @author wulang
  */
 public class MathCaptcha extends ArithmeticCaptcha {
 

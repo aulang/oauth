@@ -9,7 +9,6 @@ import cn.aulang.oauth.entity.Client;
 import cn.aulang.oauth.exception.PasswordExpiredException;
 import cn.aulang.oauth.manage.AccountBiz;
 import cn.aulang.oauth.manage.AccountTokenBiz;
-import cn.aulang.oauth.manage.ApprovedScopeBiz;
 import cn.aulang.oauth.manage.AuthCodeBiz;
 import cn.aulang.oauth.manage.AuthRequestBiz;
 import cn.aulang.oauth.manage.ClientBiz;
@@ -18,6 +17,7 @@ import cn.aulang.oauth.model.AccessToken;
 import cn.hutool.core.codec.Base64;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.digest.DigestUtil;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -31,16 +31,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.security.auth.login.AccountLockedException;
-import javax.servlet.http.HttpServletResponse;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-import java.util.regex.Pattern;
+import java.util.Objects;
 
 /**
- * @author Aulang
- * @email aulang@aq.com
- * @date 2019/12/1 14:39
+ * @author wulang
  */
 @Controller
 public class OAuthController {
@@ -51,18 +46,16 @@ public class OAuthController {
     private final AccountTokenBiz tokenBiz;
     private final AuthRequestBiz requestBiz;
     private final ReturnPageBiz returnPageBiz;
-    private final ApprovedScopeBiz approvedScopeBiz;
 
     @Autowired
-    public OAuthController(AuthCodeBiz codeBiz, ClientBiz clientBiz, AccountBiz accountBiz, AccountTokenBiz tokenBiz,
-                           AuthRequestBiz requestBiz, ReturnPageBiz returnPageBiz, ApprovedScopeBiz approvedScopeBiz) {
+    public OAuthController(AuthCodeBiz codeBiz, ClientBiz clientBiz, AccountBiz accountBiz,
+                           AccountTokenBiz tokenBiz, AuthRequestBiz requestBiz, ReturnPageBiz returnPageBiz) {
         this.codeBiz = codeBiz;
         this.clientBiz = clientBiz;
         this.accountBiz = accountBiz;
         this.tokenBiz = tokenBiz;
         this.requestBiz = requestBiz;
         this.returnPageBiz = returnPageBiz;
-        this.approvedScopeBiz = approvedScopeBiz;
     }
 
     /**
@@ -71,96 +64,68 @@ public class OAuthController {
     @GetMapping("/authorize")
     public String authorize(@RequestParam(name = "client_id") String clientId,
                             @RequestParam(name = "response_type") String responseType,
-                            @RequestParam(name = "redirect_uri", required = false) String redirectUri,
-                            @RequestParam(name = "scope", required = false) List<String> requestScopes,
+                            @RequestParam(name = "redirect_uri") String redirectUri,
                             @RequestParam(name = "state", required = false) String state,
                             @RequestParam(name = "code_challenge", required = false) String codeChallenge,
-                            @CookieValue(name = Constants.SSO_COOKIE_NAME, required = false) String accessToken,
+                            @CookieValue(name = Constants.SSO_COOKIE_NAME, required = false) String authorizeId,
                             HttpServletResponse response, Model model) {
-        Client client = clientBiz.findOne(clientId);
+        Client client = clientBiz.get(clientId);
         if (client == null) {
             // clientId不存在
             return Constants.errorPage(model, "无效的client_id");
         }
 
-        String authorizationGrant = OAuthConstants.AuthorizationGrant.typeOf(responseType);
-        if (authorizationGrant == null) {
+        String authGrant = OAuthConstants.AuthorizationGrant.typeOf(responseType);
+        if (authGrant == null) {
             return Constants.errorPage(model, "无效的response_type");
         }
 
-        if (!client.getAuthorizationGrants().contains(authorizationGrant)) {
+        if (!client.getAuthorizationGrants().contains(authGrant)) {
             return Constants.errorPage(model, "未授权的response_type");
         }
 
-        String registeredUri = redirectUri;
-        Set<String> registeredUrls = client.getRegisteredRedirectUris();
+        List<String> registeredUrls = client.getRegisteredUris();
         if (redirectUri != null) {
-            boolean result = registeredUrls.parallelStream().anyMatch(url -> {
-                Pattern pattern = Pattern.compile(url, Pattern.CASE_INSENSITIVE);
-                return pattern.matcher(redirectUri).matches();
-            });
+            boolean result = registeredUrls.parallelStream().anyMatch(url -> StrUtil.startWith(redirectUri, url, true));
             if (!result) {
                 return Constants.errorPage(model, "未注册的redirect_uri");
             }
-        } else {
-            if (registeredUrls.size() == 1) {
-                registeredUri = registeredUrls.iterator().next();
-            } else {
-                return Constants.errorPage(model, "缺失redirect_uri");
-            }
         }
 
-        Set<String> scopes = new HashSet<>();
-        if (requestScopes != null) {
-            if (!client.getScopes().keySet().containsAll(requestScopes)) {
-                return Constants.errorPage(model, "无效的scope");
-            }
-            scopes.addAll(requestScopes);
-        } else {
-            scopes.addAll(client.getAutoApprovedScopes());
-        }
+        AuthRequest request = null;
+        if (authorizeId != null) {
+            request = requestBiz.get(authorizeId);
+            if (request != null) {
+                if (!Objects.equals(clientId, request.getClientId())
+                        || !Objects.equals(authGrant, request.getAuthGrant())
+                        || !Objects.equals(redirectUri, request.getRedirectUri())
+                        || !Objects.equals(codeChallenge, request.getCodeChallenge())
+                        || !Objects.equals(state, request.getState())) {
 
-        if (accessToken != null) {
-            AccountToken accountToken = tokenBiz.findByAccessToken(accessToken);
-            if (accountToken != null) {
-                AuthRequest request = requestBiz.createAndSave(accountToken.getAccountId(), clientId,
-                        authorizationGrant, registeredUri, scopes, codeChallenge, state);
+                    request.setClientId(clientId);
+                    request.setAuthGrant(authGrant);
+                    request.setRedirectUri(redirectUri);
+                    request.setCodeChallenge(codeChallenge);
+                    request.setState(state);
+                    requestBiz.save(request);
+                }
 
-                if (accountToken.getScopes().containsAll(scopes)) {
-                    return returnPageBiz.redirect(request, response, model);
-                } else {
-                    return returnPageBiz.approvalPage(request, response, model);
+                if (request.getAuthenticated()) {
+                    if (request.getMustChpwd() != null && request.getMustChpwd()) {
+                        return returnPageBiz.changePwdPage(request, model);
+                    }
+
+                    return returnPageBiz.redirect(request, model);
                 }
             }
         }
 
-        // 保存登录认证请求信息，重定向登录页面
-        AuthRequest request = requestBiz.createAndSave(clientId, authorizationGrant,
-                registeredUri, scopes, codeChallenge, state);
-        return returnPageBiz.loginPage(request, client, model);
-    }
-
-    @PostMapping("/approval")
-    public String approval(@RequestParam(name = "authorize_id") String authorizeId,
-                           @RequestParam(name = "scopes", required = false) String[] scopes,
-                           @RequestParam(name = "authorized", defaultValue = "true") boolean authorized,
-                           HttpServletResponse response, Model model) {
-        AuthRequest request = requestBiz.findOne(authorizeId);
         if (request == null) {
-            return Constants.errorPage(model, "登录请求不存在或已失效");
+            request = requestBiz.createAndSave(clientId, authGrant, redirectUri, codeChallenge, state);
         }
 
-        Client client = clientBiz.findOne(request.getClientId());
-        if (client == null) {
-            return Constants.errorPage(model, "无效的客户端");
-        }
-
-        if (authorized) {
-            approvedScopeBiz.save(client, request.getAccountId(), scopes);
-            return returnPageBiz.grantToken(request, response, model);
-        } else {
-            return returnPageBiz.rejectToken(request);
-        }
+        Constants.setSsoCookie(response, request.getId());
+        return returnPageBiz.loginPage(request, client, model);
     }
 
     /**
@@ -182,148 +147,136 @@ public class OAuthController {
      */
     @ResponseBody
     @PostMapping(path = "/token", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Object> token(@RequestParam(name = "client_id") String clientId,
-                                        @RequestParam(name = "grant_type") String grantType,
+    public ResponseEntity<?> token(@RequestParam(name = "client_id") String clientId,
+                                   @RequestParam(name = "grant_type") String grantType,
 
-                                        @RequestParam(name = "code", required = false) String code,
-                                        @RequestParam(name = "client_secret", required = false) String clientSecret,
-                                        @RequestParam(name = "redirect_uri", required = false) String redirectUri,
-                                        @RequestParam(name = "code_verifier", required = false) String codeVerifier,
+                                   @RequestParam(name = "code", required = false) String code,
+                                   @RequestParam(name = "client_secret", required = false) String clientSecret,
+                                   @RequestParam(name = "redirect_uri", required = false) String redirectUri,
+                                   @RequestParam(name = "code_verifier", required = false) String codeVerifier,
 
-                                        @RequestParam(name = "username", required = false) String username,
-                                        @RequestParam(name = "password", required = false) String password,
+                                   @RequestParam(name = "username", required = false) String username,
+                                   @RequestParam(name = "password", required = false) String password,
 
-                                        @RequestParam(name = "refresh_token", required = false) String refreshToken,
-                                        HttpServletResponse response) {
-        Client client = clientBiz.findOne(clientId);
+                                   @RequestParam(name = "refresh_token", required = false) String refreshToken) {
+        Client client = clientBiz.get(clientId);
         if (client == null) {
-            return ResponseEntity.badRequest().body(Constants.error("无效的客户端"));
+            return ResponseEntity.badRequest().body(Constants.error(HttpStatus.BAD_REQUEST.value(), "无效的客户端"));
         }
 
         if (!client.getAuthorizationGrants().contains(grantType)) {
-            return ResponseEntity.badRequest().body(Constants.error("未授权的grantType"));
+            return ResponseEntity.badRequest().body(Constants.error(HttpStatus.BAD_REQUEST.value(), "未授权的grantType"));
         }
 
         switch (grantType.toLowerCase()) {
             case OAuthConstants.AuthorizationGrant.PASSWORD -> {
                 // 密码模式
                 if (StrUtil.hasBlank(username, password)) {
-                    return ResponseEntity.badRequest().body(Constants.error("账号和密码不能为空"));
+                    return ResponseEntity.badRequest().body(Constants.error(HttpStatus.BAD_REQUEST.value(), "账号和密码不能为空"));
                 }
 
                 try {
                     String accountId = accountBiz.login(username, password);
                     if (accountId != null) {
-                        Set<String> scopes = client.getAutoApprovedScopes();
-                        AccountToken accountToken = tokenBiz.create(clientId, scopes, grantType, accountId);
+                        AccountToken accountToken = tokenBiz.create(clientId, grantType, accountId);
 
                         AccessToken accessToken = AccessToken.create(accountToken.getAccessToken(),
-                                accountToken.getRefreshToken(), client.getAccessTokenValiditySeconds());
-
-                        // 设置单点登录Cookie
-                        Constants.setSsoCookie(response, accessToken.getAccessToken());
+                                accountToken.getRefreshToken(), client.getAccessTokenExpiresIn());
 
                         return ResponseEntity.ok(accessToken);
                     } else {
-                        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Constants.error("账号或密码错误"));
+                        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                                .body(Constants.error(HttpStatus.UNAUTHORIZED.value(), "账号或密码错误"));
                     }
                 } catch (AccountLockedException e) {
-                    return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Constants.error("账号被锁定，请申诉解锁"));
+                    return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE)
+                            .body(Constants.error(HttpStatus.NOT_ACCEPTABLE.value(), "账号被锁定，请申诉解锁"));
                 } catch (PasswordExpiredException e) {
-                    return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(Constants.error("密码过期，必须修改密码"));
+                    return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE)
+                            .body(Constants.error(HttpStatus.NOT_ACCEPTABLE.value(), "密码过期，必须修改密码"));
                 } catch (Exception e) {
-                    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Constants.error("账号或密码错误"));
+                    return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                            .body(Constants.error(HttpStatus.UNAUTHORIZED.value(), "账号或密码错误"));
                 }
             }
             case OAuthConstants.AuthorizationGrant.AUTHORIZATION_CODE -> {
                 // 授权码模式
                 if (StrUtil.isBlank(code)) {
-                    return ResponseEntity.badRequest().body(Constants.error("code不能为空"));
+                    return ResponseEntity.badRequest().body(Constants.error(HttpStatus.BAD_REQUEST.value(), "code不能为空"));
                 }
 
                 AuthCode authCode = codeBiz.consumeCode(code);
                 if (authCode == null) {
-                    return ResponseEntity.badRequest().body(Constants.error("无效code"));
+                    return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                            .body(Constants.error(HttpStatus.UNAUTHORIZED.value(), "无效的code"));
                 }
 
                 if (!authCode.getRedirectUri().equalsIgnoreCase(redirectUri)) {
-                    return ResponseEntity.badRequest().body(Constants.error("redirect_uri不匹配"));
+                    return ResponseEntity.badRequest().body(Constants.error(HttpStatus.BAD_REQUEST.value(), "redirect_uri不匹配"));
                 }
 
                 if (StrUtil.isNotBlank(authCode.getCodeChallenge())) {
                     // codeVerifier验证
                     if (StrUtil.isBlank(codeVerifier)) {
-                        return ResponseEntity.badRequest().body(Constants.error("code_verifier不能为空"));
+                        return ResponseEntity.badRequest()
+                                .body(Constants.error(HttpStatus.BAD_REQUEST.value(), "code_verifier不能为空"));
                     }
 
                     String codeChallenge = Base64.encodeUrlSafe(DigestUtil.sha256(codeVerifier));
                     if (!codeChallenge.equals(authCode.getCodeChallenge())) {
-                        return ResponseEntity.badRequest().body(Constants.error("code_verifier错误"));
+                        return ResponseEntity.badRequest().body(Constants.error(HttpStatus.BAD_REQUEST.value(), "code_verifier错误"));
                     }
                 } else {
                     // clientSecret验证
                     if (StrUtil.isBlank(clientSecret)) {
-                        return ResponseEntity.badRequest().body(Constants.error("clientSecret不能为空"));
+                        return ResponseEntity.badRequest()
+                                .body(Constants.error(HttpStatus.BAD_REQUEST.value(), "clientSecret不能为空"));
                     }
 
                     if (!client.getSecret().equals(clientSecret)) {
-                        return ResponseEntity.badRequest().body(Constants.error("client_secret错误"));
+                        return ResponseEntity.badRequest().body(Constants.error(HttpStatus.BAD_REQUEST.value(), "client_secret错误"));
                     }
                 }
 
                 AccountToken accountToken = tokenBiz.createByCode(authCode);
 
                 AccessToken accessToken = AccessToken.create(accountToken.getAccessToken(),
-                        accountToken.getRefreshToken(), client.getAccessTokenValiditySeconds());
-
-                // 设置单点登录Cookie
-                Constants.setSsoCookie(response, accessToken.getAccessToken());
+                        accountToken.getRefreshToken(), client.getAccessTokenExpiresIn());
 
                 return ResponseEntity.ok(accessToken);
             }
             case OAuthConstants.AuthorizationGrant.REFRESH_TOKEN -> {
                 // 刷新access_token
                 if (StrUtil.isBlank(refreshToken)) {
-                    return ResponseEntity.badRequest().body(Constants.error("refresh_token不能为空"));
+                    return ResponseEntity.badRequest().body(Constants.error(HttpStatus.BAD_REQUEST.value(), "refresh_token不能为空"));
                 }
 
                 AccountToken accountToken = tokenBiz.refreshAccessToken(refreshToken);
                 if (accountToken != null) {
                     AccessToken accessToken = AccessToken.create(accountToken.getAccessToken(),
-                            accountToken.getRefreshToken(), client.getAccessTokenValiditySeconds());
-
-                    // 设置单点登录Cookie
-                    Constants.setSsoCookie(response, accessToken.getAccessToken());
+                            accountToken.getRefreshToken(), client.getAccessTokenExpiresIn());
 
                     return ResponseEntity.ok(accessToken);
                 } else {
-                    return ResponseEntity.badRequest().body(Constants.error("无效的refresh_token"));
+                    return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                            .body(Constants.error(HttpStatus.UNAUTHORIZED.value(), "无效的refresh_token"));
                 }
             }
             case OAuthConstants.AuthorizationGrant.CLIENT_CREDENTIALS -> {
                 // 凭证式
                 if (!client.getSecret().equals(clientSecret)) {
-                    return ResponseEntity.badRequest().body(Constants.error("client_secret错误"));
+                    return ResponseEntity.badRequest().body(Constants.error(HttpStatus.BAD_REQUEST.value(), "client_secret错误"));
                 }
 
-                // 凭证模式的取Client里配置的accountId
-                String accountId = client.getAccountId();
-                if (StrUtil.isBlank(accountId)) {
-                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Constants.error("服务端配置错误"));
-                }
-
-                AccountToken accountToken = tokenBiz.create(clientId, client.getAutoApprovedScopes(), grantType, accountId);
+                AccountToken accountToken = tokenBiz.create(clientId, grantType, "N/A");
 
                 AccessToken accessToken = AccessToken.create(accountToken.getAccessToken(),
-                        accountToken.getRefreshToken(), client.getAccessTokenValiditySeconds());
-
-                // 设置单点登录Cookie
-                Constants.setSsoCookie(response, accessToken.getAccessToken());
+                        accountToken.getRefreshToken(), client.getAccessTokenExpiresIn());
 
                 return ResponseEntity.ok(accessToken);
             }
             default -> {
-                return ResponseEntity.badRequest().body(Constants.error("无效的grantType"));
+                return ResponseEntity.badRequest().body(Constants.error(HttpStatus.BAD_REQUEST.value(), "无效的grantType"));
             }
         }
     }

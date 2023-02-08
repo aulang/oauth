@@ -2,15 +2,16 @@ package cn.aulang.oauth.manage;
 
 import cn.aulang.oauth.entity.Client;
 import cn.aulang.oauth.repository.ClientRepository;
+import cn.hutool.core.util.StrUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
+import java.util.Date;
 
 /**
- * @author Aulang
- * @email aulang@aq.com
- * @date 2019/12/1 14:42
+ * @author wulang
  */
 @Service
 public class ClientBiz {
@@ -22,16 +23,22 @@ public class ClientBiz {
         this.dao = dao;
     }
 
+    @CacheEvict(cacheNames = "client", key = "#result.id")
     public Client save(Client entity) {
-        return dao.save(entity);
+        if (StrUtil.isBlank(entity.getId())) {
+            entity.setUpdateDate(null);
+            entity.setCreateDate(new Date());
+        } else {
+            entity.setCreateDate(null);
+            entity.setUpdateDate(new Date());
+        }
+
+        dao.save(entity);
+        return entity;
     }
 
-    public Client getOne() {
-        return dao.findFirstByEnabled(true);
-    }
-
-    public Client findOne(String id) {
-        Optional<Client> optional = dao.findById(id);
-        return optional.orElse(null);
+    @Cacheable(cacheNames = "Client", key = "#id")
+    public Client get(String id) {
+        return dao.findById(id).orElse(null);
     }
 }

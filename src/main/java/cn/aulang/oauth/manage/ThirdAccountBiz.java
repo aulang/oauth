@@ -6,11 +6,12 @@ import cn.aulang.oauth.repository.ThirdAccountRepository;
 import cn.aulang.oauth.thirdserver.core.Profile;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Date;
 
 /**
- * @author Aulang
- * @email aulang@qq.com
- * @date 2019-12-7 17:29
+ * @author wulang
  */
 @Service
 public class ThirdAccountBiz {
@@ -20,40 +21,54 @@ public class ThirdAccountBiz {
 
     @Autowired
     public ThirdAccountBiz(AccountBiz accountBiz, ThirdAccountRepository dao) {
-        this.accountBiz = accountBiz;
         this.dao = dao;
+        this.accountBiz = accountBiz;
     }
 
     public ThirdAccount getAccount(Profile profile) {
-        String profileId = profile.getId();
-        String serverName = profile.getServerName();
-        return dao.findByThirdTypeAndThirdId(serverName, profileId);
+        return dao.findByThirdTypeAndThirdId(profile.getServerName(), profile.getId());
     }
 
+    @Transactional(rollbackFor = Exception.class)
     public Account register(Profile profile) {
+        String thirdId = profile.getId();
+        String thirdName = profile.getUsername();
+        String thirdType = profile.getServerName();
+        String username = thirdType + "-" + thirdId;
+
         Account account = new Account();
-        account.setNickname(profile.getUsername());
+        account.setUsername(username);
+        account.setNickname(thirdName);
         account = accountBiz.register(account);
 
-        ThirdAccount thirdAccount = new ThirdAccount();
-        thirdAccount.setThirdId(profile.getId());
-        thirdAccount.setThirdName(profile.getUsername());
-        thirdAccount.setAccountId(account.getId());
-        thirdAccount.setThirdType(profile.getServerName());
+        ThirdAccount entity = new ThirdAccount();
 
-        thirdAccount.setProfile(profile.getOriginInfo());
+        entity.setThirdId(thirdId);
+        entity.setThirdType(thirdType);
+        entity.setThirdName(thirdName);
+        entity.setAccountId(account.getId());
+        entity.setProfile(profile.getOriginInfo());
 
-        dao.save(thirdAccount);
+        entity.setUpdateDate(null);
+        entity.setCreateDate(new Date());
+
+        dao.save(entity);
 
         return account;
     }
 
     public ThirdAccount bind(String accountId, Profile profile) {
-        ThirdAccount thirdAccount = new ThirdAccount();
-        thirdAccount.setAccountId(accountId);
-        thirdAccount.setThirdId(profile.getId());
-        thirdAccount.setThirdName(profile.getUsername());
-        thirdAccount.setThirdType(profile.getServerName());
-        return dao.save(thirdAccount);
+        ThirdAccount entity = new ThirdAccount();
+
+        entity.setAccountId(accountId);
+        entity.setThirdId(profile.getId());
+        entity.setThirdName(profile.getUsername());
+        entity.setThirdType(profile.getServerName());
+
+        entity.setUpdateDate(new Date());
+        entity.setCreateDate(null);
+
+        dao.save(entity);
+        return entity;
     }
 }

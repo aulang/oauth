@@ -1,17 +1,14 @@
 package cn.aulang.oauth.repository;
 
 import cn.aulang.oauth.entity.ThirdAccount;
-import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 /**
- * @author Aulang
- * @email aulang@qq.com
- * @date 2019-12-7 17:30
+ * @author wulang
  */
 @Repository
-public interface ThirdAccountRepository extends MongoRepository<ThirdAccount, String> {
+public interface ThirdAccountRepository extends JpaRepository<ThirdAccount, String> {
 
     ThirdAccount findByThirdTypeAndThirdId(String thirdType, String thirdId);
-
 }

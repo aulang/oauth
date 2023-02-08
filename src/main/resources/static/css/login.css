@@ -1,14 +1,32 @@
 body {
   display: flex;
-  align-items: center;
   padding-top: 40px;
   padding-bottom: 40px;
+  align-items: center;
   background-color: #f5f5f5;
 }
 
+.main {
+  width: 100%;
+  height: 100%;
+  position: fixed;
+  background-size: cover;
+  background-image: url("../img/bg.jpg");
+}
+
+#particles-js {
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  position: absolute;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: 50% 50%;
+}
+
 .logo {
-  width: 8rem;
-  height: 8rem;
+  width: 422px;
+  height: 138px;
 }
 
 .captcha-img {
@@ -18,12 +36,12 @@ body {
 
 .form-login {
   width: 100%;
-  max-width: 330px;
+  max-width: 350px;
   padding: 15px;
   margin: auto;
 }
 
-.form-login .checkbox {
+.form-login .fw400 {
   font-weight: 400;
 }
 

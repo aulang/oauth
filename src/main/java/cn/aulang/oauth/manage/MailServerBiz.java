@@ -1,36 +1,37 @@
 package cn.aulang.oauth.manage;
 
-import cn.aulang.oauth.entity.MailServer;
 import cn.aulang.oauth.repository.MailServerRepository;
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.crypto.SecureUtil;
 import cn.hutool.crypto.symmetric.AES;
+import cn.aulang.oauth.entity.MailServer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 import static cn.aulang.oauth.common.Constants.DEFAULT_KEY;
 
 /**
- * @author Aulang
- * @email aulang@aq.com
- * @date 2020-08-14 13:32
+ * @author wulang
  */
 @Service
 public class MailServerBiz {
 
-    private final MailServerRepository repository;
+    private final MailServerRepository dao;
 
     @Autowired
-    public MailServerBiz(MailServerRepository repository) {
-        this.repository = repository;
+    public MailServerBiz(MailServerRepository dao) {
+        this.dao = dao;
     }
 
     private MailServer server = null;
     private final AES aes = SecureUtil.aes(DEFAULT_KEY);
 
     public MailServer save(MailServer entity) {
-        server = repository.save(entity);
+        dao.save(entity);
 
-        server.setPass(aes.decryptStr(server.getPass()));
+        server.setPassword(aes.decryptStr(server.getPassword()));
 
         return server;
     }
@@ -40,22 +41,15 @@ public class MailServerBiz {
             return server;
         }
 
-        server = repository.findFirstBy();
+        List<MailServer> servers = dao.findAll();
 
-        if (server == null) {
-            server = new MailServer();
-            server.setHost("smtp.aliyun.com");
-            server.setPort(465);
-            server.setSslEnable(true);
-            server.setAuth(true);
-            server.setUser("aulang@aliyun.com");
-            server.setPass(aes.encryptHex("123456"));
-            server.setFrom("aulang@aliyun.com");
-            return repository.save(server);
+        if (CollectionUtil.isEmpty(servers)) {
+            return null;
+        } else {
+            server = servers.get(0);
+            // 解密密码，会有解密失败异常
+            server.setPassword(aes.decryptStr(server.getPassword()));
         }
-
-        // 解密密码，会有解密失败异常
-        server.setPass(aes.decryptStr(server.getPass()));
 
         return server;
     }

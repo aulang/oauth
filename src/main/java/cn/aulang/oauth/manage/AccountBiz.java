@@ -13,14 +13,12 @@ import cn.hutool.core.util.DesensitizedUtil;
 import cn.hutool.core.util.StrUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.security.auth.login.AccountLockedException;
-import java.util.Optional;
 
 /**
- * @author Aulang
- * @email aulang@aq.com
- * @date 2019/12/5 10:16
+ * @author wulang
  */
 @Service
 public class AccountBiz {
@@ -38,36 +36,21 @@ public class AccountBiz {
         this.unlockBiz = unlockBiz;
     }
 
-    public Account getOne() {
-        return dao.findFirstByStatus(Account.ENABLED);
-    }
-
     public Account save(Account entity) {
-        return dao.save(entity);
+        dao.save(entity);
+        return entity;
     }
 
-    public Account findByUsername(String username) {
-        return dao.findByUsername(username);
-    }
-
-    public Account findByMobile(String mobile) {
-        return dao.findByMobile(mobile);
-    }
-
-    public Account findByEmail(String email) {
-        return dao.findByEmail(email);
-    }
-
-    public Account findByLoginName(String loginName) {
-        return dao.findByUsernameOrMobileOrEmail(loginName, loginName, loginName);
+    public Account getByLoginName(String loginName) {
+        return dao.findByLoginName(loginName);
     }
 
     public SendCaptchaResult sendCaptcha(String loginName, String captcha) throws RuntimeException {
-        Account account = findByLoginName(loginName);
+        Account account = getByLoginName(loginName);
         if (account != null) {
             String content = "您申请的验证码是：" + captcha;
 
-            String mobile = account.getMobile();
+            String mobile = account.getPhone();
             String email = account.getEmail();
 
             int result;
@@ -96,54 +79,67 @@ public class AccountBiz {
 
     public String login(String loginName, String password)
             throws PasswordExpiredException, AccountLockedException {
-        Account account = findByLoginName(loginName);
-
+        Account account = getByLoginName(loginName);
         if (account == null) {
             return null;
         }
 
+        String passwordBcrypt = account.getPassword();
+
         // 判断账号是否被禁用
-        if (Account.DISABLED == account.getStatus()) {
+        if (account.getLocked()) {
             throw new AccountLockedException("账号被锁定，请稍后再试");
         }
 
-        if (!PasswordUtils.bcryptCheck(password, account.getPassword())) {
-            int passwordErrorTimes = account.getPasswordErrorTimes();
-            account.setPasswordErrorTimes(++passwordErrorTimes);
+        int triedTimes = account.getTriedTimes() + 1;
+
+        if (!PasswordUtils.bcryptCheck(password, passwordBcrypt)) {
+            account.setTriedTimes(triedTimes);
 
             // 密码连续错误一定次锁定账号，5分钟后自动解锁
-            if (passwordErrorTimes > Constants.MAX_PASSWORD_ERROR_TIMES) {
+            if (triedTimes > Constants.MAX_PASSWORD_ERROR_TIMES) {
                 // 禁用账号
-                account.setStatus(Account.DISABLED);
+                account.setLocked(true);
                 dao.save(account);
-
                 // 延迟解锁
                 unlockBiz.delayUnlock(account.getId());
-
+                // 抛出异常
                 throw new AccountLockedException("账号被锁定，请稍后再试");
             } else {
+                // 报错密码连续错误次数
                 dao.save(account);
+                // 账号或密码错误
                 return null;
             }
         }
 
-        if (account.isMustChangePassword()) {
-            String reason = account.getMustChangePasswordReason();
+        if (account.getMustChpwd()) {
+            String reason = account.getChpwdReason();
             if (StrUtil.isBlank(reason)) {
                 reason = "请修改密码";
             }
             throw new PasswordExpiredException(reason, account.getId());
         }
 
+        if (triedTimes > Constants.MAX_PASSWORD_ERROR_TIMES) {
+            // 登录成功，清除计数器
+            account.setTriedTimes(0);
+            dao.save(account);
+        }
+
         return account.getId();
     }
 
-    public String changePassword(String id, String password, boolean mustChangePassword) {
-        Optional<Account> optional = dao.findById(id);
-        if (optional.isPresent()) {
-            Account account = optional.get();
-            account.setPassword(PasswordUtils.bcrypt(password));
-            account.setMustChangePassword(mustChangePassword);
+    @Transactional(rollbackFor = Exception.class)
+    public String changePwd(String id, String password) {
+        Account account = dao.findById(id).orElse(null);
+        if (account != null) {
+            String newPassword = PasswordUtils.bcrypt(password);
+
+            account.setPassword(newPassword);
+            account.setMustChpwd(false);
+            account.setLocked(false);
+            account.setTriedTimes(0);
             dao.save(account);
             return id;
         }
@@ -151,19 +147,16 @@ public class AccountBiz {
     }
 
     public Account register(Account account) {
-        String password = account.getPassword();
-        if (password != null) {
-            account.setPassword(PasswordUtils.bcrypt(password));
-        }
-        return dao.save(account);
+        dao.save(account);
+        return account;
     }
 
-    public Profile getUser(String id) {
-        Optional<Account> optional = dao.findById(id);
-        if (optional.isEmpty()) {
+    public Profile getProfile(String id, String clientId) {
+        Account account = dao.findById(id).orElse(null);
+        if (account == null) {
             return null;
         }
-        Account account = optional.get();
-        return new Profile(account.getId(), account.getNickname());
+
+        return new Profile(account.getId(), account.getUsername(), account.getNickname(), clientId);
     }
 }

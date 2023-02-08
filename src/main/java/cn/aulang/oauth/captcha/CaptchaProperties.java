@@ -4,9 +4,7 @@ import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
- * @author Aulang
- * @email aulang@aq.com
- * @date 2019/12/5 10:25
+ * @author wulang
  */
 @Data
 @ConfigurationProperties("captcha")

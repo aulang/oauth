@@ -1,9 +1,7 @@
 package cn.aulang.oauth.common;
 
 /**
- * @author Aulang
- * @email aulang@aq.com
- * @date 2019/12/2 13:45
+ * @author wulang
  */
 public interface OAuthConstants {
 
@@ -14,6 +12,8 @@ public interface OAuthConstants {
     String EXPIRES_IN = "expires_in";
     String ACCESS_TOKEN = "access_token";
     String REFRESH_TOKEN = "refresh_token";
+
+    int DEFAULT_EXPIRES_MINUTES = 10;
 
     /**
      * 种授权方式

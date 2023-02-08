@@ -1,21 +1,16 @@
 package cn.aulang.oauth.repository;
 
 import cn.aulang.oauth.entity.AccountToken;
-import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 /**
- * @author Aulang
- * @email aulang@qq.com
- * @date 2019-12-4 21:18
+ * @author wulang
  */
 @Repository
-public interface AccountTokenRepository extends MongoRepository<AccountToken, String> {
+public interface AccountTokenRepository extends JpaRepository<AccountToken, String> {
 
     AccountToken findByRefreshToken(String refreshToken);
 
-    AccountToken findByAccessToken(String accessToken);
-
-    AccountToken findByAccountIdAndClientIdAndRedirectUri(String accountId, String clientId, String redirectUri);
-
+    AccountToken findByClientIdAndRedirectUriAndAccountId(String clientId, String redirectUri, String accountId);
 }

@@ -7,9 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
- * @author Aulang
- * @email aulang@aq.com
- * @date 2019/12/5 11:56
+ * @author wulang
  */
 @Slf4j
 @Service

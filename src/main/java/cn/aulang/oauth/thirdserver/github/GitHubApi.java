@@ -1,13 +1,11 @@
 package cn.aulang.oauth.thirdserver.github;
 
+import cn.aulang.oauth.thirdserver.impl.AbstractApi;
 import cn.aulang.oauth.entity.ThirdServer;
 import cn.aulang.oauth.thirdserver.core.AccessToken;
-import cn.aulang.oauth.thirdserver.impl.AbstractApi;
 
 /**
- * @author Aulang
- * @email aulang@qq.com
- * @date 2020-12-07 16:41
+ * @author wulang
  */
 public class GitHubApi extends AbstractApi<GitHubProfile> {
 

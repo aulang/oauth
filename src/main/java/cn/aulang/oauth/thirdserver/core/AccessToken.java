@@ -5,10 +5,8 @@ import lombok.Data;
 import java.util.Map;
 
 /**
- * @author Aulang
- * @email aulang@qq.com
- * @date 2019-12-7 17:09
  * 第三方令牌
+ * @author wulang
  */
 @Data
 public class AccessToken {

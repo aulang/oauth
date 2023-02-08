@@ -1,18 +1,16 @@
 package cn.aulang.oauth.thirdserver.impl;
 
+import cn.aulang.oauth.thirdserver.core.AccessToken;
+import cn.aulang.oauth.thirdserver.core.AuthService;
+import cn.aulang.oauth.thirdserver.core.Profile;
 import cn.aulang.oauth.entity.Account;
 import cn.aulang.oauth.entity.ThirdAccount;
 import cn.aulang.oauth.entity.ThirdServer;
 import cn.aulang.oauth.exception.AuthException;
 import cn.aulang.oauth.manage.ThirdAccountBiz;
-import cn.aulang.oauth.thirdserver.core.AccessToken;
-import cn.aulang.oauth.thirdserver.core.AuthService;
-import cn.aulang.oauth.thirdserver.core.Profile;
 
 /**
- * @author Aulang
- * @email aulang@qq.com
- * @date 2019-12-7 17:26
+ * @author wulang
  */
 public abstract class AbstractAuthService implements AuthService {
 
