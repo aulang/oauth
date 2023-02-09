@@ -19,7 +19,7 @@ spring:
     date-format: yyyy-MM-dd HH:mm:ss
     time-zone: GMT+8
   datasource:
-    url: jdbc:mysql://127.0.0.1:3306/npj_oauth?useSSL=false&charsetEncoding=utf8mb4
+    url: jdbc:mysql://127.0.0.1:3306/oauth?useSSL=false&charsetEncoding=utf8mb4
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: root
     password: 123456

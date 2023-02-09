@@ -18,6 +18,6 @@ public interface AccountRepository extends JpaRepository<Account, String> {
     @Query("update Account a set a.locked = false, a.triedTimes = 0 where a.locked = true")
     int updateLockedToUnlock();
 
-    @Query("select a from Account a where a.username = ?1 or a.phone = ?1 or a.email = ?1")
+    @Query("select a from Account a where a.status = 1 and (a.username = ?1 or a.phone = ?1 or a.email = ?1)")
     Account findByLoginName(String loginName);
 }

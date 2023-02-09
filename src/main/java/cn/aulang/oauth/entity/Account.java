@@ -39,4 +39,13 @@ public class Account {
     private Integer triedTimes = 0;
     @Column(name = "chpwd_reason")
     private String chpwdReason = "密码已过期，请修改密码！";
+
+    @Column(nullable = false)
+    private Integer status;
+
+    private String creator;
+    @Column(name = "create_date")
+    private Date createDate;
+    @Column(name = "update_date")
+    private Date updateDate;
 }

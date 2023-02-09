@@ -52,7 +52,7 @@ public class AuthRequest {
     /**
      * 是否需要修改密码
      */
-    @Column(name = "must_chwd")
+    @Column(name = "must_chpwd")
     private Boolean mustChpwd = false;
     /**
      * 需要修改密码的理由

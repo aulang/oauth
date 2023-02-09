@@ -193,5 +193,12 @@ CREATE TABLE `account`
     `locked`       TINYINT(1)   DEFAULT 0 COMMENT '是否锁定',
     `tried_times`  TINYINT(4)   DEFAULT 0 COMMENT '重试次数',
     `chpwd_reason` VARCHAR(255) DEFAULT '密码已过期，请修改密码！' COMMENT '修改密码提示',
-    PRIMARY KEY (`id`)
+    `status`       TINYINT(4)   NOT NULL DEFAULT 1 COMMENT '状态',
+    `creator`      VARCHAR(255) DEFAULT NULL COMMENT '创建人',
+    `create_date`  datetime     DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_date`  datetime     DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    PRIMARY KEY (`id`),
+    UNIQUE KEY uk_account_username(`username`),
+    UNIQUE KEY uk_account_phone(`phone`),
+    UNIQUE KEY uk_account_email(`email`),
 ) ENGINE = INNODB DEFAULT CHARSET = utf8mb4 COMMENT = '账号';
