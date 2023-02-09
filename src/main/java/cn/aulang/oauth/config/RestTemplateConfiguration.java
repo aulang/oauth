@@ -14,6 +14,7 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import java.security.SecureRandom;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author wulang
@@ -32,6 +33,8 @@ public class RestTemplateConfiguration {
 
     public OkHttpClient httpClient() throws Exception {
         return new OkHttpClient.Builder()
+                .connectTimeout(30, TimeUnit.SECONDS)
+                .readTimeout(30, TimeUnit.SECONDS)
                 .sslSocketFactory(sslSocketFactory(), DefaultTrustManager.INSTANCE)
                 .hostnameVerifier(hostnameVerifier())
                 .build();
