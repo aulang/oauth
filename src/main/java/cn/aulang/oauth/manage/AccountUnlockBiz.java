@@ -3,9 +3,9 @@ package cn.aulang.oauth.manage;
 import cn.aulang.oauth.entity.Account;
 import cn.aulang.oauth.model.UnlockDelayed;
 import cn.aulang.oauth.repository.AccountRepository;
-import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.DisposableBean;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,7 +18,7 @@ import java.util.concurrent.Executors;
  */
 @Slf4j
 @Service
-public class AccountUnlockBiz implements DisposableBean {
+public class AccountUnlockBiz implements InitializingBean, DisposableBean {
 
     private final AccountRepository dao;
 
@@ -43,8 +43,7 @@ public class AccountUnlockBiz implements DisposableBean {
         }
     }
 
-    @PostConstruct
-    public void init() {
+    public void afterPropertiesSet() {
         dao.updateLockedToUnlock();
 
         executorService.execute(() -> {

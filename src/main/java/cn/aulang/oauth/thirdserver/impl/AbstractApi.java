@@ -152,7 +152,7 @@ public abstract class AbstractApi<T extends AbstractProfile> implements Api<T> {
                 profileMethod,
                 profileParams,
                 accessToken.getAccessToken(),
-                server.getProfileAuthorization());
+                server.getProfileBearer());
 
         T profile = profileExtractor.extract(responseBody, entityClass);
         profile.setServerName(server.getName());

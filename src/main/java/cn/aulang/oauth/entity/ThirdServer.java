@@ -86,8 +86,8 @@ public class ThirdServer {
     /**
      * 获取第三方用户信息的http请求方式为header时有效，加在access_token前
      */
-    @Column(name = "profile_authorization")
-    private String profileAuthorization = Constants.BEARER;
+    @Column(name = "profile_bearer")
+    private String profileBearer = Constants.BEARER;
     /**
      * 获取第三方用户信息的http请求参数，post和get时有效
      */

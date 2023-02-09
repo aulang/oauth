@@ -1,6 +1,6 @@
-CREATE database if NOT EXISTS `npj_oauth` default character set utf8mb4 collate utf8mb4_unicode_ci;
+CREATE database if NOT EXISTS `oauth` default character set utf8mb4 collate utf8mb4_unicode_ci;
 
-use `npj_oauth`;
+use `oauth`;
 
 SET NAMES utf8mb4;
 
@@ -117,7 +117,7 @@ CREATE TABLE `third_server`
     `expires_in_key`        VARCHAR(1024) DEFAULT 'expires_in' COMMENT '取超时时间键',
 
     `profile_method`        VARCHAR(64)   DEFAULT 'header' COMMENT '用户信息请求方式',
-    `profile_authorization` VARCHAR(1024) DEFAULT 'Bearer' COMMENT '用户信息请求认证头',
+    `profile_bearer`        VARCHAR(1024) DEFAULT 'Bearer' COMMENT '用户信息请求认证头',
     `profile_params`        VARCHAR(1024) DEFAULT NULL COMMENT '用户信息请求参数',
 
     `sort`                  INT(11)       DEFAULT NULL COMMENT '排序字段',
