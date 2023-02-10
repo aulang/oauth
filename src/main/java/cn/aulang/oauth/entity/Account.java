@@ -2,9 +2,9 @@ package cn.aulang.oauth.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.util.Date;
 
@@ -12,12 +12,10 @@ import java.util.Date;
  * @author wulang
  */
 @Data
+@EqualsAndHashCode(callSuper = false)
 @Entity
 @Table(name = "account")
-public class Account {
-
-    @Id
-    private String id;
+public class Account extends StringIdEntity {
 
     @Column(unique = true)
     private String username;

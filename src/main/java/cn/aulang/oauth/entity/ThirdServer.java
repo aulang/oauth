@@ -4,11 +4,9 @@ import cn.aulang.oauth.common.Constants;
 import cn.aulang.oauth.common.OAuthConstants;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.util.Date;
 
@@ -18,13 +16,10 @@ import java.util.Date;
  * @author wulang
  */
 @Data
+@EqualsAndHashCode(callSuper = false)
 @Entity
 @Table(name = "third_server")
-public class ThirdServer {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private String id;
+public class ThirdServer extends StringIdEntity {
 
     @Column(nullable = false)
     private String name;

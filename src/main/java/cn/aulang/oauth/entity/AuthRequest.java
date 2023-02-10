@@ -2,11 +2,9 @@ package cn.aulang.oauth.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.util.Date;
 
@@ -16,13 +14,10 @@ import java.util.Date;
  * @author wulang
  */
 @Data
+@EqualsAndHashCode(callSuper = false)
 @Entity
 @Table(name = "auth_request")
-public class AuthRequest {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private String id;
+public class AuthRequest extends StringIdEntity {
 
     @Column(name = "client_Id", nullable = false)
     private String clientId;

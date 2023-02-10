@@ -8,7 +8,6 @@ import cn.aulang.oauth.model.Profile;
 import cn.aulang.oauth.repository.AccountTokenRepository;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.IdUtil;
-import cn.hutool.core.util.StrUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -50,7 +49,7 @@ public class AccountTokenBiz {
             entity.setId(accountToken.getId());
         }
 
-        if (StrUtil.isBlank(entity.getId())) {
+        if (entity.isNew()) {
             entity.setUpdateDate(null);
             entity.setCreateDate(new Date());
         } else {

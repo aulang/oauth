@@ -2,7 +2,6 @@ package cn.aulang.oauth.manage;
 
 import cn.aulang.oauth.entity.Client;
 import cn.aulang.oauth.repository.ClientRepository;
-import cn.hutool.core.util.StrUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -25,7 +24,7 @@ public class ClientBiz {
 
     @CacheEvict(cacheNames = "client", key = "#result.id")
     public Client save(Client entity) {
-        if (StrUtil.isBlank(entity.getId())) {
+        if (entity.isNew()) {
             entity.setUpdateDate(null);
             entity.setCreateDate(new Date());
         } else {

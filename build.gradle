@@ -18,8 +18,13 @@ configurations {
 }
 
 repositories {
+    maven { url 'https://maven.aliyun.com/repository/public/' }
+    maven { url 'https://maven.aliyun.com/repository/spring/' }
+    mavenLocal()
     mavenCentral()
 }
+
+ext['hibernate.version'] = '6.1.7.Final'
 
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'

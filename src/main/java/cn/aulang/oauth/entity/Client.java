@@ -4,12 +4,10 @@ import cn.aulang.oauth.common.Constants;
 import cn.hutool.core.util.StrUtil;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -21,13 +19,10 @@ import java.util.Set;
  * @author wulang
  */
 @Data
+@EqualsAndHashCode(callSuper = false)
 @Entity
 @Table(name = "client")
-public class Client {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private String id;
+public class Client extends StringIdEntity {
 
     @Column(nullable = false)
     private String name;

@@ -5,7 +5,6 @@ import cn.aulang.oauth.common.OAuthConstants;
 import cn.aulang.oauth.entity.ThirdServer;
 import cn.aulang.oauth.model.Server;
 import cn.aulang.oauth.repository.ThirdServerRepository;
-import cn.hutool.core.util.StrUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -40,7 +39,7 @@ public class ThirdServerBiz {
     }
 
     public ThirdServer save(ThirdServer entity) {
-        if (StrUtil.isBlank(entity.getId())) {
+        if (entity.isNew()) {
             entity.setUpdateDate(null);
             entity.setCreateDate(new Date());
         } else {
