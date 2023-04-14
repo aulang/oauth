@@ -1,6 +1,6 @@
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '3.0.2'
+    id 'org.springframework.boot' version '3.0.5'
     id 'com.google.cloud.tools.jib' version '3.3.1'
     id 'io.spring.dependency-management' version '1.1.0'
 }
@@ -24,7 +24,7 @@ repositories {
     mavenCentral()
 }
 
-ext['hibernate.version'] = '6.1.7.Final'
+ext['hibernate.version'] = '6.2.0.Final'
 
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
@@ -32,14 +32,14 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 
-    implementation 'com.nimbusds:nimbus-jose-jwt:9.30.1'
+    implementation 'com.nimbusds:nimbus-jose-jwt:9.31'
     implementation 'com.googlecode.aviator:aviator:5.3.3'
     implementation 'com.pig4cloud.plugin:captcha-core:2.2.2'
-    implementation 'com.github.ben-manes.caffeine:caffeine:3.1.2'
+    implementation 'com.github.ben-manes.caffeine:caffeine:3.1.5'
 
     implementation 'com.sun.mail:javax.mail:1.6.2'
-    implementation 'cn.hutool:hutool-extra:5.8.12'
-    implementation 'cn.hutool:hutool-crypto:5.8.12'
+    implementation 'cn.hutool:hutool-extra:5.8.16'
+    implementation 'cn.hutool:hutool-crypto:5.8.16'
     implementation 'com.squareup.okhttp3:okhttp:4.10.0'
 
     compileOnly 'org.projectlombok:lombok'
