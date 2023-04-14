@@ -50,10 +50,6 @@
       }
       ```
 
-   ```
-
-   ```
-
 #### 2. 简化模式
 
 1. 路径: /authorize?client_id=xxxxxx&response_type=token&redirect_uri=xxxxxx&state=xxxxxx
