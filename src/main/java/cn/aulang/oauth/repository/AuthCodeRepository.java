@@ -1,12 +1,12 @@
 package cn.aulang.oauth.repository;
 
 import cn.aulang.oauth.entity.AuthCode;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+import cn.aulang.common.crud.rdbm.MybatisRepository;
+import org.apache.ibatis.annotations.Mapper;
 
 /**
  * @author wulang
  */
-@Repository
-public interface AuthCodeRepository extends JpaRepository<AuthCode, String> {
+@Mapper
+public interface AuthCodeRepository extends MybatisRepository<AuthCode, String> {
 }

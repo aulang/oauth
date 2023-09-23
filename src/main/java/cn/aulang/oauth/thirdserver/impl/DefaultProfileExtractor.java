@@ -11,10 +11,6 @@ public class DefaultProfileExtractor implements ProfileExtractor {
 
     @Override
     public <T extends Profile> T extract(String responseBody, Class<T> type) throws Exception {
-        T t = Constants.JSON_MAPPER.readValue(responseBody, type);
-
-        t.setOriginInfo(responseBody);
-
-        return t;
+        return Constants.JSON_MAPPER.readValue(responseBody, type);
     }
 }

@@ -1,13 +1,14 @@
 package cn.aulang.oauth.manage;
 
+import cn.aulang.oauth.repository.ThirdServerRepository;
 import cn.aulang.oauth.common.Constants;
 import cn.aulang.oauth.common.OAuthConstants;
 import cn.aulang.oauth.entity.ThirdServer;
 import cn.aulang.oauth.model.Server;
-import cn.aulang.oauth.repository.ThirdServerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
+import tk.mybatis.mapper.entity.Example;
 
 import java.util.Date;
 import java.util.List;
@@ -29,13 +30,18 @@ public class ThirdServerBiz {
         this.dao = dao;
     }
 
-    public List<ThirdServer> findEnabled() {
-        return dao.findByEnabledOrderBySortAsc(true);
+    public List<ThirdServer> findVisible() {
+        Example example = new Example(ThirdServer.class);
+
+        example.and().andEqualTo("visible", true);
+        example.orderBy("sort").asc();
+
+        return dao.selectByExample(example);
     }
 
     @Cacheable(cacheNames = "ThirdServer")
     public List<Server> getAllServers() {
-        return findEnabled().parallelStream().map(e -> new Server(e.getId(), e.getName(), e.getLogoUrl())).collect(Collectors.toList());
+        return findVisible().parallelStream().map(e -> new Server(e.getId(), e.getName(), e.getLogoUrl())).collect(Collectors.toList());
     }
 
     public ThirdServer save(ThirdServer entity) {
@@ -51,12 +57,9 @@ public class ThirdServerBiz {
         return entity;
     }
 
+    @Cacheable(cacheNames = "ThirdServer", key = "#id")
     public ThirdServer get(String id) {
-        return dao.findById(id).orElse(null);
-    }
-
-    public ThirdServer findByName(String name) {
-        return dao.findByNameAndEnabled(name, true);
+        return dao.get(id);
     }
 
     private String buildGetUrl(String url, Map<String, String> params) {

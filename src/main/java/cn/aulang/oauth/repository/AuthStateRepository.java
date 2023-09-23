@@ -1,12 +1,12 @@
 package cn.aulang.oauth.repository;
 
 import cn.aulang.oauth.entity.AuthState;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+import cn.aulang.common.crud.rdbm.MybatisRepository;
+import org.apache.ibatis.annotations.Mapper;
 
 /**
  * @author wulang
  */
-@Repository
-public interface AuthStateRepository extends JpaRepository<AuthState, String> {
+@Mapper
+public interface AuthStateRepository extends MybatisRepository<AuthState, String> {
 }

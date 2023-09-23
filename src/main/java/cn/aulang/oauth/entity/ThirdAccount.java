@@ -1,11 +1,14 @@
 package cn.aulang.oauth.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import cn.aulang.common.crud.id.StringIdEntity;
+import cn.aulang.common.crud.id.UUIDGenId;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import tk.mybatis.mapper.annotation.KeySql;
 
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotBlank;
 import java.util.Date;
 
 /**
@@ -15,36 +18,48 @@ import java.util.Date;
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-@Entity
 @Table(name = "third_account")
 public class ThirdAccount extends StringIdEntity {
+
+    @Id
+    @KeySql(genId = UUIDGenId.class)
+    private String id;
     /**
-     * 第三方账号类型
+     * 第三方服务ID
      */
-    @Column(name = "third_type", nullable = false)
-    private String thirdType;
+    @NotBlank
+    private String serverId;
+    /**
+     * 第三方服务类型
+     */
+    @NotBlank
+    private String serverType;
     /**
      * 第三方账号ID
      */
-    @Column(name = "third_id", nullable = false)
+    @NotBlank
     private String thirdId;
-    /**
-     * 关联账号ID
-     */
-    @Column(name = "account_id", nullable = false)
-    private String accountId;
+
     /**
      * 第三方账号名称
      */
-    @Column(name = "third_name")
     private String thirdName;
-    /**
-     * 原始用户信息
-     */
-    private String profile;
 
-    @Column(name = "create_date")
+    /**
+     * 第三方openId
+     */
+    private String openId;
+    /**
+     * 第三方unionId
+     */
+    private String unionId;
+
+    /**
+     * 关联账号ID
+     */
+    @NotBlank
+    private String accountId;
+
     private Date createDate;
-    @Column(name = "update_date")
     private Date updateDate;
 }

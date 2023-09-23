@@ -6,6 +6,7 @@ import cn.aulang.oauth.common.Constants;
 
 /**
  * callback( {"client_id":"APPID","openid":"OPENID"} );
+ *
  * @author wulang
  */
 public class QQProfileExtractor extends DefaultProfileExtractor {
@@ -20,11 +21,6 @@ public class QQProfileExtractor extends DefaultProfileExtractor {
     @Override
     public <T extends Profile> T extract(String responseBody, Class<T> type) throws Exception {
         String json = getJson(responseBody);
-
-        T t = Constants.JSON_MAPPER.readValue(json, type);
-
-        t.setOriginInfo(responseBody);
-
-        return t;
+        return Constants.JSON_MAPPER.readValue(json, type);
     }
 }

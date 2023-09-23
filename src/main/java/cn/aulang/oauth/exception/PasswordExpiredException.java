@@ -1,16 +1,13 @@
 package cn.aulang.oauth.exception;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 public class PasswordExpiredException extends AuthException {
 
     private String accountId;
-
-    public String getAccountId() {
-        return accountId;
-    }
-
-    public void setAccountId(String accountId) {
-        this.accountId = accountId;
-    }
 
     public PasswordExpiredException(String msg, String accountId) {
         super(msg);

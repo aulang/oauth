@@ -1,11 +1,15 @@
 package cn.aulang.oauth.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import cn.aulang.common.crud.id.StringIdEntity;
+import cn.aulang.common.crud.id.UUIDGenId;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import tk.mybatis.mapper.annotation.KeySql;
 
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import java.util.Date;
 
 /**
@@ -13,22 +17,24 @@ import java.util.Date;
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-@Entity
-@Table(name = "auth_code")
+@Table(name = "oauth_code")
 public class AuthCode extends StringIdEntity {
 
-    @Column(name = "client_id", nullable = false)
+    @Id
+    @KeySql(genId = UUIDGenId.class)
+    private String id;
+
+    @NotBlank
     private String clientId;
-    @Column(name = "redirect_uri", nullable = false)
+    @NotBlank
     private String redirectUri;
-    @Column(name = "code_challenge")
     private String codeChallenge;
-    @Column(name = "account_id", nullable = false)
+    @NotBlank
     private String accountId;
 
     /**
      * 授权码（authorization code）有效期10分钟
      */
-    @Column(name = "create_date", nullable = false)
+    @NotNull
     private Date createDate = new Date();
 }

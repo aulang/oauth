@@ -10,21 +10,18 @@ public class QQProfile extends AbstractProfile {
 
     @JsonProperty("client_id")
     private String clientId;
-    private String openid;
+    @JsonProperty("openid")
+    private String openId;
     private String nickname;
 
     @Override
     public String getId() {
-        return openid;
+        return openId;
     }
 
     @Override
     public String getUsername() {
         return nickname;
-    }
-
-    public String getOpenid() {
-        return openid;
     }
 
     public String getClientId() {
@@ -35,8 +32,13 @@ public class QQProfile extends AbstractProfile {
         this.clientId = clientId;
     }
 
-    public void setOpenid(String openid) {
-        this.openid = openid;
+    @Override
+    public String getOpenId() {
+        return openId;
+    }
+
+    public void setOpenId(String openId) {
+        this.openId = openId;
     }
 
     public String getNickname() {

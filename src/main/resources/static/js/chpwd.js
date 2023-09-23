@@ -7,7 +7,4 @@ function changePassword(e) {
         e.preventDefault()
         return
     }
-
-    password.value = sha256(password.value)
-    repassword.value = sha256(repassword.value)
 }

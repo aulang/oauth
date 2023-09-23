@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <link th:href="@{/img/favicon.ico}" type="image/x-icon" rel="icon"/>
+  <link th:href="@{/public/bootstrap.min.css}" rel="stylesheet"/>
+  <link th:href="@{/dh/css/login.css}" rel="stylesheet"/>
+  <title>错误</title>
+</head>
+
+<body class="main text-center">
+
+
+<main class="form-login">
+  <div class="login-card">
+    <div class="d-flex flex-row justify-content-center">
+      <picture>
+        <img th:src="@{/dh/img/logo.svg}" class="logo me-2" alt="logo"/>
+      </picture>
+      <span class="logo">东湖水环境自动监测预警系统</span>
+    </div>
+
+    <div class="row my-3">
+      <span th:text="${error}" class="mb-3 fw-normal text-danger"></span>
+    </div>
+
+    <div class="row">
+      <a href="/">返回首页</a>
+    </div>
+  </div>
+</main>
+
+</body>
+</html>

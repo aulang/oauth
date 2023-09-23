@@ -1,9 +1,9 @@
 package cn.aulang.oauth.thirdserver.qq;
 
-import cn.aulang.oauth.thirdserver.core.AccessToken;
 import cn.aulang.oauth.thirdserver.impl.AbstractApi;
 import cn.aulang.oauth.common.Constants;
 import cn.aulang.oauth.entity.ThirdServer;
+import cn.aulang.oauth.thirdserver.core.AccessToken;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Map;
@@ -27,7 +27,7 @@ public class QQApi extends AbstractApi<QQProfile> {
             String url = String.format(GET_USER_INFO,
                     accessToken.getAccessToken(),
                     profile.getClientId(),
-                    profile.getOpenid());
+                    profile.getOpenId());
             String json = restTemplate.getForEntity(url, String.class).getBody();
             Map<String, ?> map = Constants.JSON_MAPPER.readValue(json, Map.class);
             profile.setNickname(map.get("nickname").toString());

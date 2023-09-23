@@ -1,21 +1,23 @@
 package cn.aulang.oauth.manage;
 
+import cn.aulang.common.core.utils.Identities;
 import cn.aulang.oauth.common.Constants;
 import cn.aulang.oauth.entity.Account;
 import cn.aulang.oauth.exception.PasswordExpiredException;
-import cn.aulang.oauth.model.Profile;
+import cn.aulang.oauth.model.JwtUser;
 import cn.aulang.oauth.model.SendCaptchaResult;
 import cn.aulang.oauth.repository.AccountRepository;
 import cn.aulang.oauth.service.EmailService;
-import cn.aulang.oauth.service.SMSService;
+import cn.aulang.oauth.service.SmsService;
 import cn.aulang.oauth.util.PasswordUtils;
 import cn.hutool.core.util.DesensitizedUtil;
-import cn.hutool.core.util.StrUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.security.auth.login.AccountLockedException;
+import java.util.Date;
 
 /**
  * @author wulang
@@ -24,12 +26,12 @@ import javax.security.auth.login.AccountLockedException;
 public class AccountBiz {
 
     private final AccountRepository dao;
-    private final SMSService smsService;
+    private final SmsService smsService;
     private final EmailService emailService;
     private final AccountUnlockBiz unlockBiz;
 
     @Autowired
-    public AccountBiz(AccountRepository dao, SMSService smsService, EmailService emailService, AccountUnlockBiz unlockBiz) {
+    public AccountBiz(AccountRepository dao, SmsService smsService, EmailService emailService, AccountUnlockBiz unlockBiz) {
         this.dao = dao;
         this.smsService = smsService;
         this.emailService = emailService;
@@ -37,30 +39,30 @@ public class AccountBiz {
     }
 
     public Account save(Account entity) {
-        dao.save(entity);
+        dao.saveOrUpdate(entity);
         return entity;
     }
 
     public Account getByLoginName(String loginName) {
-        return dao.findByLoginName(loginName);
+        return dao.getByUsernameOrMobileOrEmail(loginName);
     }
 
     public SendCaptchaResult sendCaptcha(String loginName, String captcha) throws RuntimeException {
         Account account = getByLoginName(loginName);
         if (account != null) {
-            String content = "您申请的验证码是：" + captcha;
+            String content = "您申请的验证码是：" + captcha + "，10分钟内有效";
 
-            String mobile = account.getPhone();
+            String mobile = account.getMobilePhone();
             String email = account.getEmail();
 
-            int result;
+            boolean result;
             String target;
-            if (mobile != null && email == null) {
+            if (loginName.equals(mobile)) {
                 // 发送短信验证码
                 // 隐私处理
                 target = DesensitizedUtil.mobilePhone(mobile);
                 result = smsService.send(mobile, content);
-            } else if (email != null) {
+            } else if (loginName.equals(email)) {
                 // 发送邮件验证码
                 // 隐私处理
                 target = DesensitizedUtil.email(email);
@@ -69,7 +71,7 @@ public class AccountBiz {
                 return null;
             }
 
-            if (result < 0) {
+            if (!result) {
                 throw new RuntimeException("发送验证码失败");
             }
             return SendCaptchaResult.of(null, account.getId(), target);
@@ -100,14 +102,15 @@ public class AccountBiz {
             if (triedTimes > Constants.MAX_PASSWORD_ERROR_TIMES) {
                 // 禁用账号
                 account.setLocked(true);
-                dao.save(account);
+                account.setLockTime(new Date());
+                save(account);
                 // 延迟解锁
                 unlockBiz.delayUnlock(account.getId());
                 // 抛出异常
                 throw new AccountLockedException("账号被锁定，请稍后再试");
             } else {
                 // 报错密码连续错误次数
-                dao.save(account);
+                save(account);
                 // 账号或密码错误
                 return null;
             }
@@ -115,7 +118,7 @@ public class AccountBiz {
 
         if (account.getMustChpwd()) {
             String reason = account.getChpwdReason();
-            if (StrUtil.isBlank(reason)) {
+            if (StringUtils.isBlank(reason)) {
                 reason = "请修改密码";
             }
             throw new PasswordExpiredException(reason, account.getId());
@@ -124,7 +127,7 @@ public class AccountBiz {
         if (triedTimes > Constants.MAX_PASSWORD_ERROR_TIMES) {
             // 登录成功，清除计数器
             account.setTriedTimes(0);
-            dao.save(account);
+            save(account);
         }
 
         return account.getId();
@@ -132,31 +135,36 @@ public class AccountBiz {
 
     @Transactional(rollbackFor = Exception.class)
     public String changePwd(String id, String password) {
-        Account account = dao.findById(id).orElse(null);
+        Account account = dao.get(id);
         if (account != null) {
             String newPassword = PasswordUtils.bcrypt(password);
+            dao.updatePassword(id, newPassword, new Date());
 
-            account.setPassword(newPassword);
             account.setMustChpwd(false);
             account.setLocked(false);
+            account.setLockTime(null);
             account.setTriedTimes(0);
-            dao.save(account);
+            save(account);
             return id;
         }
         return null;
     }
 
-    public Account register(Account account) {
-        dao.save(account);
+    public Account registerThirdAccount(Account account) {
+        account.setId(Identities.uuid2());
+        dao.registerThirdAccount(account);
         return account;
     }
 
-    public Profile getProfile(String id, String clientId) {
-        Account account = dao.findById(id).orElse(null);
+    public JwtUser getProfile(String id, String clientId, String tokenId) {
+        Account account = dao.get(id);
         if (account == null) {
             return null;
         }
 
-        return new Profile(account.getId(), account.getUsername(), account.getNickname(), clientId);
+        return new JwtUser(account.getId(),
+                account.getUsername(),
+                account.getNickname(),
+                clientId, tokenId);
     }
 }

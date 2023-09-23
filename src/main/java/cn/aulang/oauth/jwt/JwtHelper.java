@@ -1,6 +1,6 @@
 package cn.aulang.oauth.jwt;
 
-import cn.aulang.oauth.model.Profile;
+import cn.aulang.oauth.model.JwtUser;
 
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
@@ -21,11 +21,11 @@ public class JwtHelper {
         this.decoder = new JwtDecoder(publicKey);
     }
 
-    public String encode(Profile profile, Date expiresAt) throws Exception {
-        return encoder.encode(profile, expiresAt);
+    public String encode(JwtUser jwtUser, Date expiresAt) throws Exception {
+        return encoder.encode(jwtUser, expiresAt);
     }
 
-    public Profile decode(String jwt) throws Exception {
+    public JwtUser decode(String jwt) throws Exception {
         return decoder.decode(jwt);
     }
 }

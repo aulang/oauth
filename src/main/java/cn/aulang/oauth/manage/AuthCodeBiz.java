@@ -1,9 +1,9 @@
 package cn.aulang.oauth.manage;
 
-import cn.aulang.oauth.common.OAuthConstants;
 import cn.aulang.oauth.entity.AuthCode;
 import cn.aulang.oauth.repository.AuthCodeRepository;
-import cn.hutool.core.date.DateUtil;
+import cn.aulang.oauth.common.OAuthConstants;
+import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -29,18 +29,18 @@ public class AuthCodeBiz {
     }
 
     public AuthCode consumeCode(String code) {
-        AuthCode authCode = dao.findById(code).orElse(null);
+        AuthCode authCode = dao.get(code);
         if (authCode == null) {
             return null;
         }
 
-        Date tenMinutesLater = DateUtil.offsetMinute(authCode.getCreateDate(), OAuthConstants.DEFAULT_EXPIRES_MINUTES);
+        Date tenMinutesLater = DateUtils.addMinutes(authCode.getCreateDate(), OAuthConstants.DEFAULT_EXPIRES_MINUTES);
         if (tenMinutesLater.before(new Date())) {
-            dao.deleteById(authCode.getId());
+            dao.deleteByPrimaryKey(authCode.getId());
             return null;
         }
 
-        dao.deleteById(authCode.getId());
+        dao.deleteByPrimaryKey(authCode.getId());
         return authCode;
     }
 

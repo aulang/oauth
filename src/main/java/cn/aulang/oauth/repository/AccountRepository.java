@@ -1,23 +1,23 @@
 package cn.aulang.oauth.repository;
 
+import cn.aulang.common.crud.rdbm.MybatisRepository;
 import cn.aulang.oauth.entity.Account;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.Date;
 
 /**
  * @author wulang
  */
-@Repository
-public interface AccountRepository extends JpaRepository<Account, String> {
+@Mapper
+public interface AccountRepository extends MybatisRepository<Account, String> {
 
-    @Modifying
-    @Transactional
-    @Query("update Account a set a.locked = false, a.triedTimes = 0 where a.locked = true")
     int updateLockedToUnlock();
 
-    @Query("select a from Account a where a.status = 1 and (a.username = ?1 or a.phone = ?1 or a.email = ?1)")
-    Account findByLoginName(String loginName);
+    Account getByUsernameOrMobileOrEmail(@Param("loginName") String loginName);
+
+    int registerThirdAccount(@Param("account") Account account);
+
+    int updatePassword(@Param("id") String id, @Param("password") String password, @Param("date") Date date);
 }

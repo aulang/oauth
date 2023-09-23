@@ -1,11 +1,15 @@
 package cn.aulang.oauth.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import cn.aulang.common.crud.id.StringIdEntity;
+import cn.aulang.common.crud.id.UUIDGenId;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import tk.mybatis.mapper.annotation.KeySql;
 
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import java.util.Date;
 
 /**
@@ -13,29 +17,31 @@ import java.util.Date;
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-@Entity
-@Table(name = "auth_state")
+@Table(name = "oauth_state")
 public class AuthState extends StringIdEntity {
+
+    @Id
+    @KeySql(genId = UUIDGenId.class)
+    private String id;
     /**
      * 认证请求ID
      */
-    @Column(name = "authorize_id", nullable = false)
+    @NotBlank
     private String authorizeId;
     /**
      * 第三方登录服务ID
      */
-    @Column(name = "third_server_id", nullable = false)
-    private String thirdServerId;
+    @NotBlank
+    private String serverId;
 
     /**
      * 账号ID
      */
-    @Column(name = "account_id")
     private String accountId;
 
     /**
      * state有效期10分钟
      */
-    @Column(name = "create_date", nullable = false)
+    @NotNull
     private Date createDate = new Date();
 }

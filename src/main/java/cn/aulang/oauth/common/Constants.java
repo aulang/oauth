@@ -1,6 +1,5 @@
 package cn.aulang.oauth.common;
 
-import cn.aulang.oauth.model.WebResponse;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
@@ -8,10 +7,11 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.json.JsonMapper;
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletResponse;
+import cn.aulang.common.web.WebResponse;
 import org.springframework.ui.Model;
 
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import java.util.Map;
 
 /**
@@ -26,7 +26,7 @@ public interface Constants {
     String QUESTION = "?";
     String EQUAL = "=";
     String AND = "&";
-    char HASH = '#';
+    String HASH = "#";
 
     String JSON = "json";
 
@@ -34,6 +34,8 @@ public interface Constants {
     String POST = "post";
     String HEADER = "header";
     String BEARER = "Bearer";
+
+    String NA = "N/A";
 
     /**
      * 0开始，3次
@@ -47,8 +49,6 @@ public interface Constants {
 
     String REDIRECT = "redirect:";
     String BIND_STATE_AUTHORIZE_ID = "bind_third_account";
-    byte[] DEFAULT_KEY = "QGDCilNe3S3Nn8OFqRAhKoS8DRo21jVk".getBytes();
-
 
     JsonMapper JSON_MAPPER = JsonMapper.builder()
             .disable(SerializationFeature.FAIL_ON_EMPTY_BEANS)
@@ -64,6 +64,11 @@ public interface Constants {
     static String errorPage(Model model, String msg) {
         model.addAttribute("error", msg);
         return "error";
+    }
+
+    static String errorPage(String loginPage, Model model, String msg) {
+        model.addAttribute("error", msg);
+        return LoginPage.pageOf(loginPage, "error");
     }
 
     static void setSsoCookie(HttpServletResponse response, String authorizeId) {

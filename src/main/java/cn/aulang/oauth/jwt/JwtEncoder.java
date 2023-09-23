@@ -1,6 +1,6 @@
 package cn.aulang.oauth.jwt;
 
-import cn.aulang.oauth.model.Profile;
+import cn.aulang.oauth.model.JwtUser;
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.JWSHeader;
 import com.nimbusds.jose.JWSObject;
@@ -27,14 +27,16 @@ public class JwtEncoder {
         signer = new RSASSASigner(privateKey);
     }
 
-    public String encode(Profile profile, Date expiresAt) throws Exception {
+    public String encode(JwtUser jwtUser, Date expiresAt) throws Exception {
         Map<String, Object> jsonObject = new HashMap<>();
 
-        jsonObject.put(Profile.ID, profile.getId());
-        jsonObject.put(Profile.USERNAME, profile.getUsername());
-        jsonObject.put(Profile.NICKNAME, profile.getNickname());
-        jsonObject.put(Profile.CLIENT_ID, profile.getClientId());
+        jsonObject.put(JwtUser.USER_ID, jwtUser.getUserId());
+        jsonObject.put(JwtUser.USERNAME, jwtUser.getUsername());
+        jsonObject.put(JwtUser.NICKNAME, jwtUser.getNickname());
+        jsonObject.put(JwtUser.CLIENT_ID, jwtUser.getClientId());
 
+        // 令牌ID
+        jsonObject.put(JWTClaimNames.JWT_ID, jwtUser.getTokenId());
         // 失效时间, 格式固定Unix时间戳（到秒）
         jsonObject.put(JWTClaimNames.EXPIRATION_TIME, DateUtils.toSecondsSinceEpoch(expiresAt));
 

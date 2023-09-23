@@ -11,15 +11,11 @@ spring:
   application:
     name: oauth
   profiles:
-    default: prod
-  lifecycle:
-    timeout-per-shutdown-phase: 30s
+    active: prod
   jackson:
     default-property-inclusion: non_null
     date-format: yyyy-MM-dd HH:mm:ss
     time-zone: GMT+8
-  jpa:
-    open-in-view: false
   datasource:
     url: jdbc:mysql://127.0.0.1:3306/oauth?useSSL=false&charsetEncoding=utf8mb4
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -37,7 +33,31 @@ spring:
   cache:
     type: caffeine
     caffeine:
-      spec: maximumSize=10240,expireAfterWrite=1h
+      spec: maximumSize=10240,expireAfterWrite=2h
+
+mybatis:
+  configuration:
+    map-underscore-to-camel-case: true
+  mapper-locations: classpath*:mapper/**/*.xml
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+
+logging:
+  file:
+    name: /data/logs/${spring.application.name}.log
+  charset:
+    file: UTF-8
+    console: UTF-8
+  pattern:
+    dateformat: yyyy-MM-dd HH:mm:ss.SSS
+  logback:
+    rollingpolicy:
+      max-history: 30
+      max-file-size: 64MB
 
 jwt:
   file-path: classpath:oauth.pfx

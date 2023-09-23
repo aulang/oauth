@@ -10,15 +10,16 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Profile {
+public class JwtUser {
 
-    public static final String ID = "id";
+    public static final String USER_ID = "user_id";
     public static final String USERNAME = "username";
     public static final String NICKNAME = "nickname";
-    public static final String CLIENT_ID = "clientId";
+    public static final String CLIENT_ID = "client_id";
 
-    private String id;
+    private String userId;
     private String username;
     private String nickname;
     private String clientId;
+    private String tokenId;
 }

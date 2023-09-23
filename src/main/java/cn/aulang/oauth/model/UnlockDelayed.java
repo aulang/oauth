@@ -1,7 +1,7 @@
 package cn.aulang.oauth.model;
 
-import cn.hutool.core.date.DateUtil;
 import lombok.Getter;
+import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.lang.NonNull;
 
 import java.util.Date;
@@ -25,12 +25,12 @@ public class UnlockDelayed implements Delayed {
 
     public UnlockDelayed(String accountId, int lockedMinutes) {
         this.accountId = accountId;
-        this.unlockTime = DateUtil.offsetMinute(new Date(), lockedMinutes);
+        this.unlockTime = DateUtils.addMinutes(new Date(), lockedMinutes);
     }
 
     @Override
     public long getDelay(TimeUnit unit) {
-        long sourceDuration = new Date().getTime() - unlockTime.getTime();
+        long sourceDuration = unlockTime.getTime() - System.currentTimeMillis();
         return unit.convert(sourceDuration, TimeUnit.MICROSECONDS);
     }
 

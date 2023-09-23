@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.aulang.oauth.repository.AccountRepository">
+
+  <update id="updateLockedToUnlock">
+    update oauth_account set locked = 0, lock_time = null, tried_times = 0 where locked = 1
+  </update>
+
+  <insert id="registerThirdAccount">
+    insert into oauth_account(id, password, `nickname`, status) values
+    (#{account.id}, 'N/A', #{account.nickname},  1)
+  </insert>
+
+  <update id="updatePassword">
+    update oauth_account set password = #{password}, must_chpwd = 0, chpwd_time = #{date} where id = #{id}
+  </update>
+
+  <select id="getByUsernameOrMobileOrEmail" resultType="cn.aulang.oauth.entity.Account">
+    select * from oauth_account where username = #{loginName} or mobile_phone = #{loginName} or email = #{loginName}
+  </select>
+</mapper>

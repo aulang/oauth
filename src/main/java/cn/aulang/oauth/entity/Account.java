@@ -1,10 +1,15 @@
 package cn.aulang.oauth.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import cn.aulang.common.crud.id.StringIdEntity;
+import cn.aulang.common.crud.id.UUIDGenId;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import tk.mybatis.mapper.annotation.KeySql;
+
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
+import jakarta.validation.constraints.NotNull;
 
 import java.util.Date;
 
@@ -13,37 +18,31 @@ import java.util.Date;
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-@Entity
-@Table(name = "account")
+@Table(name = "oauth_account")
 public class Account extends StringIdEntity {
 
-    @Column(unique = true)
+    @Id
+    @KeySql(genId = UUIDGenId.class)
+    private String id;
+
     private String username;
-    @Column(unique = true)
-    private String phone;
-    @Column(unique = true)
+    private String mobilePhone;
     private String email;
     private String password;
 
     private String nickname;
     private String avatar;
-    @Column(name = "must_chpwd")
     private Boolean mustChpwd = false;
-    @Column(name = "chpwd_time")
     private Date chpwdTime = new Date();
 
+    private Date lockTime;
     private Boolean locked = false;
-    @Column(name = "tried_times")
     private Integer triedTimes = 0;
-    @Column(name = "chpwd_reason")
-    private String chpwdReason = "密码已过期，请修改密码！";
+    private String chpwdReason = "请修改初始密码！";
 
-    @Column(nullable = false)
     private Integer status;
 
     private String creator;
-    @Column(name = "create_date")
     private Date createDate;
-    @Column(name = "update_date")
     private Date updateDate;
 }

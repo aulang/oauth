@@ -1,15 +1,20 @@
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '3.0.5'
-    id 'com.google.cloud.tools.jib' version '3.3.1'
-    id 'io.spring.dependency-management' version '1.1.0'
+    id 'org.springframework.boot' version '3.1.4'
+    id 'com.google.cloud.tools.jib' version '3.4.0'
+    id 'io.spring.dependency-management' version '1.1.3'
 }
 
 apply from: 'docker.gradle'
 
 version = '1.0.0'
 group = 'cn.aulang'
-sourceCompatibility = '17'
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
+
 
 configurations {
     compileOnly {
@@ -18,34 +23,49 @@ configurations {
 }
 
 repositories {
-    maven { url 'https://maven.aliyun.com/repository/public/' }
-    maven { url 'https://maven.aliyun.com/repository/spring/' }
+    repositories {
+        maven {
+            url 'https://maven.aliyun.com/repository/public'
+        }
+        maven {
+            url "$maven_registry_release_url"
+            credentials {
+                username "$maven_registry_username"
+                password "$maven_registry_password"
+            }
+        }
+        maven {
+            url "$maven_registry_snapshot_url"
+            credentials {
+                username "$maven_registry_username"
+                password "$maven_registry_password"
+            }
+        }
+    }
     mavenLocal()
     mavenCentral()
 }
 
-ext['hibernate.version'] = '6.2.0.Final'
-
 dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-web'
-    implementation 'org.springframework.boot:spring-boot-starter-cache'
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'cn.aulang.common:al-web:1.0.0'
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 
-    implementation 'com.nimbusds:nimbus-jose-jwt:9.31'
-    implementation 'com.googlecode.aviator:aviator:5.3.3'
-    implementation 'com.pig4cloud.plugin:captcha-core:2.2.2'
-    implementation 'com.github.ben-manes.caffeine:caffeine:3.1.5'
+    runtimeOnly 'com.mysql:mysql-connector-j:8.1.0'
+    implementation 'tk.mybatis-jakarta:mapper-spring-boot-starter:1.0.0'
 
-    implementation 'com.sun.mail:javax.mail:1.6.2'
-    implementation 'cn.hutool:hutool-extra:5.8.16'
-    implementation 'cn.hutool:hutool-crypto:5.8.16'
-    implementation 'com.squareup.okhttp3:okhttp:4.10.0'
+    implementation 'cn.aulang.common:al-cache:1.0.0'
+    implementation 'com.github.ben-manes.caffeine:caffeine:3.1.8'
+
+    implementation 'com.googlecode.aviator:aviator:5.3.3'
+    implementation 'com.pig4cloud.plugin:captcha-core:2.2.3'
+
+    implementation 'cn.hutool:hutool-crypto:5.8.22'
+    implementation 'com.nimbusds:nimbus-jose-jwt:9.35'
+
+    implementation 'com.squareup.okhttp3:okhttp:4.11.0'
 
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
-
-    runtimeOnly 'com.mysql:mysql-connector-j:8.0.32'
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }

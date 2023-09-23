@@ -1,15 +1,15 @@
 package cn.aulang.oauth.controller;
 
-import cn.aulang.oauth.common.Constants;
-import cn.aulang.oauth.entity.AuthRequest;
-import cn.aulang.oauth.entity.Client;
 import cn.aulang.oauth.exception.PasswordExpiredException;
-import cn.aulang.oauth.manage.AccountBiz;
-import cn.aulang.oauth.manage.AuthRequestBiz;
 import cn.aulang.oauth.manage.ClientBiz;
 import cn.aulang.oauth.manage.ReturnPageBiz;
 import cn.hutool.core.util.RandomUtil;
-import jakarta.servlet.http.HttpServletResponse;
+import cn.aulang.oauth.common.Constants;
+import cn.aulang.oauth.common.LoginPage;
+import cn.aulang.oauth.entity.AuthRequest;
+import cn.aulang.oauth.entity.Client;
+import cn.aulang.oauth.manage.AccountBiz;
+import cn.aulang.oauth.manage.AuthRequestBiz;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.CookieValue;
@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.security.auth.login.AccountLockedException;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
@@ -73,7 +74,7 @@ public class LoginController {
 
         Client client = clientBiz.get(request.getClientId());
         if (client == null) {
-            return Constants.errorPage(model, "无效的client_id");
+            return Constants.errorPage(request.getLoginPage(), model, "无效的client_id");
         }
 
         if (request.getTriedTimes() > Constants.NEED_CAPTCHA_TIMES) {
@@ -95,23 +96,22 @@ public class LoginController {
                 model.addAttribute("error", "账号或密码错误");
             }
         } catch (AccountLockedException e) {
-            return "account_locked";
+            return LoginPage.pageOf(request.getLoginPage(), "account_locked");
         } catch (PasswordExpiredException e) {
             String reason = e.getMessage();
 
-            request.setAuthenticated(true);
             request.setMustChpwd(true);
+            request.setAuthenticated(true);
             request.setAccountId(e.getAccountId());
             request.setChpwdReason(reason);
             requestBiz.save(request);
 
             model.addAttribute("error", reason);
             model.addAttribute("authorizeId", authorizeId);
-            return "change_passwd";
+            return LoginPage.pageOf(request.getLoginPage(), "change_passwd");
         } catch (Exception e) {
             model.addAttribute("error", e.getMessage());
         }
-
 
         int triedTimes = request.getTriedTimes() + 1;
         if (request.getTriedTimes() > Constants.NEED_CAPTCHA_TIMES) {
@@ -148,13 +148,14 @@ public class LoginController {
             model.addAttribute("error", "验证码错误");
             return returnPageBiz.loginPage(request, null, model);
         }
+
         request.setAuthenticated(true);
         request = requestBiz.save(request);
 
         return returnPageBiz.redirect(request, model);
     }
 
-    @GetMapping("/logout")
+    @GetMapping({"/logout", "cusLogout"})
     public void logout(@RequestParam(name = "redirect_uri", required = false) String redirectUri,
                        @CookieValue(name = Constants.SSO_COOKIE_NAME, required = false) String authorizeId,
                        HttpServletResponse response) throws IOException {

@@ -31,7 +31,7 @@ public class GitHubAuthService extends AbstractAuthService {
 
     @Override
     public boolean supports(ThirdServer server) {
-        return GITHUB.equals(server.getName());
+        return GITHUB.equalsIgnoreCase(server.getType());
     }
 
     @Override

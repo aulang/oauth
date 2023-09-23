@@ -28,19 +28,22 @@ public class AuthRequestBiz {
                                      String authGrant,
                                      String redirectUri,
                                      String codeChallenge,
-                                     String state) {
+                                     String state,
+                                     String loginPage) {
 
         AuthRequest request = new AuthRequest();
 
         request.setAccountId(null);
-        request.setAuthenticated(false);
         request.setMustChpwd(false);
+        request.setAuthenticated(false);
 
         request.setClientId(clientId);
         request.setAuthGrant(authGrant);
         request.setRedirectUri(redirectUri);
         request.setCodeChallenge(codeChallenge);
         request.setState(state);
+
+        request.setLoginPage(loginPage);
 
         request.setCreateDate(new Date());
 
@@ -51,17 +54,17 @@ public class AuthRequestBiz {
     @CachePut(cacheNames = "AuthRequest", key = "#entity.id")
     public AuthRequest save(AuthRequest entity) {
         entity.setUpdateDate(new Date());
-        dao.save(entity);
+        dao.updateByPrimaryKey(entity);
         return entity;
     }
 
     @Cacheable(cacheNames = "AuthRequest", key = "#id")
     public AuthRequest get(String id) {
-        return dao.findById(id).orElse(null);
+        return dao.get(id);
     }
 
     @CacheEvict(cacheNames = "AuthRequest", key = "#id")
     public void delete(String id) {
-        dao.deleteById(id);
+        dao.deleteByPrimaryKey(id);
     }
 }

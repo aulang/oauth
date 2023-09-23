@@ -6,6 +6,7 @@ const regEmail = /^\w+@[a-z0-9]+\.[a-z]+$/
 function mobileLogin(element) {
     if (!sendSecurityCodeSuccess) {
         document.getElementById('error-msg').innerHTML = '请先发送验证码'
+        return
     }
 
     let securityCode = document.getElementById('security-code')
@@ -43,7 +44,7 @@ function sendSecurityCode(element) {
 
     let mobileValue = mobile.value
     if (!regPhone.test(mobileValue) && !regEmail.test(mobileValue)) {
-        mobile.setCustomValidity('请输入手机号或邮箱');
+        mobile.setCustomValidity('请输入手机或邮箱');
         mobile.reportValidity()
         return
     }

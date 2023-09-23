@@ -16,13 +16,10 @@ public class CaptchaFactory {
     }
 
     public Captcha create() {
-        switch (properties.getStyle().toLowerCase()) {
-            case "spec":
-                return new SpecCaptcha(properties.getWidth(), properties.getHeight(), properties.getLen());
-            case "chinese":
-                return new ChineseCaptcha(properties.getWidth(), properties.getHeight(), properties.getLen());
-            default:
-                return new MathCaptcha(properties.getWidth(), properties.getHeight(), properties.getLen());
-        }
+        return switch (properties.getStyle().toLowerCase()) {
+            case "spec" -> new SpecCaptcha(properties.getWidth(), properties.getHeight(), properties.getLen());
+            case "chinese" -> new ChineseCaptcha(properties.getWidth(), properties.getHeight(), properties.getLen());
+            default -> new MathCaptcha(properties.getWidth(), properties.getHeight(), properties.getLen());
+        };
     }
 }

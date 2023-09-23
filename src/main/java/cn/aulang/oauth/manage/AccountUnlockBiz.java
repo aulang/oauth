@@ -1,8 +1,8 @@
 package cn.aulang.oauth.manage;
 
 import cn.aulang.oauth.entity.Account;
-import cn.aulang.oauth.model.UnlockDelayed;
 import cn.aulang.oauth.repository.AccountRepository;
+import cn.aulang.oauth.model.UnlockDelayed;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
@@ -35,11 +35,12 @@ public class AccountUnlockBiz implements InitializingBean, DisposableBean {
     }
 
     public void unlock(String accountId) {
-        Account account = dao.findById(accountId).orElse(null);
+        Account account = dao.get(accountId);
         if (account != null) {
             account.setTriedTimes(0);
             account.setLocked(false);
-            dao.save(account);
+            account.setLockTime(null);
+            dao.updateByPrimaryKey(account);
         }
     }
 

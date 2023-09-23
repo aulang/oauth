@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <link th:href="@{/img/favicon.ico}" type="image/x-icon" rel="icon"/>
+  <link th:href="@{/public/bootstrap.min.css}" rel="stylesheet"/>
+  <link th:href="@{/nh/css/login.css}" rel="stylesheet"/>
+  <title>修改成功</title>
+</head>
+
+<body class="main text-center">
+
+<main class="form-login">
+  <div class="login-card">
+    <div class="d-flex flex-row justify-content-center">
+      <picture>
+        <img th:src="@{/nh/img/logo.svg}" class="logo me-2" alt="logo"/>
+      </picture>
+      <span class="logo">南湖水环境综合监管系统</span>
+    </div>
+
+    <div class="row my-3">
+      <span class="mb-3 fw-normal text-success">修改成功</span>
+    </div>
+
+    <div class="row">
+      <a th:href="@{'/login/' + ${authorizeId}}" class="btn btn-outline-primary">返回登录</a>
+    </div>
+  </div>
+
+  <div class="mt-3 position-absolute end-0 qr-code">
+    <span class="w-100 d-inline-block text-end text-decoration-underline text-white" style="cursor: pointer; font-size: 14px">移动端下载</span>
+
+    <div class="d-flex flex-column mt-2 qr-code-div">
+      <img th:src="@{/nh/img/qr-code.png}" class="qr-code-img" alt="二维码"/>
+      <span class="text-center">扫一扫下载移动版</span>
+    </div>
+  </div>
+</main>
+
+</body>
+</html>

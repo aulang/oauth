@@ -1,13 +1,14 @@
 package cn.aulang.oauth.thirdserver.impl;
 
-import cn.aulang.oauth.thirdserver.core.AccessToken;
-import cn.aulang.oauth.thirdserver.core.AuthService;
-import cn.aulang.oauth.thirdserver.core.Profile;
 import cn.aulang.oauth.entity.Account;
 import cn.aulang.oauth.entity.ThirdAccount;
 import cn.aulang.oauth.entity.ThirdServer;
 import cn.aulang.oauth.exception.AuthException;
+import cn.aulang.oauth.exception.ThirdAccountNotExistException;
 import cn.aulang.oauth.manage.ThirdAccountBiz;
+import cn.aulang.oauth.thirdserver.core.AccessToken;
+import cn.aulang.oauth.thirdserver.core.AuthService;
+import cn.aulang.oauth.thirdserver.core.Profile;
 
 /**
  * @author wulang
@@ -15,7 +16,6 @@ import cn.aulang.oauth.manage.ThirdAccountBiz;
 public abstract class AbstractAuthService implements AuthService {
 
     @Override
-    @SuppressWarnings("unchecked")
     public Account authenticate(ThirdServer server, String code) throws AuthException {
         try {
             AccessToken accessToken = getApi().getAccessToken(server, code);
@@ -30,9 +30,10 @@ public abstract class AbstractAuthService implements AuthService {
 
                 return account;
             } else {
-                getApi().getDetail(server, accessToken, profile);
-                return getThirdAccountBiz().register(profile);
+                return register(server, profile, accessToken);
             }
+        } catch (AuthException ae) {
+            throw ae;
         } catch (Exception e) {
             throw new AuthException(server.getName() + "认证失败", e);
         }
@@ -48,6 +49,16 @@ public abstract class AbstractAuthService implements AuthService {
             return getThirdAccountBiz().bind(accountId, profile);
         } catch (Exception e) {
             throw new AuthException(server.getName() + "绑定失败", e);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    protected Account register(ThirdServer server, Profile profile, AccessToken accessToken) {
+        if (server.getAutoRegister() != null && server.getAutoRegister()) {
+            getApi().getDetail(server, accessToken, profile);
+            return getThirdAccountBiz().register(profile);
+        } else {
+            throw new ThirdAccountNotExistException(server.getId(), profile.getId(), profile.getOpenId(), profile.getUnionId());
         }
     }
 

@@ -7,25 +7,24 @@ import cn.aulang.oauth.thirdserver.core.Profile;
  */
 public abstract class AbstractProfile implements Profile {
 
-    protected String serverName;
-    protected String originInfo;
+    protected String serverId;
+    protected String serverType;
 
     @Override
-    public String getServerName() {
-        return serverName;
+    public String getServerId() {
+        return serverId;
     }
 
-    public void setServerName(String serverName) {
-        this.serverName = serverName;
-    }
-
-    @Override
-    public String getOriginInfo() {
-        return originInfo;
+    public void setServerId(String serverId) {
+        this.serverId = serverId;
     }
 
     @Override
-    public void setOriginInfo(String originInfo) {
-        this.originInfo = originInfo;
+    public String getServerType() {
+        return serverType;
+    }
+
+    public void setServerType(String serverType) {
+        this.serverType = serverType;
     }
 }

@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <link th:href="@{/img/favicon.ico}" type="image/x-icon" rel="icon"/>
+    <link th:href="@{/public/bootstrap.min.css}" rel="stylesheet"/>
+    <link th:href="@{/css/login.css}" rel="stylesheet"/>
+    <title>登录</title>
+</head>
+
+<body class="main text-center">
+<input type="hidden" id="authorize-id" th:value="${authorizeId}"/>
+
+<div id="particles-js"></div>
+
+<main class="form-login">
+    <div class="login-card">
+        <div class="row">
+            <picture>
+                <img th:src="@{/img/logo.svg}" class="img-fluid mb-4 logo" alt="logo"/>
+            </picture>
+            <h5 class="h5 fw-normal text-light">绑定账号</h5>
+        </div>
+
+        <div class="row">
+            <p th:text="${error}" class="text-danger text-center text-break" id="error-msg"></p>
+        </div>
+
+        <form method="post" th:action="@{/third_login/bind}" onsubmit="passwordLogin()" id="passwordForm">
+            <input type="hidden" name="authorize_id" th:value="${authorizeId}"/>
+            <input type="hidden" name="server_id" th:value="${serverId}"/>
+            <input type="hidden" name="third_id" th:value="${thirdId}"/>
+            <input type="hidden" name="open_id" th:value="${openId}"/>
+            <input type="hidden" name="union_id" th:value="${unionId}"/>
+
+            <div class="form-floating">
+                <input type="text"
+                       name="username"
+                       th:value="${username}"
+                       class="form-control border-top-radius"
+                       placeholder="账号"
+                       id="username"
+                       required
+                />
+                <label for="username">账号</label>
+            </div>
+            <div class="form-floating">
+                <input type="password"
+                       name="password"
+                       class="form-control"
+                       th:classappend="${captcha?'border-middle-radius':'border-bottom-radius'}"
+                       placeholder="密码"
+                       id="password"
+                       required
+                />
+                <label for="password">密码</label>
+            </div>
+
+            <div th:if="${captcha}" class="form-floating input-group">
+                <input type="text"
+                       name="captcha"
+                       class="form-control border-bottom-radius"
+                       placeholder="验证码"
+                       id="captcha"
+                       required
+                />
+                <label for="captcha">验证码</label>
+                <img th:src="@{'/api/captcha/' + ${authorizeId}}" title="点击刷新" alt="验证码"
+                     class="form-control border-bottom-radius captcha-img" onclick="refreshCaptcha(this)"/>
+            </div>
+
+            <div class="fw400 mb-3 d-flex justify-content-between">
+                <div>
+                    <input type="checkbox" class="form-check-input" id="remember-me"/>
+                    <label class="form-check-label text-light" for="remember-me">记住账号</label>
+                </div>
+
+                <a th:href="@{'/forget_passwd/'+ ${authorizeId}}" class="text-light">忘记密码</a>
+            </div>
+            <button type="submit" class="w-100 btn btn-lg btn-primary">绑 定</button>
+        </form>
+
+        <form method="post" th:action="@{/third_login/bind}" class="d-none" id="mobileForm">
+            <input type="hidden" name="authorize_id" th:value="${authorizeId}"/>
+            <input type="hidden" name="server_id" th:value="${serverId}"/>
+            <input type="hidden" name="third_id" th:value="${thirdId}"/>
+            <input type="hidden" name="open_id" th:value="${openId}"/>
+            <input type="hidden" name="union_id" th:value="${unionId}"/>
+
+            <div class="form-floating">
+                <input type="text"
+                       name="mobile"
+                       class="form-control border-top-radius"
+                       placeholder="手机或邮箱"
+                       id="mobile"
+                       required
+                />
+                <label for="mobile">手机或邮箱</label>
+            </div>
+
+            <div class="form-floating input-group mb-3">
+                <input type="text"
+                       name="captcha"
+                       class="form-control border-bottom-radius"
+                       placeholder="验证码"
+                       id="security-code"
+                       required
+                />
+                <label for="security-code">验证码</label>
+                <button type="button"
+                        th:data-url="@{/api/captcha}"
+                        class="btn btn-primary border-bottom-radius mw-30"
+                        onclick="sendSecurityCode(this)"
+                >
+                    发送验证码
+                </button>
+            </div>
+
+            <button type="button"
+                    th:data-url="@{/api/captcha}"
+                    onclick="return mobileLogin(this)"
+                    class="w-100 btn btn-lg btn-primary">绑 定
+            </button>
+        </form>
+
+        <div class="row mt-3">
+            <div class="col">
+                <a class="btn btn-link d-none" onclick="changeLoginType()" title="账号密码绑定" id="passwordIcon">
+                    <img class="fs2rem" th:src="@{/svg/password.svg}" alt="账号密码绑定"/>
+                </a>
+
+                <a class="btn btn-link" onclick="changeLoginType()" title="验证码绑定" id="mobileIcon">
+                    <img class="fs2rem" th:src="@{/svg/phone.svg}" alt="验证码绑定"/>
+                </a>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script type="text/javascript" th:src="@{/public/particles.min.js}"></script>
+<script type="text/javascript" th:src="@{/public/axios.min.js}"></script>
+<script type="text/javascript" th:src="@{/js/particles.js}"></script>
+<script type="text/javascript" th:src="@{/js/sec_code.js}"></script>
+<script type="text/javascript" th:src="@{/js/cookie.js}"></script>
+<script type="text/javascript" th:src="@{/js/login.js}"></script>
+</body>
+</html>

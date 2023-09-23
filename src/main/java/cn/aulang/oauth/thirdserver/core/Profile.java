@@ -2,6 +2,7 @@ package cn.aulang.oauth.thirdserver.core;
 
 /**
  * 第三方用户信息
+ *
  * @author wulang
  */
 public interface Profile {
@@ -10,9 +11,15 @@ public interface Profile {
 
     String getUsername();
 
-    String getServerName();
+    String getServerId();
 
-    String getOriginInfo();
+    String getServerType();
 
-    void setOriginInfo(String originInfo);
+    default String getOpenId() {
+        return null;
+    }
+
+    default String getUnionId() {
+        return null;
+    }
 }

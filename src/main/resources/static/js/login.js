@@ -1,9 +1,4 @@
 (function () {
-    let url = document.getElementById('authorize-id').dataset.url
-    if (url && location.pathname !== url) {
-        history.replaceState({url: url, title: document.title}, document.title, url)
-    }
-
     let usernameCookie = getCookie('USERNAME')
     let username = document.getElementById('username')
     if (usernameCookie && !username.value) {
@@ -12,8 +7,6 @@
 })()
 
 function passwordLogin() {
-    let password = document.getElementById('password')
-    password.value = sha256(password.value)
     rememberMe()
 }
 
@@ -38,6 +31,7 @@ function changeLoginType() {
         document.getElementById('mobileIcon').classList.remove('d-none')
     }
     loginByPassword = !loginByPassword
+    document.getElementById('error-msg').innerHTML = ''
 }
 
 function rememberMe() {

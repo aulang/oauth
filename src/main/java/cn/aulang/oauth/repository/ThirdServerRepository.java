@@ -1,18 +1,12 @@
 package cn.aulang.oauth.repository;
 
 import cn.aulang.oauth.entity.ThirdServer;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
-
-import java.util.List;
+import cn.aulang.common.crud.rdbm.MybatisRepository;
+import org.apache.ibatis.annotations.Mapper;
 
 /**
  * @author wulang
  */
-@Repository
-public interface ThirdServerRepository extends JpaRepository<ThirdServer, String> {
-
-    List<ThirdServer> findByEnabledOrderBySortAsc(boolean enabled);
-
-    ThirdServer findByNameAndEnabled(String name, boolean enabled);
+@Mapper
+public interface ThirdServerRepository extends MybatisRepository<ThirdServer, String> {
 }

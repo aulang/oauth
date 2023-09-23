@@ -6,7 +6,7 @@ import cn.aulang.oauth.entity.ThirdServer;
 import cn.aulang.oauth.thirdserver.core.AccessToken;
 import cn.aulang.oauth.thirdserver.core.Api;
 import cn.aulang.oauth.thirdserver.core.ProfileExtractor;
-import cn.hutool.core.util.StrUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -85,7 +85,7 @@ public abstract class AbstractApi<T extends AbstractProfile> implements Api<T> {
         switch (method.toLowerCase()) {
             case Constants.HEADER -> {
                 HttpHeaders headers = new HttpHeaders();
-                headers.set(HttpHeaders.AUTHORIZATION, authorization + " " + accessToken);
+                headers.set(HttpHeaders.AUTHORIZATION, authorization + StringUtils.SPACE + accessToken);
                 HttpEntity<HttpHeaders> entity = new HttpEntity<>(headers);
                 return restTemplate.exchange(url, HttpMethod.GET, entity, String.class).getBody();
             }
@@ -117,7 +117,7 @@ public abstract class AbstractApi<T extends AbstractProfile> implements Api<T> {
             response = restTemplate.getForEntity(url, String.class).getBody();
         }
 
-        if (StrUtil.isBlank(response)) {
+        if (StringUtils.isBlank(response)) {
             throw new IOException("获取AccessToken响应为空！");
         }
 
@@ -155,7 +155,8 @@ public abstract class AbstractApi<T extends AbstractProfile> implements Api<T> {
                 server.getProfileBearer());
 
         T profile = profileExtractor.extract(responseBody, entityClass);
-        profile.setServerName(server.getName());
+        profile.setServerId(server.getId());
+        profile.setServerType(server.getType());
         return profile;
     }
 

@@ -28,13 +28,22 @@ public class RestTemplateConfiguration {
     }
 
     public ClientHttpRequestFactory clientHttpRequestFactory() throws Exception {
-        return new OkHttp3ClientHttpRequestFactory(httpClient());
+        OkHttp3ClientHttpRequestFactory factory = new OkHttp3ClientHttpRequestFactory(httpClient());
+
+        int timeout = 60 * 1000;
+
+        factory.setConnectTimeout(timeout);
+        factory.setReadTimeout(timeout);
+        factory.setWriteTimeout(timeout);
+
+        return factory;
     }
 
     public OkHttpClient httpClient() throws Exception {
         return new OkHttpClient.Builder()
-                .connectTimeout(30, TimeUnit.SECONDS)
-                .readTimeout(30, TimeUnit.SECONDS)
+                .connectTimeout(60, TimeUnit.SECONDS)
+                .readTimeout(60, TimeUnit.SECONDS)
+                .writeTimeout(60, TimeUnit.SECONDS)
                 .sslSocketFactory(sslSocketFactory(), DefaultTrustManager.INSTANCE)
                 .hostnameVerifier(hostnameVerifier())
                 .build();

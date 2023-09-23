@@ -1,7 +1,7 @@
 package cn.aulang.oauth.jwt;
 
 import cn.aulang.oauth.common.Constants;
-import cn.aulang.oauth.model.Profile;
+import cn.aulang.oauth.model.JwtUser;
 import com.nimbusds.jose.crypto.RSASSAVerifier;
 import com.nimbusds.jose.proc.BadJWSException;
 import com.nimbusds.jwt.JWT;
@@ -27,7 +27,7 @@ public class JwtDecoder {
         verifier = new RSASSAVerifier(publicKey);
     }
 
-    public Profile decode(String jwt) throws Exception {
+    public JwtUser decode(String jwt) throws Exception {
         JWT tmp = JWTParser.parse(jwt);
 
         if (!(tmp instanceof SignedJWT signedJwt)) {
@@ -49,11 +49,12 @@ public class JwtDecoder {
             }
         }
 
-        String id = claimsSet.getStringClaim(Profile.ID);
-        String username = claimsSet.getStringClaim(Profile.USERNAME);
-        String nickname = claimsSet.getStringClaim(Profile.NICKNAME);
-        String clientId = claimsSet.getStringClaim(Profile.CLIENT_ID);
+        String tokenId = claimsSet.getJWTID();
+        String userId = claimsSet.getStringClaim(JwtUser.USER_ID);
+        String username = claimsSet.getStringClaim(JwtUser.USERNAME);
+        String nickname = claimsSet.getStringClaim(JwtUser.NICKNAME);
+        String clientId = claimsSet.getStringClaim(JwtUser.CLIENT_ID);
 
-        return new Profile(id, username, nickname, clientId);
+        return new JwtUser(userId, username, nickname, clientId, tokenId);
     }
 }

@@ -8,10 +8,15 @@ import org.springframework.stereotype.Service;
  */
 @Slf4j
 @Service
-public class SMSService {
+public class SmsService {
 
-    public int send(String mobile, String content) {
-        log.warn("未实现发送短信验证码功能，手机号：{}，内容：{}", mobile, content);
-        return 0;
+    public boolean send(String mobile, String content) {
+        try {
+            // TODO 发送验证码
+            return true;
+        } catch (Exception e) {
+            log.error("验证码短信发送失败！", e);
+            return false;
+        }
     }
 }

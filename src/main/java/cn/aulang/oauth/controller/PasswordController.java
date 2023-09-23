@@ -1,6 +1,7 @@
 package cn.aulang.oauth.controller;
 
 import cn.aulang.oauth.common.Constants;
+import cn.aulang.oauth.common.LoginPage;
 import cn.aulang.oauth.entity.AuthRequest;
 import cn.aulang.oauth.manage.AccountBiz;
 import cn.aulang.oauth.manage.AuthRequestBiz;
@@ -44,18 +45,18 @@ public class PasswordController {
 
         if (!password.equals(repassword)) {
             model.addAttribute("error", "两次密码不一致");
-            return "change_passwd";
+            return LoginPage.pageOf(request.getLoginPage(), "change_passwd");
         }
 
         String accountId = request.getAccountId();
         if (!request.getAuthenticated() || accountId == null) {
-            return Constants.errorPage(model, "用户未登录");
+            return Constants.errorPage(request.getLoginPage(), model, "用户未登录");
         }
 
         try {
             String result = accountBiz.changePwd(accountId, password);
             if (result == null) {
-                return Constants.errorPage(model, "账号不存在");
+                return Constants.errorPage(request.getLoginPage(), model, "账号不存在");
             }
             request.setAccountId(null);
             request.setAuthenticated(false);
@@ -64,11 +65,11 @@ public class PasswordController {
             requestBiz.save(request);
         } catch (Exception e) {
             log.error("修改密码失败", e);
-            return Constants.errorPage(model, e.getMessage());
+            return Constants.errorPage(request.getLoginPage(), model, e.getMessage());
         }
 
         model.addAttribute("authorizeId", authorizeId);
-        return "change_success";
+        return LoginPage.pageOf(request.getLoginPage(), "change_success");
     }
 
     @GetMapping("/forget_passwd/{authorizeId}")
@@ -106,6 +107,7 @@ public class PasswordController {
         requestBiz.save(request);
 
         model.addAttribute("authorizeId", authorizeId);
-        return "change_passwd";
+
+        return LoginPage.pageOf(request.getLoginPage(), "change_passwd");
     }
 }

@@ -7,21 +7,13 @@ import cn.hutool.crypto.digest.DigestUtil;
  */
 public class PasswordUtils {
 
-    public static String digest(String password) {
-        return DigestUtil.sha256Hex(password);
+    public static String bcrypt(String password) {
+        return DigestUtil.bcrypt(password);
     }
 
-    public static String digestAndBcrypt(String password) {
-        return DigestUtil.bcrypt(digest(password));
-    }
-
-    public static String bcrypt(String passwordSHA256) {
-        return DigestUtil.bcrypt(passwordSHA256);
-    }
-
-    public static boolean bcryptCheck(String passwordSHA256, String passwordBcrypt) {
+    public static boolean bcryptCheck(String password, String bcrypt) {
         try {
-            return DigestUtil.bcryptCheck(passwordSHA256, passwordBcrypt);
+            return DigestUtil.bcryptCheck(password, bcrypt);
         } catch (Exception e) {
             return false;
         }

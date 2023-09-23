@@ -2,7 +2,8 @@ package cn.aulang.oauth.config;
 
 import cn.aulang.oauth.jwt.JwtHelper;
 import cn.aulang.oauth.jwt.JwtProperties;
-import cn.hutool.core.util.StrUtil;
+import cn.aulang.oauth.model.RSAKeyPair;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -31,11 +32,11 @@ public class JwtConfiguration {
     }
 
     @Bean
-    public JwtHelper jwtHelper() throws Exception {
+    public RSAKeyPair rsaKeyPair() throws Exception {
         String filePath = properties.getFilePath();
         String password = properties.getPassword();
 
-        if (StrUtil.hasBlank(filePath, password)) {
+        if (StringUtils.isAnyBlank(filePath, password)) {
             throw new RuntimeException("JWT keystore config error!");
         }
 
@@ -55,9 +56,14 @@ public class JwtConfiguration {
 
         String alias = keyStore.aliases().nextElement();
 
-        RSAPublicKey publicKey = (RSAPublicKey) keyStore.getCertificate(alias).getPublicKey();
         RSAPrivateKey privateKey = (RSAPrivateKey) keyStore.getKey(alias, passwordChars);
+        RSAPublicKey publicKey = (RSAPublicKey) keyStore.getCertificate(alias).getPublicKey();
 
-        return new JwtHelper(privateKey, publicKey);
+        return RSAKeyPair.of(privateKey, publicKey);
+    }
+
+    @Bean
+    public JwtHelper jwtHelper(RSAKeyPair rsaKeyPair) {
+        return new JwtHelper(rsaKeyPair.getPrivateKey(), rsaKeyPair.getPublicKey());
     }
 }

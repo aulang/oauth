@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <link th:href="@{/img/favicon.ico}" type="image/x-icon" rel="icon"/>
+  <link th:href="@{/public/bootstrap.min.css}" rel="stylesheet"/>
+  <link th:href="@{/dh/css/login.css}" rel="stylesheet"/>
+  <title>忘记密码</title>
+</head>
+
+<body class="main text-center">
+<input type="hidden" id="authorize-id" th:value="${authorizeId}"/>
+
+<main class="form-login">
+  <div class="login-card">
+    <div class="d-flex flex-row justify-content-center">
+      <picture>
+        <img th:src="@{/dh/img/logo.svg}" class="logo me-2" alt="logo"/>
+      </picture>
+      <span class="logo">东湖水环境自动监测预警系统</span>
+    </div>
+
+    <div class="row">
+      <p th:text="${error}" class="text-danger text-center text-break" id="error-msg"></p>
+    </div>
+
+    <form method="post" th:action="@{/forget_passwd}" id="mobileForm">
+      <input type="hidden" name="authorize_id" th:value="${authorizeId}"/>
+
+      <div class="form-floating">
+        <input type="text"
+               name="mobile"
+               class="form-control border-top-radius"
+               placeholder="手机或邮箱"
+               id="mobile"
+               required
+        />
+        <label for="mobile">手机或邮箱</label>
+      </div>
+
+      <div class="form-floating input-group mb-3">
+        <input type="text"
+               name="captcha"
+               class="form-control border-bottom-radius"
+               placeholder="验证码"
+               id="security-code"
+               required
+        />
+        <label for="security-code">验证码</label>
+        <button type="button"
+                th:data-url="@{/api/captcha}"
+                class="btn btn-primary border-bottom-radius mw-30"
+                onclick="sendSecurityCode(this)"
+        >
+          发送验证码
+        </button>
+      </div>
+
+      <button type="button"
+              th:data-url="@{/api/captcha}"
+              onclick="return mobileLogin(this)"
+              class="w-100 btn btn-lg btn-primary">下一步
+      </button>
+    </form>
+  </div>
+</main>
+
+<script type="text/javascript" th:src="@{/public/axios.min.js}"></script>
+<script type="text/javascript" th:src="@{/js/sec_code.js}"></script>
+</body>
+</html>

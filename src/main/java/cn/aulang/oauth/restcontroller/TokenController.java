@@ -1,11 +1,11 @@
 package cn.aulang.oauth.restcontroller;
 
 import cn.aulang.oauth.common.Constants;
-import cn.aulang.oauth.entity.AccountToken;
 import cn.aulang.oauth.entity.AuthRequest;
+import cn.aulang.oauth.entity.AuthToken;
 import cn.aulang.oauth.entity.Client;
-import cn.aulang.oauth.manage.AccountTokenBiz;
 import cn.aulang.oauth.manage.AuthRequestBiz;
+import cn.aulang.oauth.manage.AuthTokenBiz;
 import cn.aulang.oauth.manage.ClientBiz;
 import cn.aulang.oauth.model.AccessToken;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -20,20 +21,21 @@ import org.springframework.web.bind.annotation.RestController;
  * @author wulang
  */
 @RestController
+@RequestMapping("/api")
 public class TokenController {
 
     private final ClientBiz clientBiz;
-    private final AccountTokenBiz tokenBiz;
+    private final AuthTokenBiz tokenBiz;
     private final AuthRequestBiz requestBiz;
 
     @Autowired
-    public TokenController(ClientBiz clientBiz, AccountTokenBiz tokenBiz, AuthRequestBiz requestBiz) {
+    public TokenController(ClientBiz clientBiz, AuthTokenBiz tokenBiz, AuthRequestBiz requestBiz) {
         this.clientBiz = clientBiz;
         this.tokenBiz = tokenBiz;
         this.requestBiz = requestBiz;
     }
 
-    @PostMapping(path = "/api/token", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(path = "/token", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> captcha(@RequestParam(name = "authorize_id") String authorizeId,
                                      @RequestParam(name = "mobile") String mobile,
                                      @RequestParam(name = "captcha") String captcha) {
@@ -59,7 +61,7 @@ public class TokenController {
             return ResponseEntity.badRequest().body(Constants.error(HttpStatus.BAD_REQUEST.value(), "无效的客户端"));
         }
 
-        AccountToken accountToken = tokenBiz.create(
+        AuthToken authToken = tokenBiz.create(
                 request.getClientId(),
                 request.getRedirectUri(),
                 request.getAccountId()
@@ -67,8 +69,8 @@ public class TokenController {
 
         return ResponseEntity.ok(
                 AccessToken.create(
-                        accountToken.getAccessToken(),
-                        accountToken.getRefreshToken(),
+                        authToken.getAccessToken(),
+                        authToken.getRefreshToken(),
                         client.getAccessTokenExpiresIn()
                 )
         );

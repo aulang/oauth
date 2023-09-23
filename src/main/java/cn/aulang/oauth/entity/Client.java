@@ -1,18 +1,21 @@
 package cn.aulang.oauth.entity;
 
 import cn.aulang.oauth.common.Constants;
-import cn.hutool.core.util.StrUtil;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
+import cn.aulang.common.crud.id.StringIdEntity;
+import cn.aulang.common.crud.id.UUIDGenId;
+import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.apache.commons.lang3.StringUtils;
+import tk.mybatis.mapper.annotation.KeySql;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -20,59 +23,68 @@ import java.util.Set;
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-@Entity
-@Table(name = "client")
+@Table(name = "oauth_client")
 public class Client extends StringIdEntity {
 
-    @Column(nullable = false)
-    private String name;
-    @Column(nullable = false)
-    private String secret;
-    @Column(nullable = false)
-    private Boolean enabled = true;
+    @Id
+    @KeySql(genId = UUIDGenId.class)
+    private String id;
 
-    @Column(name = "logo_page")
-    private String logoPage;
+    @NotBlank
+    private String name;
+    @NotBlank
+    private String secret;
+    @NotNull
+    private Integer status;
+
+    private String logoUrl;
+    private String loginPage;
 
     private String grants;
-    @Column(name = "redirect_uris")
     private String redirectUris;
 
-    @Column(name = "access_token_expires_in")
     private Integer accessTokenExpiresIn = 28800;
-    @Column(name = "refresh_token_expires_in")
     private Integer refreshTokenExpiresIn = 2592000;
 
-    private String creator;
-    @Column(name = "create_date")
-    private Date createDate;
-    @Column(name = "update_date")
-    private Date updateDate;
+    private String devId;
+    private String remark;
 
+    private String creator;
+    private Date createDate;
+    private Date updateDate;
+    private Date releaseDate;
 
     @Transient
     private Set<String> authorizationGrants = null;
     @Transient
-    private List<String> registeredUris = null;
+    private Set<String> registeredUris = null;
 
     public Set<String> getAuthorizationGrants() {
-        if (authorizationGrants == null && StrUtil.isBlank(grants)) {
-            return new HashSet<>();
-        } else {
-            List<String> strings = StrUtil.split(grants, Constants.SEPARATOR);
-            authorizationGrants = new HashSet<>(strings);
+        if (authorizationGrants != null) {
+            return authorizationGrants;
         }
+
+        authorizationGrants = toSet(grants);
 
         return authorizationGrants;
     }
 
-    public List<String> getRegisteredUris() {
-        if (registeredUris == null && StrUtil.isBlank(redirectUris)) {
-            return new ArrayList<>();
-        } else {
-            registeredUris = StrUtil.split(redirectUris, Constants.SEPARATOR);
+    public Set<String> getRegisteredUris() {
+        if (registeredUris != null) {
+            return registeredUris;
         }
 
+        registeredUris = toSet(redirectUris);
+
         return registeredUris;
+    }
+
+    public Set<String> toSet(String str) {
+        if (StringUtils.isBlank(str)) {
+            return new HashSet<>();
+        } else {
+            String[] strings = StringUtils.split(str, Constants.SEPARATOR);
+            return new HashSet<>(Arrays.asList(strings));
+        }
     }
 }

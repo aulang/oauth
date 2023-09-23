@@ -280,7 +280,7 @@
 
 ### 4. 用 Token 获取用户信息（密码模式）
 
-1. 路径: /api/profile
+1. 路径: /api/jwtUser
 2. 方式：get
 3. 参数：
    1. 方式：Bearer Token

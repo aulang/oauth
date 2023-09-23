@@ -1,0 +1,79 @@
+html, body {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  background: url("../img/bg.png") no-repeat left top;
+  background-size: cover;
+}
+
+.main {
+  width: 100%;
+  height: 100%;
+  position: fixed;
+}
+
+.logo {
+  height: 40px;
+  line-height: 40px;
+  font-size: 24px;
+}
+
+.captcha-img {
+  padding: 0 !important;
+  cursor: pointer;
+}
+
+.form-login {
+  width: 100%;
+  max-width: 420px;
+  position: absolute;
+  right: 10%;
+}
+
+.login-card {
+  padding: 1.25rem;
+  background-color: #fff;
+  border-radius: 0.25rem;
+  border: 1px solid rgba(0, 0, 0, 0.125);
+}
+
+.form-login .fw400 {
+  font-weight: 400;
+}
+
+.form-login .fs2rem {
+  font-size: 2rem;
+  height: 2rem;
+}
+
+.form-login :focus-within {
+  z-index: 2;
+}
+
+.form-login .mw-30 {
+  min-width: 30%;
+}
+
+.border-top-radius {
+  margin-bottom: -1px;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.border-middle-radius {
+  margin-bottom: -1px;
+  border-radius: 0;
+}
+
+.border-bottom-radius {
+  margin-bottom: 10px;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+
+.form-check-label {
+  margin-left: 0.25em;
+}
+
+
