@@ -206,3 +206,19 @@ CREATE TABLE `oauth_account`
     UNIQUE KEY uk_account_phone(`phone`),
     UNIQUE KEY uk_account_email(`email`),
 ) ENGINE = INNODB DEFAULT CHARSET = utf8mb4 COMMENT = '账号';
+
+
+DROP TABLE IF EXISTS `mail_server`;
+CREATE TABLE `mail_server`
+(
+    `id`         VARCHAR(100) NOT NULL COMMENT 'ID',
+
+    `host`       VARCHAR(255) NOT NULL COMMENT '主机',
+    `port`       INT(11)      NOT NULL COMMENT '端口',
+    `ssl_enable` TINYINT(1)   NOT NULL DEFAULT 1 COMMENT '加密连接',
+    `mail`       VARCHAR(255) NOT NULL COMMENT '邮箱',
+    `auth`       TINYINT(1)   NOT NULL DEFAULT 1 COMMENT '启用认证',
+    `password`   VARCHAR(255) DEFAULT NULL COMMENT '密码',
+    `mail_from`  VARCHAR(255) DEFAULT NULL COMMENT '发件人',
+    PRIMARY KEY (`id`)
+) ENGINE = INNODB DEFAULT CHARSET = utf8mb4 COMMENT = '邮件服务配置';

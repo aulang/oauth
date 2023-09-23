@@ -53,6 +53,8 @@ dependencies {
     runtimeOnly 'com.mysql:mysql-connector-j:8.1.0'
     implementation 'tk.mybatis-jakarta:mapper-spring-boot-starter:1.0.0'
 
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
+
     implementation 'cn.aulang.common:al-cache:1.0.0'
     implementation 'com.github.ben-manes.caffeine:caffeine:3.1.8'
 

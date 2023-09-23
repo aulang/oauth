@@ -50,6 +50,8 @@ public interface Constants {
     String REDIRECT = "redirect:";
     String BIND_STATE_AUTHORIZE_ID = "bind_third_account";
 
+    byte[] DEFAULT_KEY = "QGDCilNe3S3Nn8OFqRAhKoS8DRo21jVk".getBytes();
+
     JsonMapper JSON_MAPPER = JsonMapper.builder()
             .disable(SerializationFeature.FAIL_ON_EMPTY_BEANS)
             .serializationInclusion(JsonInclude.Include.NON_NULL)
