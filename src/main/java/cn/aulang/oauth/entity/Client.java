@@ -1,8 +1,8 @@
 package cn.aulang.oauth.entity;
 
-import cn.aulang.oauth.common.Constants;
 import cn.aulang.common.crud.id.StringIdEntity;
 import cn.aulang.common.crud.id.UUIDGenId;
+import cn.aulang.oauth.common.Constants;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
@@ -46,8 +46,11 @@ public class Client extends StringIdEntity {
     private Integer accessTokenExpiresIn = 28800;
     private Integer refreshTokenExpiresIn = 2592000;
 
-    private String devId;
-    private String remark;
+    /**
+     * client_credentials模式绑定的账号ID
+     */
+    private String accountId;
+    private String description;
 
     private String creator;
     private Date createDate;

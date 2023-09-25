@@ -1,23 +1,23 @@
 package cn.aulang.oauth.controller;
 
-import cn.aulang.oauth.exception.PasswordExpiredException;
-import cn.aulang.oauth.manage.AuthTokenBiz;
-import cn.aulang.oauth.manage.ClientBiz;
-import cn.aulang.oauth.manage.ReturnPageBiz;
-import cn.hutool.core.codec.Base64;
-import cn.hutool.crypto.digest.DigestUtil;
-import com.nimbusds.jose.jwk.RSAKey;
 import cn.aulang.oauth.common.Constants;
 import cn.aulang.oauth.common.OAuthConstants;
 import cn.aulang.oauth.entity.AuthCode;
 import cn.aulang.oauth.entity.AuthRequest;
 import cn.aulang.oauth.entity.AuthToken;
 import cn.aulang.oauth.entity.Client;
+import cn.aulang.oauth.exception.PasswordExpiredException;
 import cn.aulang.oauth.manage.AccountBiz;
 import cn.aulang.oauth.manage.AuthCodeBiz;
 import cn.aulang.oauth.manage.AuthRequestBiz;
+import cn.aulang.oauth.manage.AuthTokenBiz;
+import cn.aulang.oauth.manage.ClientBiz;
+import cn.aulang.oauth.manage.ReturnPageBiz;
 import cn.aulang.oauth.model.AccessToken;
 import cn.aulang.oauth.model.RSAKeyPair;
+import cn.hutool.core.codec.Base64;
+import cn.hutool.crypto.digest.DigestUtil;
+import com.nimbusds.jose.jwk.RSAKey;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -285,7 +285,11 @@ public class OAuthController {
                     return ResponseEntity.badRequest().body(Constants.error(HttpStatus.BAD_REQUEST.value(), "client_secret错误"));
                 }
 
-                AuthToken authToken = tokenBiz.create(clientId, grantType, Constants.NA);
+                if (StringUtils.isBlank(client.getAccountId())) {
+                    return ResponseEntity.badRequest().body(Constants.error(HttpStatus.BAD_REQUEST.value(), "client为绑定账号"));
+                }
+
+                AuthToken authToken = tokenBiz.create(clientId, grantType, client.getAccountId());
 
                 AccessToken accessToken = AccessToken.create(authToken.getAccessToken(),
                         authToken.getRefreshToken(), client.getAccessTokenExpiresIn());

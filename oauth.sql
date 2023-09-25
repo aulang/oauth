@@ -21,12 +21,10 @@ CREATE TABLE `oauth_client`
     `access_token_expires_in`  INT(11)       DEFAULT 28800 COMMENT '令牌有效期',
     `refresh_token_expires_in` INT(11)       DEFAULT 2592000 COMMENT '刷新令牌有效期',
 
-    `dev_id`                   VARCHAR(100)  DEFAULT NULL COMMENT '开发者ID',
+    `account_id`               VARCHAR(100)  DEFAULT NULL COMMENT '开发者ID',
+    `description`              VARCHAR(255)  DEFAULT NULL COMMENT '描述',
 
     `status`                   TINYINT(4)    NOT NULL DEFAULT 1 COMMENT '状态',
-
-    `release_date`             datetime      DEFAULT NULL COMMENT '发布时间',
-    `remark`                   VARCHAR(255)  DEFAULT NULL COMMENT '备注',
 
     `creator`                  VARCHAR(255)  DEFAULT NULL COMMENT '创建人',
     `create_date`              datetime      DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
@@ -183,7 +181,6 @@ CREATE TABLE `third_account`
 DROP TABLE IF EXISTS `oauth_account`;
 CREATE TABLE `oauth_account`
 (
-
     `id`           VARCHAR(100) NOT NULL COMMENT 'ID',
     `username`     VARCHAR(64)  DEFAULT NULL COMMENT '用户名',
     `mobile_phone` VARCHAR(64)  DEFAULT NULL COMMENT '手机',
@@ -203,8 +200,8 @@ CREATE TABLE `oauth_account`
     `update_date`  datetime     DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     PRIMARY KEY (`id`),
     UNIQUE KEY uk_account_username(`username`),
-    UNIQUE KEY uk_account_phone(`phone`),
-    UNIQUE KEY uk_account_email(`email`),
+    UNIQUE KEY uk_account_phone(`mobile_phone`),
+    UNIQUE KEY uk_account_email(`email`)
 ) ENGINE = INNODB DEFAULT CHARSET = utf8mb4 COMMENT = '账号';
 
 
