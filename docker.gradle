@@ -1,10 +1,10 @@
 jib {
     def base_name = bootJar.archiveBaseName.getOrNull()
     from {
-        image = 'amazoncorretto:17-alpine'
+        image = 'aulang/jdk'
     }
     to {
-        image = "$docker_registry/$rootProject.name/$base_name"
+        image = "$docker_registry/aulang/$base_name"
         auth {
             username = "$docker_registry_username"
             password = "$docker_registry_password"
