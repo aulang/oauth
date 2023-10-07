@@ -1,15 +1,16 @@
 package cn.aulang.oauth.controller;
 
-import cn.aulang.oauth.exception.PasswordExpiredException;
-import cn.aulang.oauth.manage.ClientBiz;
-import cn.aulang.oauth.manage.ReturnPageBiz;
-import cn.hutool.core.util.RandomUtil;
 import cn.aulang.oauth.common.Constants;
 import cn.aulang.oauth.common.LoginPage;
 import cn.aulang.oauth.entity.AuthRequest;
 import cn.aulang.oauth.entity.Client;
+import cn.aulang.oauth.exception.PasswordExpiredException;
 import cn.aulang.oauth.manage.AccountBiz;
 import cn.aulang.oauth.manage.AuthRequestBiz;
+import cn.aulang.oauth.manage.ClientBiz;
+import cn.aulang.oauth.manage.ReturnPageBiz;
+import cn.hutool.core.util.RandomUtil;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.CookieValue;
@@ -19,7 +20,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.security.auth.login.AccountLockedException;
-import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
@@ -155,7 +155,7 @@ public class LoginController {
         return returnPageBiz.redirect(request, model);
     }
 
-    @GetMapping({"/logout", "cusLogout"})
+    @GetMapping("/logout")
     public void logout(@RequestParam(name = "redirect_uri", required = false) String redirectUri,
                        @CookieValue(name = Constants.SSO_COOKIE_NAME, required = false) String authorizeId,
                        HttpServletResponse response) throws IOException {
